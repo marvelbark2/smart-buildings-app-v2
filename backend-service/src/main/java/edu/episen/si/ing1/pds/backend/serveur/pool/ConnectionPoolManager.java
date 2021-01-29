@@ -95,8 +95,8 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
     @Override
     public void shutdown() {
         shutdownPool = true;
-        closeConnections();
         executor.shutdownNow();
+        closeConnections();
     }
 
     private void closeConnections() {
@@ -114,7 +114,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
         private BlockingQueue<Connection> queue;
         private Connection connection;
 
-        public ObjectReturner(BlockingQueue<Connection> queue, Connection connection) {
+        ObjectReturner(BlockingQueue<Connection> queue, Connection connection) {
             this.queue = queue;
             this.connection = connection;
         }

@@ -1,13 +1,12 @@
 package edu.episen.si.ing1.pds.backend.serveur;
 
+import edu.episen.si.ing1.pds.backend.serveur.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.serveur.test.TestPool;
+import edu.episen.si.ing1.pds.backend.serveur.test.TestType;
 import org.apache.commons.cli.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class BackendService {
     private final static Logger logger = LoggerFactory.getLogger(BackendService.class.getName());
@@ -20,6 +19,12 @@ public class BackendService {
         final Option maxConnection = Option.builder().longOpt("maxConnection").hasArg().build();
         options.addOption(maxConnection);
 
+        final Option testType = Option.builder().longOpt("testType").hasArg().build();
+        options.addOption(testType);
+
+        final Option testPoolSize = Option.builder().longOpt("testPoolSize").hasArg().build();
+        options.addOption(testPoolSize);
+
         final CommandLineParser parser = new DefaultParser();
         final CommandLine commandLine = parser.parse(options, args);
 
@@ -31,48 +36,37 @@ public class BackendService {
         if (commandLine.hasOption("maxConnection"))
             iMaxConnection = Integer.parseInt(commandLine.getOptionValue("maxConnection"));
 
-        if (itestMode && iMaxConnection > 0) {
-            TestPool test = new TestPool();
+        TestType iTestType = null;
+        if (commandLine.hasOption("testType"))
+            iTestType = TestType.Instance.getType(Integer.parseInt(commandLine.getOptionValue("testType")));
 
-            List<CompletableFuture<Void>> futures = test.getTest()
-                    .stream()
-                    .map(futur -> futur.thenAccept(System.out::println))
-                    .collect(Collectors.toList());
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                    .thenRun(() -> {
-                        
-                    });
-//            List<Boolean> results = new ArrayList<>();
-//            DataSource ds = new DataSource(iMaxConnection);
-//            Repository contacts = new Contacts(ds);
-//            ExecutorService executor = Executors.newFixedThreadPool(3);
-//            executor.submit(() -> {
-//                System.out.println(ds.getConnection().hashCode());
-//            });
-            //executor.shutdown();
-//            for (int i = 0; i < 35; i++) {
-//                contacts.read(1);
-//                if (true) {
-//                    for (int j = 0; j < 2; j++) {
-//                        logger.info(i + " : " + j);
-//                        contacts.read(1);
-//                    }
-//                } else {
-//                    String[] c1 = {"Christiant2", "Christiant@upec.fr", "0708237209"};
-//                    Boolean result1 = contacts.create(c1);
-//                    results.add(result1);
-//
-//                    String[] c2 = {"Youness", "Youness@upec.fr", "0708237299"};
-//                    Boolean result2 = contacts.update(1, c2);
-//                    results.add(result2);
-//
-//                    Boolean result3 = contacts.delete(2);
-//                    results.add(result3);
-//
-//                    logger.info("Data : {}, {}", contacts.read(1), results);
-//                }
-//            }
-            //ds.shutdownPool();
+        int ItestSize = 20;
+        if (commandLine.hasOption("testPoolSize"))
+            ItestSize = Integer.parseInt(commandLine.getOptionValue("testPoolSize"));
+
+        if (itestMode && iMaxConnection > 0) {
+            DataSource ds = new DataSource(iMaxConnection);
+            TestPool test = new TestPool(ds);
+            try {
+                if (iTestType == null) {
+                    test.handleError();
+                } else if (iTestType.equals(TestType.Create)) {
+                    test.create();
+                } else if (iTestType.equals(TestType.Read)) {
+                    test.read();
+                } else if (iTestType.equals(TestType.Update)) {
+                    test.update();
+                } else if (iTestType.equals(TestType.Delete)) {
+                    test.delete();
+                } else if (iTestType.equals(TestType.Loop)) {
+                    test.testPool(ItestSize);
+                }
+
+            } finally {
+                ds.shutdownPool();
+                System.exit(1);
+            }
+
         } else {
             logger.info("Backend Service is running (testMode = " + itestMode + ") , (maxconnection = " + iMaxConnection + "}.");
         }
