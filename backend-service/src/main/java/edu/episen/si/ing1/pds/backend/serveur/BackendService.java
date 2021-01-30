@@ -5,8 +5,9 @@ import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BackendServices {
-    private final static Logger logger = LoggerFactory.getLogger(BackendServices.class.getName());
+public class BackendService {
+    private final static Logger logger = LoggerFactory.getLogger(BackendService.class.getName());
+
     public static void main(String[] args) throws Exception {
         final Options options = new Options();
         final Option testMode = Option.builder().longOpt("testMode").build();
@@ -26,7 +27,7 @@ public class BackendServices {
         if (commandLine.hasOption("maxConnection"))
             iMaxConnection = Integer.parseInt(commandLine.getOptionValue("maxConnection"));
 
-        logger.info("Backend Service is running (testMode = "+ itestMode +") , (maxconnection = " +iMaxConnection+".");
+        logger.info("Backend Service is running (testMode = " + itestMode + ") , (maxconnection = " + iMaxConnection + "}.");
 
     }
 }
