@@ -40,7 +40,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>edu.episen.si.ing1.pds.backend.serveur.BackendServices</mainClass>
+                            <mainClass>edu.episen.si.ing1.pds.backend.serveur.BackendService</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
