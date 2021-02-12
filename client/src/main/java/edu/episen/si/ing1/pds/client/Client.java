@@ -23,7 +23,7 @@ public class Client {
         if (commandLine.hasOption("testMode"))
             itestMode = true;
 
-        RoleType roleType = null;
+        RoleType roleType = RoleType.Instance.findRole(5);
         if (commandLine.hasOption("userRole")){
             int id = Integer.parseInt(commandLine.getOptionValue("userRole"));
             roleType = RoleType.Instance.findRole(id);

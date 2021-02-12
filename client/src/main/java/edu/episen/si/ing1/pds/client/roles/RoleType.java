@@ -4,7 +4,12 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum RoleType {
-    Instance(0),ADMIN(1),EMPLOYEE(2),COMPANY(3),SG(4);
+    Instance(0),
+    ADMIN(1),
+    EMPLOYEE(2),
+    COMPANY(3),
+    SG(4),
+    GUEST(5);
     private int degree;
 
     private RoleType(int degree){
