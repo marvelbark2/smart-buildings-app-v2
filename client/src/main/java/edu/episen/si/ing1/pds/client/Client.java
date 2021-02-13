@@ -27,7 +27,6 @@ public class Client {
         if (commandLine.hasOption("userRole")){
             int id = Integer.parseInt(commandLine.getOptionValue("userRole"));
             roleType = RoleType.Instance.findRole(id);
-            System.out.println(roleType);
         }
 
 
