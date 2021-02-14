@@ -24,7 +24,8 @@ public enum RoleType {
                 ? Arrays.stream(RoleType.values())
                         .filter(role -> role.getDegree() == id)
                         .findFirst()
-                        .get()
+                        .orElse(GUEST)
+
                 : null;
     }
 }
