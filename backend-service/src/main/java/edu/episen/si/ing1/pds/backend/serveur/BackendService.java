@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.backend.serveur;
 
+import edu.episen.si.ing1.pds.backend.serveur.persistence.Contacts;
 import org.apache.commons.cli.*;
 
 import org.slf4j.Logger;
@@ -27,7 +28,14 @@ public class BackendService {
         if (commandLine.hasOption("maxConnection"))
             iMaxConnection = Integer.parseInt(commandLine.getOptionValue("maxConnection"));
 
-        logger.info("Backend Service is running (testMode = " + itestMode + ") , (maxconnection = " + iMaxConnection + "}.");
+        if(itestMode) {
+            if(iMaxConnection > 0) {
+                Contacts contacts = new Contacts(iMaxConnection);
+                logger.info("Data : {}", contacts.read());
+            }
+        } else {
+            logger.info("Backend Service is running (testMode = " + itestMode + ") , (maxconnection = " + iMaxConnection + "}.");
+        }
 
     }
 }
