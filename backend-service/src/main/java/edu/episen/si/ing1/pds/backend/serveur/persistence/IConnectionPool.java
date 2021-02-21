@@ -45,27 +45,22 @@ public class IConnectionPool implements ConnectionPool {
             usedConnection.add(connection);
         } else {
             connection = usedConnection.get(0);
-            mountedConnetion.remove(connection);
+            mountedConnetion.remove(connection); // Handling this line ? 
         }
 
         return connection;
     }
 
-
-    public Boolean close(Connection c) throws SQLException {
-        checkout(c);
-        c.close();
-        return c.isClosed();
-    }
-
     @Override
-    public Boolean checkout(Connection c) {
-        Boolean status = true;
+    public Boolean checkout(Connection c) {  // 
+    	Boolean status;
         if(usedConnection.contains(c)) {
             usedConnection.remove(c);
+            mountedConnetion.add(c);
+            status = true;
         }
-        if(mountedConnetion.contains(c)){
-            mountedConnetion.remove(c);
+        else {
+        	status = false;
         }
         return status;
     }
