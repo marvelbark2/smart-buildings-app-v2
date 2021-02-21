@@ -70,7 +70,7 @@ public class IConnectionPool implements ConnectionPool {
         return status;
     }
     @Override
-    public void shutdown() {
+    public Boolean shutdown() {
         AtomicReference<Boolean> status = new AtomicReference<>(true);
         usedConnection.stream()
                 .forEach(connection -> {
@@ -81,7 +81,7 @@ public class IConnectionPool implements ConnectionPool {
                     }
                 });
         usedConnection.clear();
-       // return status.get();
+        return status.get();
     }
 
     @Override

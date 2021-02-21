@@ -7,6 +7,6 @@ import java.util.Properties;
 public interface ConnectionPool {
     public Connection getConnection() throws SQLException;
     public Boolean close(Connection c) throws SQLException;
-    public void shutdown();
+    public Boolean shutdown();
     public Properties getProperties();
 }
