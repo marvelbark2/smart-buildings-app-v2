@@ -1,6 +1,5 @@
 package edu.episen.si.ing1.pds.backend.serveur.persistence;
 
-import java.io.InputStream;
 import java.sql.*;
 import java.util.Properties;
 
