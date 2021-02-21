@@ -6,6 +6,9 @@ import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BackendService {
     private final static Logger logger = LoggerFactory.getLogger(BackendService.class.getName());
 
@@ -28,11 +31,22 @@ public class BackendService {
         if (commandLine.hasOption("maxConnection"))
             iMaxConnection = Integer.parseInt(commandLine.getOptionValue("maxConnection"));
 
-        if(itestMode) {
-            if(iMaxConnection > 0) {
-                Contacts contacts = new Contacts(iMaxConnection);
-                logger.info("Data : {}", contacts.read());
-            }
+        if(itestMode && iMaxConnection > 0) {
+            List<Boolean> results = new ArrayList<>();
+            Contacts contacts = new Contacts(iMaxConnection);
+
+            String[] c1 = {"Ludo", "ludo@upec.fr", "0778237299"};
+            Boolean result1 = contacts.create(c1);
+            results.add(result1);
+
+            String[] c2 = {"Younes", "Youness@upec.fr", "0708237299"};
+            Boolean result2 = contacts.update(1,c2);
+            results.add(result2);
+
+            Boolean result3 = contacts.delete(2);
+            results.add(result3);
+
+            logger.info("Data : {}, {}", contacts.read(1), results);
         } else {
             logger.info("Backend Service is running (testMode = " + itestMode + ") , (maxconnection = " + iMaxConnection + "}.");
         }

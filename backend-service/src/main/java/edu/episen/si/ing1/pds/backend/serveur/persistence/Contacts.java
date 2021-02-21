@@ -1,37 +1,66 @@
 package edu.episen.si.ing1.pds.backend.serveur.persistence;
 
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Properties;
 
 public class Contacts {
     private Connection connection;
-    Properties properties;
-    public Contacts(int n) throws Exception {
-        PoolConnectionImpl pool = new PoolConnectionImpl(n);
-        properties = new Properties();
-        InputStream inStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("application.dev.properties");
-        properties.load(inStream);
-        Class.forName(properties.getProperty("DB.ClassDriver"));
-        String url = properties.getProperty("DB.HOST");
-        String user = properties.getProperty("DB.USER");
-        String password = properties.getProperty("DB.PASS");
-        PoolConnectionImpl poolConnection = pool.create(url, user, password);
+    private Properties properties;
 
-        TConnection tConnection = new TConnection(poolConnection);
-        tConnection.start();
-        this.connection = poolConnection.getConnection();
+    public Contacts(int n) throws Exception {
+        ConnectionSingleton csg = ConnectionSingleton.getInstance(n);
+        connection = csg.getConnection();
+        properties = csg.getProperties();
     }
 
-    public String read() throws Exception {
-        Statement statement = connection.createStatement();
-        String query = properties.getProperty("SQL.READ");
-        ResultSet rs = statement.executeQuery(query);
-        while (rs.next()) {
-            return rs.getString(1);
+    public String read(int id) throws Exception {
+        String result = "";
+        PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.READ"));
+        preparedStatement.setInt(1, id);
+        ResultSet rs = preparedStatement.executeQuery();
+        while (rs.next()){
+            result = rs.getString(1);
         }
-        return "";
+        return result;
+    }
+
+    public boolean update(int id, String[] values) {
+        boolean result = false;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.UPDATE"));
+            for (int i = 0; i < values.length; i++) {
+                preparedStatement.setString(i+1, values[0]);
+            }
+            preparedStatement.setInt(values.length + 1, id);
+            result = preparedStatement.executeUpdate() > 0 ? true : false;
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return result;
+    }
+
+    public boolean create(String[] values) {
+        boolean result = false;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.CREATE"));
+            for (int i = 0; i < values.length; i++) {
+                preparedStatement.setString(i+1, values[i]);
+            }
+            result = preparedStatement.executeUpdate() > 0 ? true : false;
+        } catch (Exception e) {e.printStackTrace();}
+
+        return result;
+    }
+
+    public boolean delete(int id) {
+        boolean result = false;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.DELETE"));
+            preparedStatement.setInt(1, id);
+            result = preparedStatement.executeUpdate() > 0 ? true : false;
+        } catch (Exception e) {e.printStackTrace();}
+        return result;
     }
 }
