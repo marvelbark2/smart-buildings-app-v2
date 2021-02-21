@@ -4,13 +4,14 @@ import java.sql.*;
 import java.util.Properties;
 
 public class Contacts {
+    private ConnectionPool pool;
     private Connection connection;
     private Properties properties;
 
     public Contacts(int n) throws Exception {
-        ConnectionSingleton csg = ConnectionSingleton.getInstance(n);
-        connection = csg.getConnection();
-        properties = csg.getProperties();
+        pool = new IConnectionPool(n);
+        connection = pool.getConnection();
+        properties = pool.getProperties();
     }
 
     public String read(int id) throws Exception {
@@ -61,5 +62,9 @@ public class Contacts {
             result = preparedStatement.executeUpdate() > 0 ? true : false;
         } catch (Exception e) {e.printStackTrace();}
         return result;
+    }
+
+    public boolean closeConnection() throws Exception {
+        return pool.checkout(connection);
     }
 }

@@ -35,7 +35,7 @@ public class BackendService {
             List<Boolean> results = new ArrayList<>();
             Contacts contacts = new Contacts(iMaxConnection);
 
-            String[] c1 = {"Ludo", "ludo@upec.fr", "0778237299"};
+            String[] c1 = {"Christiant", "Christiant@upec.fr", "0708237209"};
             Boolean result1 = contacts.create(c1);
             results.add(result1);
 
@@ -45,6 +45,8 @@ public class BackendService {
 
             Boolean result3 = contacts.delete(2);
             results.add(result3);
+
+            contacts.closeConnection();
 
             logger.info("Data : {}, {}", contacts.read(1), results);
         } else {

@@ -51,14 +51,15 @@ public class IConnectionPool implements ConnectionPool {
         return connection;
     }
 
-    @Override
+
     public Boolean close(Connection c) throws SQLException {
         checkout(c);
         c.close();
         return c.isClosed();
     }
 
-    public boolean checkout(Connection c) {
+    @Override
+    public Boolean checkout(Connection c) {
         Boolean status = true;
         if(usedConnection.contains(c)) {
             usedConnection.remove(c);
