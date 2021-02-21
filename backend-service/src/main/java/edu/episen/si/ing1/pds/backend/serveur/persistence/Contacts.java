@@ -30,7 +30,7 @@ public class Contacts {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.UPDATE"));
             for (int i = 0; i < values.length; i++) {
-                preparedStatement.setString(i+1, values[0]);
+                preparedStatement.setString(i+1, values[i]);
             }
             preparedStatement.setInt(values.length + 1, id);
             result = preparedStatement.executeUpdate() > 0 ? true : false;

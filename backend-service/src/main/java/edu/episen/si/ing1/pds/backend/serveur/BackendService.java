@@ -35,11 +35,11 @@ public class BackendService {
             List<Boolean> results = new ArrayList<>();
             Contacts contacts = new Contacts(iMaxConnection);
 
-            String[] c1 = {"Christiant", "Christiant@upec.fr", "0708237209"};
+            String[] c1 = {"Christiant2", "Christiant@upec.fr", "0708237209"};
             Boolean result1 = contacts.create(c1);
             results.add(result1);
 
-            String[] c2 = {"Younes", "Youness@upec.fr", "0708237299"};
+            String[] c2 = {"Youness", "Youness@upec.fr", "0708237299"};
             Boolean result2 = contacts.update(1,c2);
             results.add(result2);
 
