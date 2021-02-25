@@ -2,6 +2,7 @@ package edu.episen.si.ing1.pds.backend.serveur;
 
 import edu.episen.si.ing1.pds.backend.serveur.db.DataSource;
 import edu.episen.si.ing1.pds.backend.serveur.persistence.Contacts;
+import edu.episen.si.ing1.pds.backend.serveur.persistence.Repository;
 import org.apache.commons.cli.*;
 
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class BackendService {
         if (itestMode && iMaxConnection > 0) {
             List<Boolean> results = new ArrayList<>();
             DataSource ds = new DataSource(iMaxConnection);
-            Contacts contacts = new Contacts(ds);
+            Repository contacts = new Contacts(ds);
 
             for (int i = 0; i < 35; i++) {
                 contacts.read(1);
