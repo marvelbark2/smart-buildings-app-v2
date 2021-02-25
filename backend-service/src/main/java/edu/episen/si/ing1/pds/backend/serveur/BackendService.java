@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.backend.serveur;
 
+import edu.episen.si.ing1.pds.backend.serveur.db.DataSource;
 import edu.episen.si.ing1.pds.backend.serveur.persistence.Contacts;
 import org.apache.commons.cli.*;
 
@@ -31,24 +32,35 @@ public class BackendService {
         if (commandLine.hasOption("maxConnection"))
             iMaxConnection = Integer.parseInt(commandLine.getOptionValue("maxConnection"));
 
-        if(itestMode && iMaxConnection > 0) {
+        if (itestMode && iMaxConnection > 0) {
             List<Boolean> results = new ArrayList<>();
-            Contacts contacts = new Contacts(iMaxConnection);
+            DataSource ds = new DataSource(iMaxConnection);
+            Contacts contacts = new Contacts(ds);
 
-            String[] c1 = {"Christiant2", "Christiant@upec.fr", "0708237209"};
-            Boolean result1 = contacts.create(c1);
-            results.add(result1);
+            for (int i = 0; i < 35; i++) {
+                contacts.read(1);
+                if (true) {
+                    for (int j = 0; j < 2; j++) {
+                        logger.info(i + " : " + j);
+                        contacts.read(1);
+                    }
+                } else {
+                    String[] c1 = {"Christiant2", "Christiant@upec.fr", "0708237209"};
+                    Boolean result1 = contacts.create(c1);
+                    results.add(result1);
 
-            String[] c2 = {"Youness", "Youness@upec.fr", "0708237299"};
-            Boolean result2 = contacts.update(1,c2);
-            results.add(result2);
+                    String[] c2 = {"Youness", "Youness@upec.fr", "0708237299"};
+                    Boolean result2 = contacts.update(1, c2);
+                    results.add(result2);
 
-            Boolean result3 = contacts.delete(2);
-            results.add(result3);
+                    Boolean result3 = contacts.delete(2);
+                    results.add(result3);
 
-            contacts.closeConnection();
+                    logger.info("Data : {}, {}", contacts.read(1), results);
+                }
+            }
 
-            logger.info("Data : {}, {}", contacts.read(1), results);
+            ds.shutdownPool();
         } else {
             logger.info("Backend Service is running (testMode = " + itestMode + ") , (maxconnection = " + iMaxConnection + "}.");
         }
