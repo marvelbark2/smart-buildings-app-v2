@@ -1,11 +1,11 @@
-package edu.episen.si.ing1.pds.backend.serveur.db;
+package edu.episen.si.ing1.pds.backend.serveur.pool;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.*;
 
-public class ConnectionPoolManager extends AbstractPool implements BlockingPool{
+public class ConnectionPoolManager extends AbstractPool implements BlockingPool {
 
     private int nPool;
     private BlockingQueue<Connection> mountedConnection;
@@ -42,12 +42,12 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool{
 
     @Override
     protected void handleInvalidReturn(Connection con) {
-        throw new IllegalStateException("Error! Cannot put this Connection: " + con.toString()+ " to the pool");
+        throw new IllegalStateException("Error! Cannot put this Connection: " + con.toString() + " to the pool");
     }
 
     @Override
     protected void returnToPool(Connection connection) {
-        if(isValid(connection))
+        if (isValid(connection))
             executor.submit(new ObjectReturner(mountedConnection, connection));
     }
 
@@ -64,7 +64,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool{
 
     @Override
     public Connection getConnection(long time, TimeUnit unit) throws InterruptedException {
-        if(!shutdownPool) {
+        if (!shutdownPool) {
             Connection connection = null;
             try {
                 connection = mountedConnection.poll(time, unit);
@@ -79,7 +79,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool{
 
     @Override
     public Connection getConnection() {
-        if(!shutdownPool) {
+        if (!shutdownPool) {
             Connection connection = null;
             try {
                 connection = mountedConnection.take();
@@ -99,19 +99,19 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool{
         executor.shutdownNow();
     }
 
-    private void closeConnections(){
+    private void closeConnections() {
         mountedConnection.stream()
-                        .forEach(connection -> {
-                            try {
-                                connection.close();
-                            } catch (SQLException throwables) {
-                                throwables.printStackTrace();
-                            }
-                        });
+                .forEach(connection -> {
+                    try {
+                        connection.close();
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
+                });
     }
 
     private class ObjectReturner implements Runnable {
-        private BlockingQueue <Connection> queue;
+        private BlockingQueue<Connection> queue;
         private Connection connection;
 
         public ObjectReturner(BlockingQueue<Connection> queue, Connection connection) {
@@ -123,7 +123,8 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool{
         public void run() {
             while (true) {
                 try {
-                    queue.put(connection); break;
+                    queue.put(connection);
+                    break;
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }

@@ -1,12 +1,10 @@
-package edu.episen.si.ing1.pds.backend.serveur.db;
+package edu.episen.si.ing1.pds.backend.serveur.pool;
 
 import java.io.InputStream;
 import java.util.Properties;
 
 public enum PropertiesReader {
     Instance;
-
-
 
     Properties properties;
     String HOST;

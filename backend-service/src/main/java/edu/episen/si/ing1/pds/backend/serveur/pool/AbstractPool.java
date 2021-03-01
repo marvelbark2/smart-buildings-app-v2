@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.backend.serveur.db;
+package edu.episen.si.ing1.pds.backend.serveur.pool;
 
 import java.sql.Connection;
 
@@ -6,10 +6,9 @@ public abstract class AbstractPool implements Pool {
 
     @Override
     public void release(Connection connection) {
-        if(isValid(connection)) {
+        if (isValid(connection)) {
             returnToPool(connection);
-        }
-        else {
+        } else {
             handleInvalidReturn(connection);
         }
     }

@@ -1,21 +1,22 @@
 package edu.episen.si.ing1.pds.backend.serveur.persistence;
 
-import edu.episen.si.ing1.pds.backend.serveur.db.DataSource;
+import edu.episen.si.ing1.pds.backend.serveur.pool.DataSource;
 
 import java.sql.*;
 import java.util.Properties;
 
 public class Contacts implements Repository {
-    private DataSource pool;
+    private DataSource dataSource;
     private Properties properties;
 
-    public Contacts(DataSource pool) throws Exception {
-        this.pool = pool;
-        properties = pool.getProperties();
+    public Contacts(DataSource dataSource) throws Exception {
+        this.dataSource = dataSource;
+        properties = dataSource.getProperties();
     }
 
     public String read(int id) {
-        Connection connection = pool.getConnection();
+        Connection connection = dataSource.getConnection();
+        System.out.println(connection.hashCode());
         String result = "";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.READ"));
@@ -24,18 +25,17 @@ public class Contacts implements Repository {
             while (rs.next()) {
                 result = rs.getString(1);
             }
-            pool.release(connection);
         } catch (Exception e) {
             Thread.currentThread().interrupt();
         } finally {
-            pool.release(connection);
+            dataSource.release(connection);
         }
         return result;
     }
 
     public boolean update(int id, String[] values) {
         boolean result = false;
-        Connection connection = pool.getConnection();
+        Connection connection = dataSource.getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.UPDATE"));
             for (int i = 0; i < values.length; i++) {
@@ -47,14 +47,14 @@ public class Contacts implements Repository {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            pool.release(connection);
+            dataSource.release(connection);
         }
         return result;
     }
 
     public boolean create(String[] values) {
         boolean result = false;
-        Connection connection = pool.getConnection();
+        Connection connection = dataSource.getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.CREATE"));
             for (int i = 0; i < values.length; i++) {
@@ -64,7 +64,7 @@ public class Contacts implements Repository {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            pool.release(connection);
+            dataSource.release(connection);
         }
 
         return result;
@@ -72,7 +72,7 @@ public class Contacts implements Repository {
 
     public boolean delete(int id) {
         boolean result = false;
-        Connection connection = pool.getConnection();
+        Connection connection = dataSource.getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.DELETE"));
             preparedStatement.setInt(1, id);
@@ -80,7 +80,7 @@ public class Contacts implements Repository {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            pool.release(connection);
+            dataSource.release(connection);
         }
         return result;
     }
