@@ -21,10 +21,11 @@ public enum TestType {
     }
 
     public TestType getType(int value) {
-        return (value > 0) ? Arrays.stream(TestType.values())
-                .filter(testType -> testType.getType() == value)
-                .findFirst()
-                .orElse(null)
-                : null;
+        	return (value > 0) 
+        			? Arrays.stream(TestType.values())
+        					.filter(testType -> testType.getType() == value)
+        					.findFirst()
+        					.orElse(null)
+                   : null;
     }
 }

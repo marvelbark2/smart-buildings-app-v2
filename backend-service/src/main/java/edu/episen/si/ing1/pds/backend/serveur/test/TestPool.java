@@ -17,7 +17,7 @@ public class TestPool {
     private final Logger logger = LoggerFactory.getLogger(TestPool.class.getName());
     private final static Scanner scanner = new Scanner(System.in);
 
-    private final DataSource ds;
+    private final DataSource ds; 
     private final Repository contacts;
 
     public TestPool(DataSource ds) {
@@ -139,6 +139,29 @@ public class TestPool {
         System.out.println("3 - Update operation");
         System.out.println("4 - Delete operation");
         System.out.println("5 - Loop operation");
+    }
+    
+    public void testModeTest() {
+    	logger.info("testMode is running! ");
+    	logger.info("Creation of a contact ");
+    	contacts.create(new String[]{"ludovic","ludo@gmail.com","0101012345"});
+    	logger.info("Contact has been created ");
+    	logger.info("Let's read data ");
+    	List<Map> listContact = contacts.readAll();
+    	logger.info(String.valueOf(listContact));
+    	logger.info("Data has been read ");
+    	logger.info("Let's update ");
+    	contacts.update(9,new String[] { "paul","paul@gmail.com","0102030405"});
+    	logger.info("Data has been updated ");
+    	logger.info("Let's delete the contact ");
+      	boolean resultDelete = contacts.delete((int) listContact.get(contacts.readAll().size()-1).get("id"));
+      	if (resultDelete)
+      		logger.info("The contact has been destroyed ");
+      	else
+      		logger.warn("No contact has been destroyed");
+      	logger.info("Loop method has been called");
+      	testPool(15);
+    	
     }
 
 }

@@ -16,7 +16,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
         this.nPool = nPool;
         mountedConnection = new LinkedBlockingQueue<>(nPool);
         init();
-        shutdownPool = false;
+        shutdownPool = false; 
     }
 
     private void init() {

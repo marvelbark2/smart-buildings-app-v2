@@ -6,7 +6,7 @@ import java.util.Properties;
 public class DataSource {
     private Pool pool;
 
-    public DataSource(int n) { pool = PoolFactory.Instance.newPool(n); }
+    public DataSource(int n) { pool = PoolFactory.Instance.newPool(n); } 
 
     public Connection getConnection() {
         return pool.getConnection();

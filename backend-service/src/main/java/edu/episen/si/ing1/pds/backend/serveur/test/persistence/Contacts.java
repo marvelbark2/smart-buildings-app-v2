@@ -26,7 +26,7 @@ public class Contacts implements Repository {
                 result = rs.getString(1);
             }
         } catch (Exception e) {
-            Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt();  
         } finally {
             dataSource.release(connection);
         }
