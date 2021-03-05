@@ -26,7 +26,7 @@ public class Contacts implements Repository {
                 result = rs.getString(1);
             }
         } catch (Exception e) {
-            Thread.currentThread().interrupt();  
+            Thread.currentThread().interrupt();
         } finally {
             dataSource.release(connection);
         }
@@ -95,8 +95,8 @@ public class Contacts implements Repository {
             int cols = resultSet.getMetaData().getColumnCount();
             while (resultSet.next()) {
                 Map<String, Object> row = new HashMap<>();
-                for(int i=1; i<=cols; ++i){
-                    row.put(resultSet.getMetaData().getColumnName(i),resultSet.getObject(i));
+                for (int i = 1; i <= cols; ++i) {
+                    row.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
                 }
                 result.add(row);
             }

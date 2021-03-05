@@ -11,6 +11,7 @@ public enum PropertiesReader {
     String USER;
     String PASS;
     String DRIVER;
+
     PropertiesReader() {
         properties = new Properties();
         InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("application.dev.properties");
@@ -20,8 +21,11 @@ public enum PropertiesReader {
             USER = properties.getProperty("DB.USER");
             PASS = properties.getProperty("DB.PASS");
             DRIVER = properties.getProperty("DB.ClassDriver");
-        } catch (Exception e) {e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
     public Properties getProperties() {
         return properties;
     }
