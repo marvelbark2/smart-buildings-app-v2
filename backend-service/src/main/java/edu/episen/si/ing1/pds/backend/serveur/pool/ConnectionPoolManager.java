@@ -63,7 +63,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
     }
 
     @Override
-    public Connection getConnection(long time, TimeUnit unit) throws InterruptedException {
+    public Connection getConnection(long time, TimeUnit unit) {
         if (!shutdownPool) {
             Connection connection = null;
             try {
@@ -75,6 +75,11 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
         } else {
             throw new IllegalStateException("Pool is shutdown");
         }
+    }
+
+    @Override
+    public int poolSize() {
+        return mountedConnection.size();
     }
 
     @Override

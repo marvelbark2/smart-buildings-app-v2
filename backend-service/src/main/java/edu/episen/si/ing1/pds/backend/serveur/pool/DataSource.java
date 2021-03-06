@@ -2,16 +2,20 @@ package edu.episen.si.ing1.pds.backend.serveur.pool;
 
 import java.sql.Connection;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public class DataSource {
-    private Pool pool;
+    private BlockingPool pool;
+    private long time;
 
-    public DataSource(int n) {
+    public DataSource(int n, long time) {
+
         pool = PoolFactory.Instance.newPool(n);
+        this.time = time;
     }
 
     public Connection getConnection() {
-        return pool.getConnection();
+        return pool.getConnection(time, TimeUnit.MILLISECONDS);
     }
 
     public void shutdownPool() {
@@ -20,6 +24,10 @@ public class DataSource {
 
     public void release(Connection connection) {
         pool.release(connection);
+    }
+
+    public int poolSize() {
+        return pool.poolSize();
     }
 
     public Properties getProperties() {

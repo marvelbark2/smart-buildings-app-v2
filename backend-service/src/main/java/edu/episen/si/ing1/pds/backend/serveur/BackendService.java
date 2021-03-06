@@ -45,7 +45,7 @@ public class BackendService {
             ItestSize = Integer.parseInt(commandLine.getOptionValue("testPoolSize"));
 
         if (iMaxConnection > 0) {
-            DataSource ds = new DataSource(iMaxConnection);
+            DataSource ds = new DataSource(iMaxConnection, 1_000);
             TestPool test = new TestPool(ds);
             try {
                 if (!itestMode) {

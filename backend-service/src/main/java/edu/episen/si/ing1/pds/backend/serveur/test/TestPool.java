@@ -44,6 +44,7 @@ public class TestPool {
                 getTest(nLoop)
                         .stream()
                         .map(future -> future.thenAccept(connection -> {
+                            if(ds.poolSize() == 0) logger.warn("pool is empty");
                             if(!data.containsKey(connection.hashCode())) {
                                 data.put(connection.hashCode(), colors.iterator().next());
                                 result.add(colors.iterator().next());

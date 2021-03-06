@@ -6,7 +6,7 @@ public enum PoolFactory {
     PoolFactory() {
     }
 
-    Pool newPool(int n) {
+    BlockingPool newPool(int n) {
         return new ConnectionPoolManager(n);
     }
 
