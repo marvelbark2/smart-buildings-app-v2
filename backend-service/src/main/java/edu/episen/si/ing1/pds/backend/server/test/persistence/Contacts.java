@@ -16,7 +16,6 @@ public class Contacts implements Repository {
 
     public String read(int id) {
         Connection connection = dataSource.getConnection();
-        System.out.println(connection.hashCode());
         String result = "";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.READ"));
@@ -100,6 +99,7 @@ public class Contacts implements Repository {
                 }
                 result.add(row);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

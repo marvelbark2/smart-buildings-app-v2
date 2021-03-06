@@ -60,6 +60,12 @@ public class PoolOverloadTestCli {
                 .build();
         options.addOption(crudOperation);
 
+        final Option retention = Option.builder()
+                .longOpt("with-retention")
+                .desc("If exist, return all connection to pool")
+                .build();
+        options.addOption(retention);
+
         final CommandLineParser parser = new DefaultParser();
         final CommandLine commandLine;
         DataSource ds = null;
@@ -71,6 +77,7 @@ public class PoolOverloadTestCli {
             int additionalDelay = Integer.valueOf(commandLine.getOptionValue(fard.getLongOpt()));
             String[] operations = commandLine.getOptionValues(crudOperation.getLongOpt());
             ds = new DataSource(nInitPool, delayTime);
+            ds.returnable(commandLine.hasOption(retention.getLongOpt()));
             TestPoolOverLoad testPool = new TestPoolOverLoad(ds);
             for (int i = 0; i < testCount; i++) {
                 if(ds.poolSize() == 0)

@@ -11,6 +11,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
     private BlockingQueue<Connection> mountedConnection;
     private ExecutorService executor = Executors.newCachedThreadPool();
     private volatile boolean shutdownPool;
+    private boolean isReturned = true;
 
     public ConnectionPoolManager(int nPool) {
         this.nPool = nPool;
@@ -42,7 +43,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
 
     @Override
     protected void handleInvalidReturn(Connection con) {
-        throw new IllegalStateException("Error! Cannot put this Connection: " + con.toString() + " to the pool");
+        throw new IllegalStateException("Error! Cannot put this Connection: " + con + " to the pool");
     }
 
     @Override
@@ -55,7 +56,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
     protected boolean isValid(Connection connection) {
         boolean status = false;
         try {
-            status = (!(connection.equals(null) || connection.isClosed()));
+            status = (!(connection == null || connection.isClosed()));
         } catch (SQLException throwables) {
             Thread.currentThread().interrupt();
         }
@@ -68,6 +69,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
             Connection connection = null;
             try {
                 connection = mountedConnection.poll(time, unit);
+                if (!isValid(connection)) connection = connectionFactory();
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
             }
@@ -88,6 +90,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
             Connection connection = null;
             try {
                 connection = mountedConnection.take();
+                if (!isValid(connection)) connection = connectionFactory();
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
             }
@@ -95,6 +98,11 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
         } else {
             throw new IllegalStateException("Pool is shutdown");
         }
+    }
+
+    @Override
+    public void isReturnedTo(Boolean v) {
+        this.isReturned = v;
     }
 
     @Override
@@ -128,7 +136,9 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
         public void run() {
             while (true) {
                 try {
-                    queue.put(connection);
+                    if(isReturned) {
+                        queue.put(connection);
+                    }
                     break;
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();

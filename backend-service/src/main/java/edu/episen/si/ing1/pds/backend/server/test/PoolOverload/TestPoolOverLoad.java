@@ -42,7 +42,7 @@ public class TestPoolOverLoad {
 
     public void read() {
         logger.info("Read method was called! ");
-        logger.info(String.valueOf(contacts.readAll()));
+        logger.info(String.valueOf(contacts.readAll().size() > 0 ? contacts.readAll():"Empty"));
         logger.info("Read method done! ");
     }
 

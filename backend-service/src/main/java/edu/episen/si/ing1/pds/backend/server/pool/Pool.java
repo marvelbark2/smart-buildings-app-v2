@@ -9,6 +9,8 @@ public interface Pool {
     // Return pbject to the pool
     void release(Connection connection);
 
+    void isReturnedTo(Boolean v);
+
     // Close all connections on the pool
     void shutdown();
 }
