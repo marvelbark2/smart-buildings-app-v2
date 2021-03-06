@@ -1,6 +1,6 @@
-package edu.episen.si.ing1.pds.backend.serveur.test.persistence;
+package edu.episen.si.ing1.pds.backend.server.test.persistence;
 
-import edu.episen.si.ing1.pds.backend.serveur.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 
 import java.sql.*;
 import java.util.*;

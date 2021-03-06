@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.backend.serveur.pool;
+package edu.episen.si.ing1.pds.backend.server.pool;
 
 import java.sql.Connection;
 import java.util.Properties;

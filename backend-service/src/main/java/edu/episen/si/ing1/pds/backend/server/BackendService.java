@@ -1,8 +1,8 @@
-package edu.episen.si.ing1.pds.backend.serveur;
+package edu.episen.si.ing1.pds.backend.server;
 
-import edu.episen.si.ing1.pds.backend.serveur.pool.DataSource;
-import edu.episen.si.ing1.pds.backend.serveur.test.TestPool;
-import edu.episen.si.ing1.pds.backend.serveur.test.TestType;
+import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.test.TestPool;
+import edu.episen.si.ing1.pds.backend.server.test.TestType;
 import org.apache.commons.cli.*;
 
 import org.slf4j.Logger;

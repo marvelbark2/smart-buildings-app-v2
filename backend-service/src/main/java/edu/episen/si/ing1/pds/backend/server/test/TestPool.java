@@ -1,8 +1,8 @@
-package edu.episen.si.ing1.pds.backend.serveur.test;
+package edu.episen.si.ing1.pds.backend.server.test;
 
-import edu.episen.si.ing1.pds.backend.serveur.pool.DataSource;
-import edu.episen.si.ing1.pds.backend.serveur.test.persistence.Contacts;
-import edu.episen.si.ing1.pds.backend.serveur.test.persistence.Repository;
+import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.test.persistence.Contacts;
+import edu.episen.si.ing1.pds.backend.server.test.persistence.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

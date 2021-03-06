@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.backend.serveur.test;
+package edu.episen.si.ing1.pds.backend.server.test;
 
 import java.util.Arrays;
 
