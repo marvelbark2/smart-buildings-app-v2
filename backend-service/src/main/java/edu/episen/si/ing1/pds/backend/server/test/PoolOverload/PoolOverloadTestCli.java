@@ -19,6 +19,7 @@ public class PoolOverloadTestCli {
                 .desc("Number to init pool")
                 .type(Integer.class)
                 .hasArg()
+                .argName("number value")
                 .build();
         options.addOption(initialLoad);
 
@@ -28,6 +29,7 @@ public class PoolOverloadTestCli {
                 .desc("Number to test pool (Overload pool)")
                 .type(Integer.class)
                 .hasArg()
+                .argName("number value")
                 .build();
         options.addOption(upTo);
 
@@ -36,6 +38,7 @@ public class PoolOverloadTestCli {
                 .required()
                 .desc("How long to get connection")
                 .type(Integer.class)
+                .argName("number value en msec")
                 .hasArg()
                 .build();
         options.addOption(getConnectionIv);
@@ -46,20 +49,20 @@ public class PoolOverloadTestCli {
                 .desc("How long to wait after any operation")
                 .type(Number.class)
                 .hasArg()
+                .argName("number value en msec")
                 .build();
         options.addOption(fard);
 
         final Option crudOperation = Option.builder()
                 .longOpt("use-crud-operation")
                 .required()
-                .desc("Crud operation list")
+                .desc("Crud operation list args operation separated by |")
                 .numberOfArgs(Option.UNLIMITED_VALUES)
-                .argName("CRUD")
+                .argName("operation list")
                 .valueSeparator('|')
                 .hasArgs()
                 .build();
         options.addOption(crudOperation);
-
         final Option retention = Option.builder()
                 .longOpt("with-retention")
                 .desc("If exist, return all connection to pool")
@@ -99,7 +102,8 @@ public class PoolOverloadTestCli {
             HelpFormatter helpFormatter = new HelpFormatter();
             helpFormatter.printHelp(PoolOverloadTestCli.class.getName(), options);
         } finally {
-            ds.shutdownPool();
+            if(ds != null)
+                ds.shutdownPool();
         }
 
     }

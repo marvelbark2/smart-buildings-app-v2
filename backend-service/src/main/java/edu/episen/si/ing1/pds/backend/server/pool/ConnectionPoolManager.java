@@ -1,5 +1,7 @@
 package edu.episen.si.ing1.pds.backend.server.pool;
 
+import edu.episen.si.ing1.pds.backend.server.pool.config.DBConfig;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -29,10 +31,10 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
 
     private Connection connectionFactory() {
         Connection connection = null;
-        PropertiesReader props = PropertiesReader.Instance;
-        String url = props.HOST;
-        String user = props.USER;
-        String pass = props.PASS;
+        DBConfig config = DBConfig.Instance;
+        String url = config.HOST;
+        String user = config.USER;
+        String pass = config.PASS;
         try {
             connection = DriverManager.getConnection(url, user, pass);
         } catch (Exception e) {
@@ -137,7 +139,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
             while (true) {
                 try {
                     if(isReturned) {
-                        queue.put(connection);
+                        mountedConnection.put(connection);
                     }
                     break;
                 } catch (InterruptedException e) {

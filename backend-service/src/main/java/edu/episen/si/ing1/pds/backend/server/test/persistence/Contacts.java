@@ -7,18 +7,18 @@ import java.util.*;
 
 public class Contacts implements Repository {
     private DataSource dataSource;
-    private Properties properties;
+    private SqlConfig sql;
 
     public Contacts(DataSource dataSource) {
         this.dataSource = dataSource;
-        properties = dataSource.getProperties();
+        sql = SqlConfig.Instance;
     }
 
     public String read(int id) {
         Connection connection = dataSource.getConnection();
         String result = "";
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.READ"));
+            PreparedStatement preparedStatement = connection.prepareStatement(sql.READ);
             preparedStatement.setInt(1, id);
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
@@ -36,7 +36,7 @@ public class Contacts implements Repository {
         boolean result = false;
         Connection connection = dataSource.getConnection();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.UPDATE"));
+            PreparedStatement preparedStatement = connection.prepareStatement(sql.UPDATE);
             for (int i = 0; i < values.length; i++) {
                 preparedStatement.setString(i + 1, String.valueOf(values[i]));
             }
@@ -55,7 +55,7 @@ public class Contacts implements Repository {
         boolean result = false;
         Connection connection = dataSource.getConnection();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.CREATE"));
+            PreparedStatement preparedStatement = connection.prepareStatement(sql.CREATE);
             for (int i = 0; i < values.length; i++) {
                 preparedStatement.setString(i + 1, values[i]);
             }
@@ -73,7 +73,7 @@ public class Contacts implements Repository {
         boolean result = false;
         Connection connection = dataSource.getConnection();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(properties.getProperty("SQL.DELETE"));
+            PreparedStatement preparedStatement = connection.prepareStatement(sql.DELETE);
             preparedStatement.setInt(1, id);
             result = preparedStatement.executeUpdate() > 0 ? true : false;
         } catch (Exception e) {
@@ -89,7 +89,7 @@ public class Contacts implements Repository {
         List<Map<String, Object>> result = new ArrayList<>();
         try {
             Statement statement = connection.createStatement();
-            String query = properties.getProperty("SQL.READALL");
+            String query = sql.ALL;
             ResultSet resultSet = statement.executeQuery(query);
             int cols = resultSet.getMetaData().getColumnCount();
             while (resultSet.next()) {

@@ -30,9 +30,5 @@ public class DataSource {
         return pool.poolSize();
     }
 
-    public Properties getProperties() {
-        return PropertiesReader.Instance.getProperties();
-    }
-
     public void returnable(Boolean v) { pool.isReturnedTo(v); }
 }
