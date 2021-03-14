@@ -42,16 +42,7 @@ public class Client {
             Socket socket = new Socket(config.HOST, config.PORT);
             SocketClient client = new SocketClient(socket);
             client.readMessage();
-            Map<String, String> data = new HashMap<>();
-            data.put("id", "23");
-
-            Request request = new Request();
-            request.setEvent("create");
-            request.setData(data);
-
-            ObjectMapper mapper = new ObjectMapper();
-            String requestMessage = mapper.writeValueAsString(request);
-            client.sendMessage(requestMessage);
+            client.create();
         }
 
 
