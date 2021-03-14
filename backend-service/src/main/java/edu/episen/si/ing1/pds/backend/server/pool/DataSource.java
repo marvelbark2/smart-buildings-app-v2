@@ -9,9 +9,12 @@ public class DataSource {
     private long time;
 
     public DataSource(int n, long time) {
-
         pool = PoolFactory.Instance.newPool(n);
         this.time = time;
+    }
+    public DataSource(int n) {
+        pool = PoolFactory.Instance.newPool(n);
+        this.time = 1_000;
     }
 
     public Connection getConnection() {

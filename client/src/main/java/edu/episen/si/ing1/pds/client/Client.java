@@ -1,9 +1,17 @@
 package edu.episen.si.ing1.pds.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.episen.si.ing1.pds.client.network.Request;
+import edu.episen.si.ing1.pds.client.network.SocketClient;
+import edu.episen.si.ing1.pds.client.network.SocketConfig;
 import edu.episen.si.ing1.pds.client.roles.RoleType;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Client {
     private final static Logger logger = LoggerFactory.getLogger(Client.class.getName());
@@ -19,18 +27,35 @@ public class Client {
         final CommandLineParser parser = new DefaultParser();
         final CommandLine commandLine = parser.parse(options, args);
 
-        boolean itestMode = false;
+        boolean iTestMode = false;
         if (commandLine.hasOption("testMode"))
-            itestMode = true;
+            iTestMode = true;
 
         RoleType roleType = RoleType.Instance.findRole(5);
-        if (commandLine.hasOption("userRole")){
+        if (commandLine.hasOption("userRole")) {
             int id = Integer.parseInt(commandLine.getOptionValue("userRole"));
             roleType = RoleType.Instance.findRole(id);
         }
 
+        if(iTestMode) {
+            SocketConfig config = SocketConfig.Instance;
+            Socket socket = new Socket(config.HOST, config.PORT);
+            SocketClient client = new SocketClient(socket);
+            client.readMessage();
+            Map<String, String> data = new HashMap<>();
+            data.put("id", "23");
 
-        logger.info("Client is running (testMode = {}, under a {}", itestMode , roleType);
+            Request request = new Request();
+            request.setEvent("create");
+            request.setData(data);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String requestMessage = mapper.writeValueAsString(request);
+            client.sendMessage(requestMessage);
+        }
+
+
+        logger.info("Client is running (testMode = {}, under a {}", iTestMode, roleType);
 
     }
 }

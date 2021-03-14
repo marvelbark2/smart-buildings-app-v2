@@ -1,0 +1,7 @@
+socket:
+  dev:
+    port: 1337
+    host: 127.0.0.1
+  prod:
+    port: 1337
+    host: 172.31.254.83

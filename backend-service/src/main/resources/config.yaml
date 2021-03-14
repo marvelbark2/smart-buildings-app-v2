@@ -8,9 +8,13 @@ db:
     url: jdbc:postgresql://localhost:5432/db-test
     user: postgres
     pass: Aqwzsxedc-123
+
 sql:
   CREATE: INSERT INTO contacts (name, email, telephone) VALUES (?, ?, ?);
   READ: SELECT name ,email , telephone from contacts where id = ?;
   UPDATE: UPDATE contacts set name = ?,email = ?, telephone = ? where id = ?;
   DELETE: DELETE FROM contacts where id = ?;
   ALL: SELECT id, name, email, telephone from contacts;
+
+socket:
+  port: 1337
