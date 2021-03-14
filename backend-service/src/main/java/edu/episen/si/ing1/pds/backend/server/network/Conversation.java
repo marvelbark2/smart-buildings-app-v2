@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Conversation extends Thread {
+public class Conversation implements Runnable {
     private Socket socket;
     private int clientId;
 

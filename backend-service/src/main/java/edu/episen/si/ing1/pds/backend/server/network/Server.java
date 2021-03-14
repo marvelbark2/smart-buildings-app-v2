@@ -27,8 +27,8 @@ public class Server extends Thread {
                 Socket socket = serverSocket.accept();
                 ++nbConnection;
                 Conversation conversation = new Conversation(socket, nbConnection);
-//                executor.submit(conversation);
-                conversation.start();
+                clients.add(conversation);
+                executor.submit(conversation);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
