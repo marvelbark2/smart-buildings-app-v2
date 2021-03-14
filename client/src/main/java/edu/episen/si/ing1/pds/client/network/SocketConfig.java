@@ -14,7 +14,7 @@ public enum SocketConfig {
 
     SocketConfig() {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        InputStream reader = Thread.currentThread().getContextClassLoader().getResourceAsStream("config.yaml");
+        InputStream reader = Thread.currentThread().getContextClassLoader().getResourceAsStream("Config.yaml");
         try {
             JsonNode jsonNode = mapper.readTree(reader).get("socket").get("dev");
             PORT = jsonNode.get("port").asInt();

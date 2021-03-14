@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Conversation implements Runnable {
+public class Conversation extends Thread {
     private Socket socket;
     private int clientId;
 
@@ -50,36 +50,42 @@ public class Conversation implements Runnable {
             writer.println(successMessage);
 
             //Request Handling
-            String request = reader.readLine();
-            Request requestObj = mapper.readValue(request, Request.class);
-            switch (requestObj.getEvent()) {
-                case "create" :
-                    logger.info("Client {} asking for create", clientId);
-                    Map<String, String> createResponse = responseFactory("created Successfully");
-                    String createMessage = mapper.writeValueAsString(createResponse);
-                    writer.println(createMessage);
-                    break;
+            while(true) {
+                String request = reader.readLine();
+                Request requestObj = mapper.readValue(request, Request.class);
+                String event = requestObj.getEvent();
 
-                case "update" :
-                    logger.info("Client {} asking for create", clientId);
-                    Map<String, String> updateResponse = responseFactory("updated Successfully");
-                    String updateMessage = mapper.writeValueAsString(updateResponse);
-                    writer.println(updateMessage);
-                    break;
+                switch (event) {
+                    case "create":
+                        logger.info("Client {} asking for create", clientId);
+                        Map<String, String> createResponse = responseFactory("created Successfully");
+                        String createMessage = mapper.writeValueAsString(createResponse);
+                        writer.println(createMessage);
+                        break;
 
-                case "delete" :
-                    logger.info("Client {} asking for create", clientId);
-                    Map<String, String> deleteResponse = responseFactory("deleted Successfully");
-                    String deleteMessage = mapper.writeValueAsString(deleteResponse);
-                    writer.println(deleteMessage);
-                    break;
+                    case "update":
+                        logger.info("Client {} asking for create", clientId);
+                        Map<String, String> updateResponse = responseFactory("updated Successfully");
+                        String updateMessage = mapper.writeValueAsString(updateResponse);
+                        writer.println(updateMessage);
+                        break;
 
-                case "read" :
-                    logger.info("Client {} asking for create", clientId);
-                    Map<String, String> readResponse = responseFactory("read Successfully");
-                    String readMessage = mapper.writeValueAsString(readResponse);
-                    writer.println(readMessage);
-                    break;
+                    case "delete" :
+                        logger.info("Client {} asking for create", clientId);
+                        Map<String, String> deleteResponse = responseFactory("deleted Successfully");
+                        String deleteMessage = mapper.writeValueAsString(deleteResponse);
+                        writer.println(deleteMessage);
+                        break;
+
+                    case "read" :
+                        logger.info("Client {} asking for create", clientId);
+                        Map<String, String> readResponse = responseFactory("read Successfully");
+                        String readMessage = mapper.writeValueAsString(readResponse);
+                        writer.println(readMessage);
+                        break;
+
+
+                }
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

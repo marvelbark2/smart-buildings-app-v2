@@ -20,14 +20,15 @@ public class Server extends Thread {
     private ServerSocket serverSocket;
     @Override
     public void run() {
-        logger.info("Server TCP Started");
+        logger.info("Server TCP Started on {}", port);
         try {
             serverSocket = new ServerSocket(port);
             while(true) {
                 Socket socket = serverSocket.accept();
                 ++nbConnection;
                 Conversation conversation = new Conversation(socket, nbConnection);
-                executor.submit(conversation);
+//                executor.submit(conversation);
+                conversation.start();
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
