@@ -64,21 +64,21 @@ public class Conversation extends Thread {
                         break;
 
                     case "update":
-                        logger.info("Client {} asking for create", clientId);
+                        logger.info("Client {} asking for update", clientId);
                         Map<String, String> updateResponse = responseFactory("updated Successfully");
                         String updateMessage = mapper.writeValueAsString(updateResponse);
                         writer.println(updateMessage);
                         break;
 
                     case "delete" :
-                        logger.info("Client {} asking for create", clientId);
+                        logger.info("Client {} asking for delete", clientId);
                         Map<String, String> deleteResponse = responseFactory("deleted Successfully");
                         String deleteMessage = mapper.writeValueAsString(deleteResponse);
                         writer.println(deleteMessage);
                         break;
 
                     case "read" :
-                        logger.info("Client {} asking for create", clientId);
+                        logger.info("Client {} asking for read", clientId);
                         Map<String, String> readResponse = responseFactory("read Successfully");
                         String readMessage = mapper.writeValueAsString(readResponse);
                         writer.println(readMessage);

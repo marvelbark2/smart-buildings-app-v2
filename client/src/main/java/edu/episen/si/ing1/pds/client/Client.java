@@ -38,7 +38,8 @@ public class Client {
         }
 
         if(iTestMode) {
-            Socket socket = new Socket(SocketConfig.Instance.HOST, SocketConfig.Instance.PORT);
+            SocketConfig config = SocketConfig.Instance;
+            Socket socket = new Socket(config.HOST, config.PORT);
             SocketClient client = new SocketClient(socket);
             client.readMessage();
             client.create();
