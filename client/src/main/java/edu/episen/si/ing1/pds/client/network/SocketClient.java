@@ -12,36 +12,42 @@ import java.util.Map;
 
 public class SocketClient {
     private Socket socket;
+    private BufferedReader reader;
+    private PrintWriter writer;
     private final Logger logger = LoggerFactory.getLogger(SocketClient.class.getName());
 
     public SocketClient(Socket socket) {
         this.socket = socket;
-    }
-
-    public void sendMessage(String msg) {
+        InputStream inputStream = null;
         try {
+            inputStream = socket.getInputStream();
             OutputStream outputStream = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(outputStream, true);
-            writer.println(msg);
-            readMessage();
+            writer = new PrintWriter(outputStream, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+        reader = new BufferedReader(inputStreamReader);
 
     }
+
+    public void sendMessage(String msg) {
+        writer.println(msg);
+        readMessage();
+
+    }
+
     public void readMessage() {
         try {
-            InputStream inputStream = socket.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            BufferedReader reader = new BufferedReader(inputStreamReader);
             String request = reader.readLine();
             ObjectMapper mapper = new ObjectMapper();
             Response response = mapper.readValue(request, Response.class);
-            if(response.isSuccess()) {
+            if (response.isSuccess()) {
                 logger.info(response.getMessage());
             } else {
                 logger.error(response.getMessage());
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,6 +70,7 @@ public class SocketClient {
         }
 
     }
+
     public void read() {
         Map<String, String> data = new HashMap<>();
         data.put("id", "23");
@@ -81,6 +88,7 @@ public class SocketClient {
         }
 
     }
+
     public void update() {
         Map<String, String> data = new HashMap<>();
         data.put("id", "23");
@@ -98,6 +106,7 @@ public class SocketClient {
         }
 
     }
+
     public void delete() {
         Map<String, String> data = new HashMap<>();
         data.put("id", "23");

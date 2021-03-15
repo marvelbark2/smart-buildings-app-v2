@@ -50,8 +50,8 @@ public class Conversation implements Runnable {
             writer.println(successMessage);
 
             //Request Handling
-            while(true) {
-                String request = reader.readLine();
+            String request;
+            while ((request = reader.readLine()) != null) {
                 Request requestObj = mapper.readValue(request, Request.class);
                 String event = requestObj.getEvent();
 
@@ -68,16 +68,17 @@ public class Conversation implements Runnable {
                         Map<String, String> updateResponse = responseFactory("updated Successfully");
                         String updateMessage = mapper.writeValueAsString(updateResponse);
                         writer.println(updateMessage);
+                        logger.info("Update res sent");
                         break;
 
-                    case "delete" :
+                    case "delete":
                         logger.info("Client {} asking for delete", clientId);
                         Map<String, String> deleteResponse = responseFactory("deleted Successfully");
                         String deleteMessage = mapper.writeValueAsString(deleteResponse);
                         writer.println(deleteMessage);
                         break;
 
-                    case "read" :
+                    case "read":
                         logger.info("Client {} asking for read", clientId);
                         Map<String, String> readResponse = responseFactory("read Successfully");
                         String readMessage = mapper.writeValueAsString(readResponse);
@@ -92,10 +93,10 @@ public class Conversation implements Runnable {
         }
     }
 
-    private Map responseFactory(String msg) {
+    private Map<String, String> responseFactory(String msg) {
         Map<String, String> message = new HashMap<>();
         message.put("success", String.valueOf(true));
         message.put("message", msg);
-        return  message;
+        return message;
     }
 }

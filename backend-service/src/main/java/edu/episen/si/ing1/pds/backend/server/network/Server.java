@@ -18,6 +18,7 @@ public class Server extends Thread {
     private List<Conversation> clients = new ArrayList<>();
     private ExecutorService executor = Executors.newCachedThreadPool();
     private ServerSocket serverSocket;
+
     @Override
     public void run() {
         logger.info("Server TCP Started on {}", port);

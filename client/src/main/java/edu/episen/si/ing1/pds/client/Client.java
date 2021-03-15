@@ -41,6 +41,7 @@ public class Client {
             SocketConfig config = SocketConfig.Instance;
             Socket socket = new Socket(config.HOST, config.PORT);
             SocketClient client = new SocketClient(socket);
+            client.readMessage();
             client.create();
             client.update();
             client.delete();
