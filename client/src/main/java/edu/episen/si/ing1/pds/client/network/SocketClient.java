@@ -37,6 +37,15 @@ public class SocketClient {
 
     }
 
+    public void close() {
+        try {
+            writer.close();
+            reader.close();
+            socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void readMessage() {
         try {
             String request = reader.readLine();

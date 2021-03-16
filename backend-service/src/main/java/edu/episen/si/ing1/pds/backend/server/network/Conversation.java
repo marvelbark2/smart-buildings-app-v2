@@ -9,9 +9,10 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Conversation implements Runnable {
+public class Conversation implements Runnable  {
     private Socket socket;
     private int clientId;
+    private boolean active = true;
 
     private Logger logger = LoggerFactory.getLogger(Conversation.class.getName());
 
@@ -32,7 +33,7 @@ public class Conversation implements Runnable {
             OutputStream outputStream = socket.getOutputStream();
             PrintWriter writer = new PrintWriter(outputStream, true);
 
-            //IP
+            //Client IP
             String ip = socket.getRemoteSocketAddress().toString();
             String msg = "Client " + clientId + " has been successfully connected with " + ip;
 
@@ -55,6 +56,7 @@ public class Conversation implements Runnable {
                 Request requestObj = mapper.readValue(request, Request.class);
                 String event = requestObj.getEvent();
 
+                // TODO: (Replace || handling) with crud operations
                 switch (event) {
                     case "create":
                         logger.info("Client {} asking for create", clientId);
@@ -68,7 +70,6 @@ public class Conversation implements Runnable {
                         Map<String, String> updateResponse = responseFactory("updated Successfully");
                         String updateMessage = mapper.writeValueAsString(updateResponse);
                         writer.println(updateMessage);
-                        logger.info("Update res sent");
                         break;
 
                     case "delete":
@@ -84,9 +85,12 @@ public class Conversation implements Runnable {
                         String readMessage = mapper.writeValueAsString(readResponse);
                         writer.println(readMessage);
                         break;
-
-
                 }
+            }
+            socket.close();
+            while(socket.isClosed()) {
+                logger.info("The user {} disconnected", clientId);
+                break;
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

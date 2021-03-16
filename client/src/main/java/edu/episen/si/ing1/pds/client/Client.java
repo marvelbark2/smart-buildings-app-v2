@@ -5,10 +5,12 @@ import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.SocketClient;
 import edu.episen.si.ing1.pds.client.network.SocketConfig;
 import edu.episen.si.ing1.pds.client.roles.RoleType;
+import edu.episen.si.ing1.pds.client.test.SocketTest;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,16 +40,25 @@ public class Client {
         }
 
         if(iTestMode) {
-            SocketConfig config = SocketConfig.Instance;
-            Socket socket = new Socket(config.HOST, config.PORT);
-            SocketClient client = new SocketClient(socket);
-            client.readMessage();
-            client.create();
-            client.update();
-            client.delete();
-            client.read();
+            if(false) {
+                SocketConfig config = SocketConfig.Instance;
+                InetAddress host = InetAddress.getByName(config.HOST);
+                Socket socket = new Socket(host, config.PORT);
+                SocketClient client = new SocketClient(socket);
 
-            socket.close();
+                //welcome message
+                client.readMessage();
+
+                client.create();
+                client.update();
+                client.delete();
+                client.read();
+
+                client.close();
+            } else {
+                SocketTest test = new SocketTest();
+                test.testSockets();
+            }
         }
 
 
