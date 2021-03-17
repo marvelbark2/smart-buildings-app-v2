@@ -9,20 +9,17 @@ import java.util.concurrent.*;
 
 public class ConnectionPoolManager extends AbstractPool implements BlockingPool {
 
-    private int nPool;
     private BlockingQueue<Connection> mountedConnection;
     private ExecutorService executor = Executors.newCachedThreadPool();
     private volatile boolean shutdownPool;
     private boolean isReturned = true;
 
-    public ConnectionPoolManager(int nPool) {
-        this.nPool = nPool;
-        mountedConnection = new LinkedBlockingQueue<>(nPool);
-        init();
+    public ConnectionPoolManager() {
         shutdownPool = false;
     }
 
-    private void init() {
+    public void init(int nPool) {
+        mountedConnection = new LinkedBlockingQueue<>(nPool);
         for (int i = 0; i < nPool; i++) {
             Connection connection = connectionFactory();
             mountedConnection.add(connection);

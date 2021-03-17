@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.backend.server.network;
 
+import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,8 +14,9 @@ import java.util.concurrent.Executors;
 
 public class Server extends Thread {
     private int port = SocketConfig.Instance.PORT;
-    private int nbConnection;
     private Logger logger = LoggerFactory.getLogger(Server.class.getName());
+    private DataSource ds = new DataSource(12);
+    private int nbConnection;
     private List<Conversation> clients = new ArrayList<>();
     private ExecutorService executor = Executors.newCachedThreadPool();
     private ServerSocket serverSocket;

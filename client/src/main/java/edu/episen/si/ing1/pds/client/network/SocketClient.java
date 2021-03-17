@@ -33,6 +33,7 @@ public class SocketClient {
 
     public void sendMessage(String msg) {
         writer.println(msg);
+        writer.flush();
         readMessage();
 
     }
