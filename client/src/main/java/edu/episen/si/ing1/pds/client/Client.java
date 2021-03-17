@@ -33,11 +33,11 @@ public class Client {
         if (commandLine.hasOption("testMode"))
             iTestMode = true;
 
-        RoleType roleType = RoleType.Instance.findRole(5);
-        if (commandLine.hasOption("userRole")) {
-            int id = Integer.parseInt(commandLine.getOptionValue("userRole"));
-            roleType = RoleType.Instance.findRole(id);
-        }
+       // RoleType roleType = RoleType.Instance.findRole(5);
+       // if (commandLine.hasOption("userRole")) {
+       //     int id = Integer.parseInt(commandLine.getOptionValue("userRole"));
+        //    roleType = RoleType.Instance.findRole(id);
+       // }
 
         if(iTestMode) {
             if(false) {
@@ -45,7 +45,7 @@ public class Client {
                 InetAddress host = InetAddress.getByName(config.HOST);
                 Socket socket = new Socket(host, config.PORT);
                 SocketClient client = new SocketClient(socket);
-
+                
                 //welcome message
                 client.readMessage();
 
@@ -57,12 +57,13 @@ public class Client {
                 client.close();
             } else {
                 SocketTest test = new SocketTest();
+                SocketConfig.Instance.setEnv(iTestMode);
                 test.testSockets();
             }
         }
 
 
-        logger.info("Client is running (testMode = {}, under a {}", iTestMode, roleType);
+        logger.info("Client is running (testMode = {}", iTestMode);
 
     }
 }

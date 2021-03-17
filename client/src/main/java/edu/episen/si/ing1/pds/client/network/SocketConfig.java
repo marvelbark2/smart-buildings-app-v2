@@ -13,10 +13,20 @@ public enum SocketConfig {
     public int PORT;
 
     SocketConfig() {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+     
+    }
+    
+    public void setEnv(Boolean isTestMode){
+    	ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         InputStream reader = Thread.currentThread().getContextClassLoader().getResourceAsStream("Config.yaml");
         try {
-            JsonNode jsonNode = mapper.readTree(reader).get("socket").get("dev");
+            JsonNode jsonNode;
+            if(isTestMode) {
+            	jsonNode = mapper.readTree(reader).get("socket").get("dev");
+            }
+            else {
+            	jsonNode = mapper.readTree(reader).get("socket").get("prod");
+            }
             PORT = jsonNode.get("port").asInt();
             HOST = jsonNode.get("host").textValue();
         } catch (Exception e) {
