@@ -34,10 +34,6 @@ public class Conversation implements Runnable  {
     @Override
     public void run() {
         try {
-        	Connection connection = PoolFactory.Instance.pool.getConnection();
-        	System.out.println(connection);
-        	System.out.println(PoolFactory.Instance.pool.poolSize());
-        	PoolFactory.Instance.pool.release(connection);
             //Init Reading
             InputStream inputStream = socket.getInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -69,7 +65,6 @@ public class Conversation implements Runnable  {
             while ((request = reader.readLine()) != null) {
                 Request requestObj = mapper.readValue(request, Request.class);
                 String event = requestObj.getEvent();
-
                 // TODO: (Replace || handling) with crud operations
                 switch (event) {
                     case "create":
