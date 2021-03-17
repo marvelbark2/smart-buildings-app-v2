@@ -3,7 +3,7 @@ package edu.episen.si.ing1.pds.backend.server.pool;
 public enum PoolFactory {
     Instance;
 
-    BlockingPool pool;
+    public BlockingPool pool;
     PoolFactory() {
         pool = new ConnectionPoolManager();
     }

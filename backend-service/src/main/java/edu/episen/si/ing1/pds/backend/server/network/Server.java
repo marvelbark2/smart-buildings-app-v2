@@ -1,6 +1,9 @@
 package edu.episen.si.ing1.pds.backend.server.network;
 
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.test.persistence.Contacts;
+import edu.episen.si.ing1.pds.backend.server.test.persistence.Repository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,11 +18,15 @@ import java.util.concurrent.Executors;
 public class Server extends Thread {
     private int port = SocketConfig.Instance.PORT;
     private Logger logger = LoggerFactory.getLogger(Server.class.getName());
-    private DataSource ds = new DataSource(12);
+    private DataSource ds;
     private int nbConnection;
     private List<Conversation> clients = new ArrayList<>();
     private ExecutorService executor = Executors.newCachedThreadPool();
     private ServerSocket serverSocket;
+    
+    public Server(int nPool) {
+    	ds = new DataSource(nPool);
+    }
 
     @Override
     public void run() {
@@ -30,6 +37,8 @@ public class Server extends Thread {
                 Socket socket = serverSocket.accept();
                 ++nbConnection;
                 Conversation conversation = new Conversation(socket, nbConnection);
+                Repository contact = new Contacts(ds);
+                conversation.setRepository(contact);
                 clients.add(conversation);
                 executor.submit(conversation);
             }

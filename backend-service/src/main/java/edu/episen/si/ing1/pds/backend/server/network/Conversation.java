@@ -1,11 +1,16 @@
 package edu.episen.si.ing1.pds.backend.server.network;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.episen.si.ing1.pds.backend.server.pool.PoolFactory;
+import edu.episen.si.ing1.pds.backend.server.test.persistence.Repository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,17 +18,26 @@ public class Conversation implements Runnable  {
     private Socket socket;
     private int clientId;
     private boolean active = true;
-
-    private Logger logger = LoggerFactory.getLogger(Conversation.class.getName());
+    private Repository repository;
+	private Logger logger = LoggerFactory.getLogger(Conversation.class.getName());
 
     public Conversation(Socket socket, int clientId) {
         this.socket = socket;
         this.clientId = clientId;
     }
+    
+    public void setRepository(Repository repository) {
+		this.repository = repository;
+	}
+
 
     @Override
     public void run() {
         try {
+        	Connection connection = PoolFactory.Instance.pool.getConnection();
+        	System.out.println(connection);
+        	System.out.println(PoolFactory.Instance.pool.poolSize());
+        	PoolFactory.Instance.pool.release(connection);
             //Init Reading
             InputStream inputStream = socket.getInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -41,7 +55,7 @@ public class Conversation implements Runnable  {
             logger.info(msg);
 
             // write Map message
-            Map<String, String> message = responseFactory("Connected Successfully");
+            Map<String, Object> message = responseFactory("Connected Successfully");
 
             // Serialize map's message to json
             ObjectMapper mapper = new ObjectMapper();
@@ -60,30 +74,30 @@ public class Conversation implements Runnable  {
                 switch (event) {
                     case "create":
                         logger.info("Client {} asking for create", clientId);
-                        Map<String, String> createResponse = responseFactory("created Successfully");
+                        Map<String, Object> createResponse = responseFactory("created Successfully");
                         String createMessage = mapper.writeValueAsString(createResponse);
                         writer.println(createMessage);
                         break;
 
                     case "update":
                         logger.info("Client {} asking for update", clientId);
-                        Map<String, String> updateResponse = responseFactory("updated Successfully");
+                        Map<String, Object> updateResponse = responseFactory("updated Successfully");
                         String updateMessage = mapper.writeValueAsString(updateResponse);
                         writer.println(updateMessage);
                         break;
 
                     case "delete":
                         logger.info("Client {} asking for delete", clientId);
-                        Map<String, String> deleteResponse = responseFactory("deleted Successfully");
+                        Map<String, Object> deleteResponse = responseFactory("deleted Successfully");
                         String deleteMessage = mapper.writeValueAsString(deleteResponse);
                         writer.println(deleteMessage);
                         break;
 
                     case "read":
                         logger.info("Client {} asking for read", clientId);
-                        Map<String, String> readResponse = responseFactory("read Successfully");
+                        Map<String, Object> readResponse = responseFactory(repository.readAll());
                         String readMessage = mapper.writeValueAsString(readResponse);
-                        writer.println(readMessage);
+                        writer.println(readMessage);               
                         break;
                 }
             }
@@ -97,8 +111,8 @@ public class Conversation implements Runnable  {
         }
     }
 
-    private Map<String, String> responseFactory(String msg) {
-        Map<String, String> message = new HashMap<>();
+    private Map<String, Object> responseFactory(Object msg) {
+        Map<String, Object> message = new HashMap<>();
         message.put("success", String.valueOf(true));
         message.put("message", msg);
         return message;

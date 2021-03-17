@@ -1,6 +1,7 @@
 package edu.episen.si.ing1.pds.client.network;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +54,10 @@ public class SocketClient {
             ObjectMapper mapper = new ObjectMapper();
             Response response = mapper.readValue(request, Response.class);
             if (response.isSuccess()) {
-                logger.info(response.getMessage());
+            	Object objt = response.getMessage();
+                logger.info(objt.toString());
             } else {
-                logger.error(response.getMessage());
+                logger.error(response.getMessage().toString());
             }
 
         } catch (IOException e) {

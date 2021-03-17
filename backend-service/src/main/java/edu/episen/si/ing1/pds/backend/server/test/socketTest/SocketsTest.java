@@ -8,7 +8,7 @@ public class SocketsTest {
     static final Logger logger = LoggerFactory.getLogger(SocketsTest.class.getName());
     public static void main(String[] args) {
         logger.info("TestSocket Started");
-        Server serverSocket = new Server();
+        Server serverSocket = new Server(10);
         serverSocket.start();
     }
 }
