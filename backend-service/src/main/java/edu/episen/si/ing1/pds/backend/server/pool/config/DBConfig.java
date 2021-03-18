@@ -16,14 +16,23 @@ public enum DBConfig {
     public String DRIVER;
 
     DBConfig() {
+
+    }
+    public void setEnv(boolean isTestMode) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         InputStream reader = Thread.currentThread().getContextClassLoader().getResourceAsStream("config.yaml");
         try {
-            JsonNode jsonNode = mapper.readTree(reader);
-            HOST = jsonNode.get("db").get("prod").get("url").textValue();
-            USER = jsonNode.get("db").get("prod").get("user").textValue();
-            PASS = jsonNode.get("db").get("prod").get("pass").textValue();
-            DRIVER = jsonNode.get("db").get("driverClass").textValue();
+            JsonNode db = mapper.readTree(reader).get("db");
+            JsonNode jsonNode;
+            if(isTestMode) {
+                jsonNode = db.get("dev");
+            }else {
+                jsonNode = db.get("prod");
+            }
+            HOST = jsonNode.get("url").textValue();
+            USER = jsonNode.get("user").textValue();
+            PASS = jsonNode.get("pass").textValue();
+            DRIVER = db.get("driverClass").textValue();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -34,7 +34,6 @@ public class SocketClient {
 
     public void sendMessage(String msg) {
         writer.println(msg);
-        writer.flush();
         readMessage();
 
     }
@@ -65,13 +64,10 @@ public class SocketClient {
         }
     }
 
-    public void create() {
-        Map<String, String> data = new HashMap<>();
-        data.put("id", "23");
-
+    public void create(Map<String, String> values) {
         Request request = new Request();
         request.setEvent("create");
-        request.setData(data);
+        request.setData(values);
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -83,13 +79,10 @@ public class SocketClient {
 
     }
 
-    public void read() {
-        Map<String, String> data = new HashMap<>();
-        data.put("id", "23");
-
+    public void read(Map<String, String> values) {
         Request request = new Request();
         request.setEvent("read");
-        request.setData(data);
+        request.setData(values);
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -101,13 +94,10 @@ public class SocketClient {
 
     }
 
-    public void update() {
-        Map<String, String> data = new HashMap<>();
-        data.put("id", "23");
-
+    public void update(Map<String, String> values) {
         Request request = new Request();
         request.setEvent("update");
-        request.setData(data);
+        request.setData(values);
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -119,13 +109,10 @@ public class SocketClient {
 
     }
 
-    public void delete() {
-        Map<String, String> data = new HashMap<>();
-        data.put("id", "23");
-
+    public void delete(Map<String, String> values) {
         Request request = new Request();
         request.setEvent("delete");
-        request.setData(data);
+        request.setData(values);
 
         ObjectMapper mapper = new ObjectMapper();
         try {

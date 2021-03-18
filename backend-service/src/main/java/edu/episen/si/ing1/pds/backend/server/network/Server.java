@@ -12,20 +12,26 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Server extends Thread {
     private int port = SocketConfig.Instance.PORT;
     private Logger logger = LoggerFactory.getLogger(Server.class.getName());
     private DataSource ds;
     private int nbConnection;
-    private List<Conversation> clients = new ArrayList<>();
+    private static List<Conversation> clients = new ArrayList<>();
     private ExecutorService executor = Executors.newCachedThreadPool();
     private ServerSocket serverSocket;
     
     public Server(int nPool) {
     	ds = new DataSource(nPool);
+    }
+
+    public static List<Conversation> getClients() {
+        return clients;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.backend.server.network;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.episen.si.ing1.pds.backend.server.pool.PoolFactory;
@@ -12,6 +13,7 @@ import java.io.*;
 import java.net.Socket;
 import java.sql.Connection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Conversation implements Runnable  {
@@ -30,6 +32,7 @@ public class Conversation implements Runnable  {
 		this.repository = repository;
 	}
 
+	public boolean isActive() { return active; }
 
     @Override
     public void run() {
@@ -62,35 +65,39 @@ public class Conversation implements Runnable  {
 
             //Request Handling
             String request;
-            while ((request = reader.readLine()) != null) {
+            while ((request = reader.readLine()) != null && active) {
                 Request requestObj = mapper.readValue(request, Request.class);
                 String event = requestObj.getEvent();
                 // TODO: (Replace || handling) with crud operations
                 switch (event) {
                     case "create":
                         logger.info("Client {} asking for create", clientId);
-                        Map<String, Object> createResponse = responseFactory("created Successfully");
+                        JsonNode node = requestObj.getData();
+                        String[] values = new String[]{node.get("name").asText(), node.get("email").asText(), node.get("telephone").asText() };
+                        Map<String, Object> createResponse = responseFactory(repository.create(values));
                         String createMessage = mapper.writeValueAsString(createResponse);
                         writer.println(createMessage);
                         break;
 
                     case "update":
                         logger.info("Client {} asking for update", clientId);
-                        Map<String, Object> updateResponse = responseFactory("updated Successfully");
+                        JsonNode node2 = requestObj.getData();
+                        String[] valuesUpdate = new String[]{node2.get("name").asText(), node2.get("email").asText(), node2.get("telephone").asText() };
+                        Map<String, Object> updateResponse = responseFactory(repository.update(getLastId(), valuesUpdate));
                         String updateMessage = mapper.writeValueAsString(updateResponse);
                         writer.println(updateMessage);
                         break;
 
                     case "delete":
                         logger.info("Client {} asking for delete", clientId);
-                        Map<String, Object> deleteResponse = responseFactory("deleted Successfully");
+                        Map<String, Object> deleteResponse = responseFactory(repository.delete(getLastId()));
                         String deleteMessage = mapper.writeValueAsString(deleteResponse);
                         writer.println(deleteMessage);
                         break;
 
                     case "read":
                         logger.info("Client {} asking for read", clientId);
-                        Map<String, Object> readResponse = responseFactory(repository.readAll());
+                        Map<String, Object> readResponse = responseFactory(repository.readAll().get(repository.readAll().size() - 1));
                         String readMessage = mapper.writeValueAsString(readResponse);
                         writer.println(readMessage);               
                         break;
@@ -98,7 +105,9 @@ public class Conversation implements Runnable  {
             }
             socket.close();
             while(socket.isClosed()) {
+                active = false;
                 logger.info("The user {} disconnected", clientId);
+                Server.getClients().remove(this);
                 break;
             }
         } catch (Exception e) {
@@ -110,6 +119,20 @@ public class Conversation implements Runnable  {
         Map<String, Object> message = new HashMap<>();
         message.put("success", String.valueOf(true));
         message.put("message", msg);
+        if(msg instanceof List) {
+            message.put("dataType", "list");
+        } else if(msg instanceof Map) {
+            message.put("dataType", "map");
+        } else if (msg instanceof String) {
+            message.put("dataType", "string");
+        } else {
+            message.put("dataType", "object");
+        }
         return message;
+    }
+
+    private int getLastId() {
+        List<Map<String, Object>> all = repository.readAll();
+        return (int) all.get(all.size() - 1).get("id");
     }
 }

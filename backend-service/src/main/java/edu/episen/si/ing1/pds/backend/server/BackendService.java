@@ -1,6 +1,7 @@
 package edu.episen.si.ing1.pds.backend.server;
 
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.pool.config.DBConfig;
 import edu.episen.si.ing1.pds.backend.server.test.TestPool;
 import edu.episen.si.ing1.pds.backend.server.test.TestType;
 import org.apache.commons.cli.*;
@@ -47,6 +48,7 @@ public class BackendService {
         if (iMaxConnection > 0) {
             DataSource ds = new DataSource(iMaxConnection);
             TestPool test = new TestPool(ds);
+            DBConfig.Instance.setEnv(itestMode);
             try {
                 if (!itestMode) {
                     if (iTestType == null) {

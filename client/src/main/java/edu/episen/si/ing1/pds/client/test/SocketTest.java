@@ -7,12 +7,18 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class SocketTest {
 
     public void testSockets() {
+        Map<String, String> values = new HashMap();
+        values.put("name", "Eric");
+        values.put("email", "eric@u.fr");
+        values.put("telephone", "0888288331");
         CompletableFuture.allOf(
                 futureList().stream()
                         .map(future -> future.thenAccept(socket -> {
@@ -20,10 +26,11 @@ public class SocketTest {
                                     //welcome message
                                     client.readMessage();
 
-                                    client.create();
-                                    client.update();
-                                    client.delete();
-                                    client.read();
+                                    client.create(values);
+                                    client.update(values);
+                                    client.delete(values);
+                                    client.read(values);
+
                                     client.close();
                                 }
                         )).toArray(CompletableFuture[]::new)
