@@ -45,39 +45,41 @@ public class BackendService {
         if (commandLine.hasOption("testPoolSize"))
             ItestSize = Integer.parseInt(commandLine.getOptionValue("testPoolSize"));
 
-        if (iMaxConnection > 0) {
-            DataSource ds = new DataSource(iMaxConnection);
-            TestPool test = new TestPool(ds);
-            DBConfig.Instance.setEnv(itestMode);
-            try {
-                if (!itestMode) {
-                    if (iTestType == null) {
-                        test.handleError();
-                    } else if (iTestType.equals(TestType.Create)) {
-                        test.create();
-                    } else if (iTestType.equals(TestType.Read)) {
-                        test.read();
-                    } else if (iTestType.equals(TestType.Update)) {
-                        test.update();
-                    } else if (iTestType.equals(TestType.Delete)) {
-                        test.delete();
-                    } else if (iTestType.equals(TestType.Loop)) {
-                        test.testPool(ItestSize);
-                    }
 
-                } else {
-                    test.testModeTest();
-                }
-
-            } finally {
-                ds.shutdownPool();
-                System.exit(1);
-            }
-
-        } else {
-            logger.info("Backend Service is running (testMode = " + itestMode + ") , (maxconnection = " + iMaxConnection
-                    + "}.");
-        }
+        return;
+//        if (iMaxConnection > 0) {
+//            //DataSource ds = new DataSource(iMaxConnection);
+//           // TestPool test = new TestPool(ds);
+//            DBConfig.Instance.setEnv(itestMode);
+//            try {
+//                if (!itestMode) {
+//                    if (iTestType == null) {
+//                        test.handleError();
+//                    } else if (iTestType.equals(TestType.Create)) {
+//                        test.create();
+//                    } else if (iTestType.equals(TestType.Read)) {
+//                        test.read();
+//                    } else if (iTestType.equals(TestType.Update)) {
+//                        test.update();
+//                    } else if (iTestType.equals(TestType.Delete)) {
+//                        test.delete();
+//                    } else if (iTestType.equals(TestType.Loop)) {
+//                        test.testPool(ItestSize);
+//                    }
+//
+//                } else {
+//                    test.testModeTest();
+//                }
+//
+//            } finally {
+//                ds.shutdownPool();
+//                System.exit(1);
+//            }
+//
+//        } else {
+//            logger.info("Backend Service is running (testMode = " + itestMode + ") , (maxconnection = " + iMaxConnection
+//                    + "}.");
+//        }
 
     }
 }

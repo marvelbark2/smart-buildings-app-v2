@@ -5,7 +5,6 @@ public enum PoolFactory {
 
     public BlockingPool pool;
     boolean isNotReturnable;
-    int delayTime;
     PoolFactory() {
         pool = new ConnectionPoolManager();
     }
@@ -21,14 +20,5 @@ public enum PoolFactory {
     public void setNotReturnable(boolean notReturnable) {
         isNotReturnable = notReturnable;
     }
-
-    public int getDelayTime() {
-        return delayTime;
-    }
-
-    public void setDelayTime(int delayTime) {
-        this.delayTime = delayTime;
-    }
-
 
 }

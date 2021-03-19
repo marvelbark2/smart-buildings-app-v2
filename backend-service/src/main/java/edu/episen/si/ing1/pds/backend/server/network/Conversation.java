@@ -35,6 +35,8 @@ public class Conversation implements Runnable  {
     @Override
     public void run() {
         try {
+
+            Thread.currentThread().setName(Thread.currentThread().getName()+"-client-" + clientId);
             //Init Reading
             InputStream inputStream = socket.getInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -66,13 +68,12 @@ public class Conversation implements Runnable  {
             while ((request = reader.readLine()) != null && active) {
                 Request requestObj = mapper.readValue(request, Request.class);
                 String event = requestObj.getEvent();
-                // TODO: (Replace || handling) with crud operations
                 switch (event) {
                     case "create":
                         logger.info("Client {} asking for create", clientId);
                         JsonNode node = requestObj.getData();
                         String[] values = new String[]{node.get("name").asText(), node.get("email").asText(), node.get("telephone").asText() };
-                        Map<String, Object> createResponse = responseFactory(repository.create(values));
+                        Map<String, Object> createResponse = responseFactory("Create: " + repository.create(values));
                         String createMessage = mapper.writeValueAsString(createResponse);
                         writer.println(createMessage);
                         break;
@@ -84,7 +85,7 @@ public class Conversation implements Runnable  {
                         if(node2.has("id"))
                             updateId = node2.get("id").asInt();
                         String[] valuesUpdate = new String[]{node2.get("name").asText(), node2.get("email").asText(), node2.get("telephone").asText() };
-                        Map<String, Object> updateResponse = responseFactory(repository.update(updateId, valuesUpdate));
+                        Map<String, Object> updateResponse = responseFactory("Update: " + repository.update(updateId, valuesUpdate));
                         String updateMessage = mapper.writeValueAsString(updateResponse);
                         writer.println(updateMessage);
                         break;
@@ -94,8 +95,8 @@ public class Conversation implements Runnable  {
                         JsonNode deleteNode = requestObj.getData();
                         int deleteId = getLastId();
                         if(deleteNode.has("id"))
-                            deleteId = deleteNode.get("id").asInt();
-                        Map<String, Object> deleteResponse = responseFactory(repository.delete(deleteId));
+                            deleteId = Integer.parseInt(deleteNode.get("id").asText());
+                        Map<String, Object> deleteResponse = responseFactory("Delete: " + repository.delete(deleteId));
                         String deleteMessage = mapper.writeValueAsString(deleteResponse);
                         writer.println(deleteMessage);
                         break;

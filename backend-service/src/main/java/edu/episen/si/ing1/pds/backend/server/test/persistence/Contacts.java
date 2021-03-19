@@ -6,16 +6,15 @@ import java.sql.*;
 import java.util.*;
 
 public class Contacts implements Repository {
-    private DataSource dataSource;
+    private Connection connection;
     private SqlConfig sql;
 
-    public Contacts(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public Contacts(Connection connection) {
+        this.connection = connection;
         sql = SqlConfig.Instance;
     }
 
     public String read(int id) {
-        Connection connection = dataSource.getConnection();
         String result = "";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql.READ);
@@ -26,15 +25,12 @@ public class Contacts implements Repository {
             }
         } catch (Exception e) {
             Thread.currentThread().interrupt();
-        } finally {
-            dataSource.release(connection);
         }
         return result;
     }
 
     public boolean update(int id, Object[] values) {
         boolean result = false;
-        Connection connection = dataSource.getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql.UPDATE);
             for (int i = 0; i < values.length; i++) {
@@ -45,15 +41,12 @@ public class Contacts implements Repository {
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-        } finally {
-            dataSource.release(connection);
         }
         return result;
     }
 
     public boolean create(String[] values) {
         boolean result = false;
-        Connection connection = dataSource.getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql.CREATE);
             for (int i = 0; i < values.length; i++) {
@@ -62,8 +55,6 @@ public class Contacts implements Repository {
             result = preparedStatement.executeUpdate() > 0 ? true : false;
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            dataSource.release(connection);
         }
 
         return result;
@@ -71,21 +62,17 @@ public class Contacts implements Repository {
 
     public boolean delete(int id) {
         boolean result = false;
-        Connection connection = dataSource.getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql.DELETE);
             preparedStatement.setInt(1, id);
             result = preparedStatement.executeUpdate() > 0 ? true : false;
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            dataSource.release(connection);
         }
         return result;
     }
 
     public List readAll() {
-        Connection connection = dataSource.getConnection();
         List<Map<String, Object>> result = new ArrayList<>();
         try {
             Statement statement = connection.createStatement();
@@ -102,8 +89,6 @@ public class Contacts implements Repository {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            dataSource.release(connection);
         }
         return result;
     }

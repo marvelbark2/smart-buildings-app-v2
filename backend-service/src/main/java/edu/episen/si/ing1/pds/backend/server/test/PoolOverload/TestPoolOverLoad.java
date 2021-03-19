@@ -18,7 +18,7 @@ public class TestPoolOverLoad {
 
     public TestPoolOverLoad(DataSource ds) {
         this.ds = ds;
-        contacts = new Contacts(ds);
+        contacts = new Contacts(ds.getConnection());
     }
 
     private int lastId() {

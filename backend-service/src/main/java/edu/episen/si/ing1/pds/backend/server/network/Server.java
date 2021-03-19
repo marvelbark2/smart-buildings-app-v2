@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-public class Server extends Thread {
+public class Server {
     private Logger logger = LoggerFactory.getLogger(Server.class.getName());
     private DataSource ds;
     private int nbConnection;
@@ -26,15 +26,14 @@ public class Server extends Thread {
     private ServerSocket serverSocket;
     
     public Server(int nPool) {
-    	ds = new DataSource(nPool, PoolFactory.Instance.getDelayTime());
+    	ds = new DataSource(nPool);
     }
 
     public static List<Conversation> getClients() {
         return clients;
     }
 
-    @Override
-    public void run() {
+    public void serve() {
         final int port = SocketConfig.Instance.PORT;
         logger.info("Server TCP Started on {}", port);
         try {
@@ -44,11 +43,12 @@ public class Server extends Thread {
                 ++nbConnection;
                 Conversation conversation = new Conversation(socket, nbConnection);
                 ds.returnable(PoolFactory.Instance.isNotReturnable());
-                Repository contact = new Contacts(ds);
+                Connection connection = ds.getConnection();
+                Repository contact = new Contacts(connection);
                 conversation.setRepository(contact);
                 clients.add(conversation);
                 executor.execute(conversation);
-                executor.awaitTermination(SocketConfig.Instance.getDelayTime(), TimeUnit.MILLISECONDS);
+                ds.release(connection);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());

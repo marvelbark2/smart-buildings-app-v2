@@ -20,7 +20,7 @@ public class TestPool {
 
     public TestPool(DataSource ds) {
         this.ds = ds;
-        contacts = new Contacts(ds);
+        contacts = new Contacts(ds.getConnection());
     }
 
     private CompletableFuture<Connection> getConnection() {

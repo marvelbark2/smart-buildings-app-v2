@@ -3,7 +3,9 @@ package edu.episen.si.ing1.pds.backend.server.pool.config;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -20,7 +22,7 @@ public enum DBConfig {
     }
     public void setEnv(boolean isTestMode) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        InputStream reader = Thread.currentThread().getContextClassLoader().getResourceAsStream("config.yaml");
+        File reader = Utils.getFileContent("SMARTBUILDCONFIG");
         try {
             JsonNode db = mapper.readTree(reader).get("db");
             JsonNode jsonNode;
