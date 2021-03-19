@@ -47,7 +47,7 @@ public class Server extends Thread {
                 Repository contact = new Contacts(ds);
                 conversation.setRepository(contact);
                 clients.add(conversation);
-                executor.submit(conversation);
+                executor.execute(conversation);
                 executor.awaitTermination(SocketConfig.Instance.getDelayTime(), TimeUnit.MILLISECONDS);
             }
         } catch (Exception e) {
