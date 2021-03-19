@@ -9,6 +9,7 @@ import java.io.InputStream;
 public enum SocketConfig {
     Instance;
     int PORT;
+    int delayTime;
 
     SocketConfig() {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -21,4 +22,11 @@ public enum SocketConfig {
         }
     }
 
+    public int getDelayTime() {
+        return delayTime;
+    }
+
+    public void setDelayTime(int delayTime) {
+        this.delayTime = delayTime;
+    }
 }

@@ -14,13 +14,13 @@ import java.util.concurrent.CompletableFuture;
 
 public class SocketTest {
 
-    public void testSockets() {
+    public void testSockets(int nSimulation) {
         Map<String, String> values = new HashMap();
         values.put("name", "Eric");
         values.put("email", "eric@u.fr");
         values.put("telephone", "0888288331");
         CompletableFuture.allOf(
-                futureList().stream()
+                futureList(nSimulation).stream()
                         .map(future -> future.thenAccept(socket -> {
                                     SocketClient client = new SocketClient(socket);
                                     //welcome message
@@ -37,9 +37,9 @@ public class SocketTest {
         );
     }
 
-    private List<CompletableFuture<Socket>> futureList() {
+    private List<CompletableFuture<Socket>> futureList(int nSimulation) {
         List<CompletableFuture<Socket>> futures = new ArrayList<>();
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < nSimulation; i++) {
             futures.add(socketFactory());
         }
         return futures;

@@ -1,6 +1,7 @@
 package edu.episen.si.ing1.pds.backend.server.network;
 
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.pool.PoolFactory;
 import edu.episen.si.ing1.pds.backend.server.test.persistence.Contacts;
 import edu.episen.si.ing1.pds.backend.server.test.persistence.Repository;
 
@@ -12,13 +13,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class Server extends Thread {
-    private int port = SocketConfig.Instance.PORT;
     private Logger logger = LoggerFactory.getLogger(Server.class.getName());
     private DataSource ds;
     private int nbConnection;
@@ -27,7 +26,7 @@ public class Server extends Thread {
     private ServerSocket serverSocket;
     
     public Server(int nPool) {
-    	ds = new DataSource(nPool);
+    	ds = new DataSource(nPool, PoolFactory.Instance.getDelayTime());
     }
 
     public static List<Conversation> getClients() {
@@ -36,6 +35,7 @@ public class Server extends Thread {
 
     @Override
     public void run() {
+        final int port = SocketConfig.Instance.PORT;
         logger.info("Server TCP Started on {}", port);
         try {
             serverSocket = new ServerSocket(port);
@@ -43,10 +43,12 @@ public class Server extends Thread {
                 Socket socket = serverSocket.accept();
                 ++nbConnection;
                 Conversation conversation = new Conversation(socket, nbConnection);
+                ds.returnable(PoolFactory.Instance.isNotReturnable());
                 Repository contact = new Contacts(ds);
                 conversation.setRepository(contact);
                 clients.add(conversation);
                 executor.submit(conversation);
+                executor.awaitTermination(SocketConfig.Instance.getDelayTime(), TimeUnit.MILLISECONDS);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());

@@ -3,7 +3,6 @@ package edu.episen.si.ing1.pds.backend.server.network;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.episen.si.ing1.pds.backend.server.pool.PoolFactory;
 import edu.episen.si.ing1.pds.backend.server.test.persistence.Repository;
 
 import org.slf4j.Logger;
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,15 +80,22 @@ public class Conversation implements Runnable  {
                     case "update":
                         logger.info("Client {} asking for update", clientId);
                         JsonNode node2 = requestObj.getData();
+                        int updateId = getLastId();
+                        if(node2.has("id"))
+                            updateId = node2.get("id").asInt();
                         String[] valuesUpdate = new String[]{node2.get("name").asText(), node2.get("email").asText(), node2.get("telephone").asText() };
-                        Map<String, Object> updateResponse = responseFactory(repository.update(getLastId(), valuesUpdate));
+                        Map<String, Object> updateResponse = responseFactory(repository.update(updateId, valuesUpdate));
                         String updateMessage = mapper.writeValueAsString(updateResponse);
                         writer.println(updateMessage);
                         break;
 
                     case "delete":
                         logger.info("Client {} asking for delete", clientId);
-                        Map<String, Object> deleteResponse = responseFactory(repository.delete(getLastId()));
+                        JsonNode deleteNode = requestObj.getData();
+                        int deleteId = getLastId();
+                        if(deleteNode.has("id"))
+                            deleteId = deleteNode.get("id").asInt();
+                        Map<String, Object> deleteResponse = responseFactory(repository.delete(deleteId));
                         String deleteMessage = mapper.writeValueAsString(deleteResponse);
                         writer.println(deleteMessage);
                         break;

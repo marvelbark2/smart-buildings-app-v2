@@ -26,6 +26,9 @@ public class SocketTestCli {
         final Option localEnv = Option.builder().longOpt("localEnv").build();
         options.addOption(localEnv);
 
+        final Option simulationNumber = Option.builder().longOpt("simulation-number").hasArg().build();
+        options.addOption(simulationNumber);
+
         final Option crudOperation = Option.builder()
                 .longOpt("use-crud-operation")
                 .desc("Crud operation list args operation separated by |")
@@ -56,11 +59,15 @@ public class SocketTestCli {
         if(commandLine.hasOption(localEnv.getLongOpt()))
             iLocalEnv = true;
 
+        int iSimulationNumber = 15;
+        if(commandLine.hasOption(simulationNumber.getLongOpt()))
+            iSimulationNumber = Integer.parseInt(commandLine.getOptionValue(simulationNumber.getLongOpt()));
+
         SocketConfig.Instance.setEnv(iLocalEnv);
 
         if(iTestMode) {
             SocketTest test = new SocketTest();
-            test.testSockets();
+            test.testSockets(iSimulationNumber);
         } else {
             String[] operations = commandLine.getOptionValues(crudOperation.getLongOpt());
             Map<String, String> values = Utils.toMap(commandLine.getOptionValue(valuesOption.getLongOpt()));
