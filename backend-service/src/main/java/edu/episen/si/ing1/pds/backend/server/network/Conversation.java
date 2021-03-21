@@ -1,8 +1,10 @@
 package edu.episen.si.ing1.pds.backend.server.network;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.episen.si.ing1.pds.backend.server.test.persistence.Repository;
 
 import org.slf4j.Logger;
@@ -68,37 +70,89 @@ public class Conversation implements Runnable  {
             while ((request = reader.readLine()) != null && active) {
                 Request requestObj = mapper.readValue(request, Request.class);
                 String event = requestObj.getEvent();
+                logger.info(requestObj.getRequestId());
                 switch (event) {
                     case "create":
                         logger.info("Client {} asking for create", clientId);
                         JsonNode node = requestObj.getData();
-                        String[] values = new String[]{node.get("name").asText(), node.get("email").asText(), node.get("telephone").asText() };
-                        Map<String, Object> createResponse = responseFactory("Create: " + repository.create(values));
-                        String createMessage = mapper.writeValueAsString(createResponse);
-                        writer.println(createMessage);
+                        if(!(node instanceof ArrayNode)) {
+                            String[] values = new String[]{node.get("name").asText(), node.get("email").asText(), node.get("telephone").asText() };
+                            Map<String, Object> createResponse = responseFactory("Create: " + repository.create(values));
+                            String createMessage = mapper.writeValueAsString(createResponse);
+                            writer.println(createMessage);
+                        } else {
+                            ArrayNode arrayNode = (ArrayNode) node;
+                            arrayNode.forEach(nodeData -> {
+                                String[] values = new String[]{nodeData.get("name").asText(), nodeData.get("email").asText(), nodeData.get("telephone").asText() };
+                                Map<String, Object> createResponse = responseFactory("Create: " + repository.create(values));
+                                String createMessage = null;
+                                try {
+                                    createMessage = mapper.writeValueAsString(createResponse);
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+                                writer.println(createMessage);
+                            });
+                        }
+
                         break;
 
                     case "update":
                         logger.info("Client {} asking for update", clientId);
                         JsonNode node2 = requestObj.getData();
-                        int updateId = getLastId();
-                        if(node2.has("id"))
-                            updateId = node2.get("id").asInt();
-                        String[] valuesUpdate = new String[]{node2.get("name").asText(), node2.get("email").asText(), node2.get("telephone").asText() };
-                        Map<String, Object> updateResponse = responseFactory("Update: " + repository.update(updateId, valuesUpdate));
-                        String updateMessage = mapper.writeValueAsString(updateResponse);
-                        writer.println(updateMessage);
+                        if(!(node2 instanceof ArrayNode)) {
+                            int updateId = getLastId();
+                            if(node2.has("id"))
+                                updateId = node2.get("id").asInt();
+                            String[] valuesUpdate = new String[]{node2.get("name").asText(), node2.get("email").asText(), node2.get("telephone").asText() };
+                            Map<String, Object> updateResponse = responseFactory("Update: " + repository.update(updateId, valuesUpdate));
+                            String updateMessage = mapper.writeValueAsString(updateResponse);
+                            writer.println(updateMessage);
+                        } else {
+                            ArrayNode arrayNode2 = (ArrayNode) node2;
+                            arrayNode2.forEach(nodeUpdate -> {
+                                int updateId = getLastId();
+                                if(nodeUpdate.has("id"))
+                                    updateId = nodeUpdate.get("id").asInt();
+                                String[] valuesUpdate = new String[]{nodeUpdate.get("name").asText(), nodeUpdate.get("email").asText(), nodeUpdate.get("telephone").asText() };
+                                Map<String, Object> updateResponse = responseFactory("Update: " + repository.update(updateId, valuesUpdate));
+                                String updateMessage = null;
+                                try {
+                                    updateMessage = mapper.writeValueAsString(updateResponse);
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+                                writer.println(updateMessage);
+                            });
+                        }
                         break;
 
                     case "delete":
                         logger.info("Client {} asking for delete", clientId);
                         JsonNode deleteNode = requestObj.getData();
-                        int deleteId = getLastId();
-                        if(deleteNode.has("id"))
-                            deleteId = Integer.parseInt(deleteNode.get("id").asText());
-                        Map<String, Object> deleteResponse = responseFactory("Delete: " + repository.delete(deleteId));
-                        String deleteMessage = mapper.writeValueAsString(deleteResponse);
-                        writer.println(deleteMessage);
+                        if(!(deleteNode instanceof ArrayNode)) {
+                            int deleteId = getLastId();
+                            if(deleteNode.has("id"))
+                                deleteId = Integer.parseInt(deleteNode.get("id").asText());
+                            Map<String, Object> deleteResponse = responseFactory("Delete: " + repository.delete(deleteId));
+                            String deleteMessage = mapper.writeValueAsString(deleteResponse);
+                            writer.println(deleteMessage);
+                        } else {
+                            ArrayNode nodeDelete = (ArrayNode) deleteNode;
+                            nodeDelete.forEach(delete -> {
+                                int deleteId = getLastId();
+                                if(delete.has("id"))
+                                    deleteId = Integer.parseInt(delete.get("id").asText());
+                                Map<String, Object> deleteResponse = responseFactory("Delete: " + repository.delete(deleteId));
+                                String deleteMessage = null;
+                                try {
+                                    deleteMessage = mapper.writeValueAsString(deleteResponse);
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+                                writer.println(deleteMessage);
+                            });
+                        }
                         break;
 
                     case "read":
@@ -108,8 +162,13 @@ public class Conversation implements Runnable  {
                         writer.println(readMessage);               
                         break;
                 }
+                Map<String, Object> endResponse = responseFactory("end");
+                String createMessage = mapper.writeValueAsString(endResponse);
+                writer.println(createMessage);
             }
+
             socket.close();
+
             while(socket.isClosed()) {
                 active = false;
                 logger.info("The user {} disconnected", clientId);

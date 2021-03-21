@@ -3,8 +3,9 @@ package edu.episen.si.ing1.pds.client.network;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import edu.episen.si.ing1.pds.client.utils.Utils;
 
-import java.io.InputStream;
+import java.io.File;
 
 public enum SocketConfig {
     Instance;
@@ -18,7 +19,7 @@ public enum SocketConfig {
     
     public void setEnv(Boolean isTestMode){
     	ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        InputStream reader = Thread.currentThread().getContextClassLoader().getResourceAsStream("Config.yaml");
+        File reader = Utils.getFileContent("SMARTBUILDCLIENTCONFIG");
         try {
             JsonNode jsonNode;
             if(isTestMode) {

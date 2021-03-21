@@ -1,5 +1,7 @@
 package edu.episen.si.ing1.pds.client.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.episen.si.ing1.pds.client.network.SocketClient;
 import edu.episen.si.ing1.pds.client.network.SocketConfig;
 import edu.episen.si.ing1.pds.client.utils.Utils;
@@ -8,6 +10,7 @@ import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
@@ -48,6 +51,14 @@ public class SocketTestCli {
                 .build();
         options.addOption(valuesOption);
 
+        final Option dataSample = Option.builder()
+                .longOpt("json-sample-file")
+                .desc("Json path file of data sample")
+                .argName("Sample file")
+                .hasArg()
+                .build();
+        options.addOption(dataSample);
+
         final CommandLineParser parser = new DefaultParser();
         final CommandLine commandLine = parser.parse(options, args);;
 
@@ -70,27 +81,36 @@ public class SocketTestCli {
             test.testSockets(iSimulationNumber);
         } else {
             String[] operations = commandLine.getOptionValues(crudOperation.getLongOpt());
-            Map<String, String> values = Utils.toMap(commandLine.getOptionValue(valuesOption.getLongOpt()));
-
+            Object values = null;
+            if(commandLine.hasOption(valuesOption.getLongOpt()))
+                values = Utils.toMap(commandLine.getOptionValue(valuesOption.getLongOpt()));
+            else if(commandLine.hasOption(dataSample.getLongOpt())) {
+                ObjectMapper mapper = new ObjectMapper();
+                File reader = new File(commandLine.getOptionValue(dataSample.getLongOpt()));
+                ArrayNode node = (ArrayNode) mapper.readTree(reader).get("data");
+                values = node;
+            }
             SocketConfig config = SocketConfig.Instance;
             InetAddress host = InetAddress.getByName(config.HOST);
 
             Socket socket = new Socket(host, config.PORT);
             SocketClient client = new SocketClient(socket);
 
-            client.readMessage();
+            //client.readMessage();
+            Object finalValues = values;
             Arrays.stream(operations).forEach(operation -> {
                 switch(operation) {
                     case "insert":
-                        client.create(values); break;
+                        client.create(finalValues); break;
                     case "update":
-                        client.update(values); break;
+                        client.update(finalValues); break;
                     case "select":
-                        client.read(values); break;
+                        client.read(finalValues); break;
                     case "delete":
-                        client.delete(values); break;
+                        client.delete(finalValues); break;
                 }
             });
+            client.close();
         }
 
     }

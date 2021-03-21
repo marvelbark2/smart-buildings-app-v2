@@ -1,10 +1,9 @@
 package edu.episen.si.ing1.pds.client.network;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import java.util.Map;
+import edu.episen.si.ing1.pds.client.utils.Utils;
 
 public class Request {
+    private String requestId = Utils.generateStringId(25);
     private String event;
     private Object data;
 
@@ -22,5 +21,13 @@ public class Request {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }

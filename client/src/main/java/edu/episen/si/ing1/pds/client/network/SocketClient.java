@@ -1,20 +1,19 @@
 package edu.episen.si.ing1.pds.client.network;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class SocketClient {
-    private Socket socket;
-    private BufferedReader reader;
+    private final Socket socket;
+    private final BufferedReader reader;
     private PrintWriter writer;
+    private final ObjectMapper mapper = new ObjectMapper();
     private final Logger logger = LoggerFactory.getLogger(SocketClient.class.getName());
 
     public SocketClient(Socket socket) {
@@ -29,7 +28,6 @@ public class SocketClient {
         }
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
         reader = new BufferedReader(inputStreamReader);
-
     }
 
     public void sendMessage(String msg) {
@@ -47,29 +45,33 @@ public class SocketClient {
             e.printStackTrace();
         }
     }
+
     public void readMessage() {
         try {
-            String request = reader.readLine();
-            ObjectMapper mapper = new ObjectMapper();
-            Response response = mapper.readValue(request, Response.class);
-            if (response.isSuccess()) {
-            	Object objt = response.getMessage();
-                logger.info(objt.toString());
-            } else {
-                logger.error(response.getMessage().toString());
+            while (true) {
+                String request = reader.readLine();
+                Response response = mapper.readValue(request, Response.class);
+                if (response.isSuccess()) {
+                    Object objt = response.getMessage();
+                    logger.info(objt.toString());
+                } else {
+                    logger.error(response.getMessage().toString());
+                }
+                if(request == null) {
+                    break;
+                }
+                else if(response.getMessage().equals("end"))
+                    break;
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void create(Map<String, String> values) {
+    public void create(Object values) {
         Request request = new Request();
         request.setEvent("create");
         request.setData(values);
-
-        ObjectMapper mapper = new ObjectMapper();
         try {
             String requestMessage = mapper.writeValueAsString(request);
             sendMessage(requestMessage);
@@ -79,12 +81,10 @@ public class SocketClient {
 
     }
 
-    public void read(Map<String, String> values) {
+    public void read(Object values) {
         Request request = new Request();
         request.setEvent("read");
         request.setData(values);
-
-        ObjectMapper mapper = new ObjectMapper();
         try {
             String requestMessage = mapper.writeValueAsString(request);
             sendMessage(requestMessage);
@@ -94,12 +94,10 @@ public class SocketClient {
 
     }
 
-    public void update(Map<String, String> values) {
+    public void update(Object values) {
         Request request = new Request();
         request.setEvent("update");
         request.setData(values);
-
-        ObjectMapper mapper = new ObjectMapper();
         try {
             String requestMessage = mapper.writeValueAsString(request);
             sendMessage(requestMessage);
@@ -109,18 +107,15 @@ public class SocketClient {
 
     }
 
-    public void delete(Map<String, String> values) {
+    public void delete(Object values) {
         Request request = new Request();
         request.setEvent("delete");
         request.setData(values);
-
-        ObjectMapper mapper = new ObjectMapper();
         try {
             String requestMessage = mapper.writeValueAsString(request);
             sendMessage(requestMessage);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-
     }
 }

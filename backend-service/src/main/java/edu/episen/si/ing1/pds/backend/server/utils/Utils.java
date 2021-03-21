@@ -23,6 +23,5 @@ public class Utils {
     public static File getFileContent(String varEnv) {
         String varValue = System.getenv(varEnv);
         return new File(varValue);
-
     }
 }

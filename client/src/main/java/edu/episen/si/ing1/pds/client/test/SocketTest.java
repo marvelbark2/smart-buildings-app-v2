@@ -1,31 +1,27 @@
 package edu.episen.si.ing1.pds.client.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.episen.si.ing1.pds.client.network.SocketClient;
 import edu.episen.si.ing1.pds.client.network.SocketConfig;
+import edu.episen.si.ing1.pds.client.utils.Utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class SocketTest {
 
     public void testSockets(int nSimulation) {
-        Map<String, String> values = new HashMap();
-        values.put("name", "Eric");
-        values.put("email", "eric@u.fr");
-        values.put("telephone", "0888288331");
+        Object values = sampleData();
         CompletableFuture.allOf(
                 futureList(nSimulation).stream()
                         .map(future -> future.thenAccept(socket -> {
                                     SocketClient client = new SocketClient(socket);
-                                    //welcome message
-                                    client.readMessage();
-
                                     client.create(values);
                                     client.update(values);
                                     client.delete(values);
@@ -58,5 +54,16 @@ public class SocketTest {
         return CompletableFuture.supplyAsync(() -> finalSocket);
     }
 
+    private Object sampleData() {
+        File data = Utils.getFileContent("SMARTBUILDSAMPLE");
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode node = null;
+        try {
+            node = (ArrayNode) mapper.readTree(data).get("data");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return node;
+    }
 }
 
