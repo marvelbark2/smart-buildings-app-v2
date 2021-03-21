@@ -17,4 +17,4 @@ sql:
   ALL: SELECT id, name, email, telephone from contacts;
 
 socket:
-  port: 1337
+  port: 63205
