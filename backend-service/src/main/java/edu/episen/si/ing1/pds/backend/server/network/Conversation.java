@@ -70,7 +70,7 @@ public class Conversation implements Runnable  {
             while ((request = reader.readLine()) != null && active) {
                 Request requestObj = mapper.readValue(request, Request.class);
                 String event = requestObj.getEvent();
-                logger.info(requestObj.getRequestId());
+                logger.info("Request ID: {}",requestObj.getRequestId());
                 switch (event) {
                     case "create":
                         logger.info("Client {} asking for create", clientId);
