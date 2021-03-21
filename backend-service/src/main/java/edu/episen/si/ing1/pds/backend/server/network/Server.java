@@ -44,6 +44,9 @@ public class Server {
                 Conversation conversation = new Conversation(socket, nbConnection);
                 ds.returnable(PoolFactory.Instance.isNotReturnable());
                 Connection connection = ds.getConnection();
+                if(ds.poolSize() == 0) {
+                    logger.info("Pool is Empty !");
+                }
                 Repository contact = new Contacts(connection);
                 conversation.setRepository(contact);
                 clients.add(conversation);

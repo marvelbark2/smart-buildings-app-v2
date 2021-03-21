@@ -7,8 +7,6 @@ import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 public enum DBConfig {
     Instance;

@@ -38,7 +38,7 @@ public class Conversation implements Runnable  {
     public void run() {
         try {
 
-            Thread.currentThread().setName(Thread.currentThread().getName()+"-client-" + clientId);
+            Thread.currentThread().setName("client-thread-" + clientId);
             //Init Reading
             InputStream inputStream = socket.getInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
