@@ -33,7 +33,6 @@ public class SocketClient {
     public void sendMessage(String msg) {
         writer.println(msg);
         readMessage();
-
     }
 
     public void close() {
@@ -42,7 +41,7 @@ public class SocketClient {
             reader.close();
             socket.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getLocalizedMessage());
         }
     }
 
@@ -64,7 +63,8 @@ public class SocketClient {
                     break;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getLocalizedMessage());
+            close();
         }
     }
 
@@ -76,7 +76,8 @@ public class SocketClient {
             String requestMessage = mapper.writeValueAsString(request);
             sendMessage(requestMessage);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error(e.getLocalizedMessage());
+            close();
         }
 
     }
@@ -89,7 +90,8 @@ public class SocketClient {
             String requestMessage = mapper.writeValueAsString(request);
             sendMessage(requestMessage);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error(e.getLocalizedMessage());
+            close();
         }
 
     }
@@ -102,7 +104,8 @@ public class SocketClient {
             String requestMessage = mapper.writeValueAsString(request);
             sendMessage(requestMessage);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error(e.getLocalizedMessage());
+            close();
         }
 
     }
@@ -115,7 +118,8 @@ public class SocketClient {
             String requestMessage = mapper.writeValueAsString(request);
             sendMessage(requestMessage);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error(e.getLocalizedMessage());
+            close();
         }
     }
 }
