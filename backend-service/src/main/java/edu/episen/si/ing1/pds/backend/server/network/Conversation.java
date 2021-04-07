@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Conversation implements Runnable {
-    private Socket socket;
-    private int clientId;
+    private final Socket socket;
+    private final int clientId;
     private boolean active = true;
     private Repository repository;
 	private final Logger logger = LoggerFactory.getLogger(Conversation.class.getName());
@@ -76,14 +76,14 @@ public class Conversation implements Runnable {
                         JsonNode node = requestObj.getData();
                         if(!(node instanceof ArrayNode)) {
                             String[] values = new String[]{node.get("name").asText(), node.get("email").asText(), node.get("telephone").asText() };
-                            Map<String, Object> createResponse = responseFactory("Create: " + repository.create(values));
+                            Map<String, Object> createResponse = responseFactory("Client-"+ clientId + " - Create: " + repository.create(values));
                             String createMessage = mapper.writeValueAsString(createResponse);
                             writer.println(createMessage);
                         } else {
                             ArrayNode arrayNode = (ArrayNode) node;
                             arrayNode.forEach(nodeData -> {
                                 String[] values = new String[]{nodeData.get("name").asText(), nodeData.get("email").asText(), nodeData.get("telephone").asText() };
-                                Map<String, Object> createResponse = responseFactory("Create: " + repository.create(values));
+                                Map<String, Object> createResponse = responseFactory("Client-"+ clientId + " - Create: " + repository.create(values));
                                 String createMessage = null;
                                 try {
                                     createMessage = mapper.writeValueAsString(createResponse);
@@ -177,7 +177,7 @@ public class Conversation implements Runnable {
 
                     case "read":
                         logger.info("Client {} asking for read", clientId);
-                        Map<String, Object> readResponse = responseFactory(repository.readAll().get(repository.readAll().size() - 1));
+                        Map<String, Object> readResponse = responseFactory("Read: " + repository.readAll().get(repository.readAll().size() - 1));
                         String readMessage = mapper.writeValueAsString(readResponse);
                         writer.println(readMessage);               
                         break;
