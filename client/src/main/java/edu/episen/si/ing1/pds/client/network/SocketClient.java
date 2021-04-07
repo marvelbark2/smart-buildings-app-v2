@@ -24,7 +24,7 @@ public class SocketClient {
             OutputStream outputStream = socket.getOutputStream();
             writer = new PrintWriter(outputStream, true);
         } catch (IOException e) {
-            e.printStackTrace();
+           logger.error(e.getMessage());
         }
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
         reader = new BufferedReader(inputStreamReader);
@@ -47,8 +47,12 @@ public class SocketClient {
 
     public void readMessage() {
         try {
+            String request;
             while (true) {
-                String request = reader.readLine();
+                request = reader.readLine();
+                if(request == null) {
+                    break;
+                }
                 Response response = mapper.readValue(request, Response.class);
                 if (response.isSuccess()) {
                     Object objt = response.getMessage();
@@ -56,10 +60,8 @@ public class SocketClient {
                 } else {
                     logger.error(response.getMessage().toString());
                 }
-                if(request == null) {
-                    break;
-                }
-                else if(response.getMessage().equals("end"))
+
+                if(response.getMessage().equals("end"))
                     break;
             }
         } catch (IOException e) {

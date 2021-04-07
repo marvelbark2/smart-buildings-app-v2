@@ -48,6 +48,8 @@ public class SocketsTest {
 
         DBConfig.Instance.setEnv(iTestMode);
         PoolFactory.Instance.setNotReturnable(iNotReturnable);
+
+
         Server serverSocket = new Server(iMaxConnection);
         serverSocket.serve();
     }

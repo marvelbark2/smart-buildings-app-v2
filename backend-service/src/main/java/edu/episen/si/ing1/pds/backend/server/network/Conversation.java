@@ -16,12 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Conversation implements Runnable  {
+public class Conversation implements Runnable {
     private Socket socket;
     private int clientId;
     private boolean active = true;
     private Repository repository;
-	private Logger logger = LoggerFactory.getLogger(Conversation.class.getName());
+	private final Logger logger = LoggerFactory.getLogger(Conversation.class.getName());
 
     public Conversation(Socket socket, int clientId) {
         this.socket = socket;
@@ -37,7 +37,6 @@ public class Conversation implements Runnable  {
     @Override
     public void run() {
         try {
-
             Thread.currentThread().setName("client-thread-" + clientId);
             //Init Reading
             InputStream inputStream = socket.getInputStream();
@@ -89,6 +88,13 @@ public class Conversation implements Runnable  {
                                 try {
                                     createMessage = mapper.writeValueAsString(createResponse);
                                 } catch (JsonProcessingException e) {
+                                    try {
+                                        badResponseFactory(e);
+                                        writer.close();
+                                        reader.close();
+                                    } catch (Exception ex) {
+                                        logger.error(ex.getMessage(), ex);
+                                    }
                                     e.printStackTrace();
                                 }
                                 writer.println(createMessage);
@@ -120,6 +126,13 @@ public class Conversation implements Runnable  {
                                 try {
                                     updateMessage = mapper.writeValueAsString(updateResponse);
                                 } catch (JsonProcessingException e) {
+                                    try {
+                                        badResponseFactory(e);
+                                        writer.close();
+                                        reader.close();
+                                    } catch (Exception ex) {
+                                        logger.error(ex.getMessage(), ex);
+                                    }
                                     e.printStackTrace();
                                 }
                                 writer.println(updateMessage);
@@ -148,6 +161,13 @@ public class Conversation implements Runnable  {
                                 try {
                                     deleteMessage = mapper.writeValueAsString(deleteResponse);
                                 } catch (JsonProcessingException e) {
+                                    try {
+                                        badResponseFactory(e);
+                                        writer.close();
+                                        reader.close();
+                                    } catch (Exception ex) {
+                                        logger.error(ex.getMessage(), ex);
+                                    }
                                     e.printStackTrace();
                                 }
                                 writer.println(deleteMessage);
@@ -169,20 +189,20 @@ public class Conversation implements Runnable  {
 
             socket.close();
 
-            while(socket.isClosed()) {
+            if(socket.isClosed()) {
                 active = false;
                 logger.info("The user {} disconnected", clientId);
                 Server.getClients().remove(this);
-                break;
             }
         } catch (Exception e) {
+            badResponseFactory(e);
             logger.error(e.getMessage(), e);
         }
     }
 
     private Map<String, Object> responseFactory(Object msg) {
         Map<String, Object> message = new HashMap<>();
-        message.put("success", String.valueOf(true));
+        message.put("success", true);
         message.put("message", msg);
         if(msg instanceof List) {
             message.put("dataType", "list");
@@ -195,6 +215,36 @@ public class Conversation implements Runnable  {
         }
         return message;
     }
+
+    private void badResponseFactory(Exception e) {
+        Map<String, String> message = new HashMap<>();
+        message.put("success", String.valueOf(false));
+        message.put("dataType", "error");
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            OutputStream outputStream = socket.getOutputStream();
+            PrintWriter writer = new PrintWriter(outputStream, true);
+
+            StringWriter sWriter = new StringWriter();
+            PrintWriter stringVar = new PrintWriter(sWriter, true);
+            e.printStackTrace(stringVar);
+            String error = sWriter.toString();
+
+            message.put("message", "Server Error: " + error);;
+            String errprMessage = mapper.writeValueAsString(message);
+
+            writer.println(errprMessage);
+
+            stringVar.close();
+            writer.close();
+            socket.close();
+        } catch (IOException ioException) {
+            logger.error(ioException.getMessage(), ioException);
+        }
+    }
+
+
 
     private int getLastId() {
         List<Map<String, Object>> all = repository.readAll();

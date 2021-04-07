@@ -54,12 +54,12 @@ public class Server {
                 ds.release(connection);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             executor.shutdownNow();
             try {
                 serverSocket.close();
             } catch (IOException ioException) {
-                ioException.printStackTrace();
+                logger.info(ioException.getMessage());
             }
         }
 
