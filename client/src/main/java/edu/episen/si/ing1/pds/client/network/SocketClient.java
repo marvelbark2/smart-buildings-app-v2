@@ -88,6 +88,7 @@ public class SocketClient {
         Request request = new Request();
         request.setEvent("read");
         request.setData(values);
+
         try {
             String requestMessage = mapper.writeValueAsString(request);
             sendMessage(requestMessage);

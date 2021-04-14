@@ -3,6 +3,7 @@ package edu.episen.si.ing1.pds.client.utils;
 import java.io.File;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -32,5 +33,14 @@ public class Utils {
     public static File getFileContent(String varEnv) {
         String varValue = System.getenv(varEnv);
         return new File(varValue);
+    }
+    public static String generateSerialNumber() {
+        String randomString = generateStringId(20).toUpperCase(Locale.ROOT);
+        StringBuilder builder = new StringBuilder(randomString);
+        for (int i = 0; i < builder.length(); i++) {
+            if(i % 5 == 0 && i != 0)
+                builder.insert(i, "-");
+        }
+        return builder.toString();
     }
 }

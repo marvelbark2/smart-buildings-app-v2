@@ -1,19 +1,9 @@
 package edu.episen.si.ing1.pds.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.episen.si.ing1.pds.client.network.Request;
-import edu.episen.si.ing1.pds.client.network.SocketClient;
-import edu.episen.si.ing1.pds.client.network.SocketConfig;
 import edu.episen.si.ing1.pds.client.roles.RoleType;
-import edu.episen.si.ing1.pds.client.test.SocketTest;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.InetAddress;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Client {
     private final static Logger logger = LoggerFactory.getLogger(Client.class.getName());

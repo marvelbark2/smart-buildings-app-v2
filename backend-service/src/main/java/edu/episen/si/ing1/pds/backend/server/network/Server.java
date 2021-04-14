@@ -2,8 +2,6 @@ package edu.episen.si.ing1.pds.backend.server.network;
 
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 import edu.episen.si.ing1.pds.backend.server.pool.PoolFactory;
-import edu.episen.si.ing1.pds.backend.server.test.persistence.Contacts;
-import edu.episen.si.ing1.pds.backend.server.test.persistence.Repository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,18 +17,13 @@ import java.util.concurrent.Executors;
 
 public class Server {
     private Logger logger = LoggerFactory.getLogger(Server.class.getName());
-    private DataSource ds;
+    private final DataSource ds;
     private int nbConnection;
-    private static List<Conversation> clients = new ArrayList<>();
     private ExecutorService executor = Executors.newCachedThreadPool();
     private ServerSocket serverSocket;
     
     public Server(int nPool) {
     	ds = new DataSource(nPool);
-    }
-
-    public static List<Conversation> getClients() {
-        return clients;
     }
 
     public void serve() {
@@ -47,9 +40,7 @@ public class Server {
                 if(ds.poolSize() == 0) {
                     logger.info("Pool is Empty !");
                 }
-                Repository contact = new Contacts(connection);
-                conversation.setRepository(contact);
-                clients.add(conversation);
+                conversation.setConnection(connection);
                 executor.execute(conversation);
                 ds.release(connection);
             }
