@@ -5,14 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.network.SocketConfig;
+import edu.episen.si.ing1.pds.client.network.SocketFactory;
+import edu.episen.si.ing1.pds.client.test.swing.Routes;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -27,7 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
-public class CardView extends JFrame {
+public class CardView implements Routes {
     private final ObjectMapper mapper = new ObjectMapper();
     private String[][] tableData;
     private PrintWriter writer;
@@ -35,16 +41,61 @@ public class CardView extends JFrame {
     private final Logger logger = LoggerFactory.getLogger(CardView.class.getName());
 
     public CardView() {
-        this.setTitle("Liste des cartes");
-        this.setSize(1200, 800);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JPanel panel = new JPanel(new GridLayout(4, 1));
 
+    }
+
+    private void getCardList() {
+            try {
+                Request request = new Request();
+                request.setEvent("card_list");
+                String requestSerialized = mapper.writeValueAsString(request);
+                writer.println(requestSerialized);
+                while (true) {
+                    String req = reader.readLine();
+                    Response response = mapper.readValue(req, Response.class);
+                    if (response.getMessage().equals("end"))
+                        break;
+                    if (response.getEvent().equals("card_list")) {
+                        List<Map<String, Object>> data = (List) response.getMessage();
+                        logger.info(data.get(data.size() - 1).toString());
+                        String[][] arr = new String[data.size()][data.get(0).size()];
+                        int i = 0;
+                        for (Map map : data) {
+                            int w = 0;
+                            for (Object key : map.keySet()) {
+                                if (map.get(key) != null) {
+                                    if (map.get(key) instanceof Map)
+                                        arr[i][w] = ((Map<?, ?>) map.get(key)).get("name").toString();
+                                    else
+                                        arr[i][w] = map.get(key).toString();
+                                    w++;
+                                } else {
+                                    arr[i][w] = "0";
+                                    w++;
+                                }
+                            }
+                            i++;
+                        }
+                        tableData = arr;
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+    }
+
+    @Override
+    public void launch(ContextFrame context) {
+        JFrame frame = context.getFrame();
+        frame.setTitle("Gerer les cartes");
+        frame.pack();
+//        JPanel panel = new JPanel(new GridLayout(5, 1, 5, 5));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         try {
-            String host = SocketConfig.Instance.HOST;
-            InetAddress address = InetAddress.getByName(host);
-            Socket socket = new Socket(address, SocketConfig.Instance.PORT);
+            Socket socket = SocketFactory.Instance.getSocket();
             writer = new PrintWriter(socket.getOutputStream(), true);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -56,10 +107,8 @@ public class CardView extends JFrame {
             JScrollPane sp = new JScrollPane(table);
 
             ListSelectionModel select = table.getSelectionModel();
-            JPanel btnPanel = new JPanel();
+            JPanel btnPanel = new JPanel(new GridLayout(1, 2));
 
-            LayoutManager btnLayout = new BoxLayout(btnPanel, BoxLayout.X_AXIS);
-            btnPanel.setLayout(btnLayout);
             btnPanel.setBorder(BorderFactory.createTitledBorder("Operations"));
 
 
@@ -87,21 +136,19 @@ public class CardView extends JFrame {
                             if(response.getEvent().equals("card_delete")) {
                                 logger.info("Data Deleted");
                                 logger.info(response.toString());
+                                table.clearSelection();
                             }
                         }
                     } catch (Exception jsonProcessingException) {
                         jsonProcessingException.printStackTrace();
                     }
-                } else
+                } else {
                     logger.error("Select a row");
-
+                }
             });
 
-            edit.setAlignmentY(Component.CENTER_ALIGNMENT);
-            delete.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-            btnPanel.add(edit, Component.CENTER_ALIGNMENT);
-            btnPanel.add(delete, Component.CENTER_ALIGNMENT);
+            btnPanel.add(edit, BorderLayout.CENTER);
+            btnPanel.add(delete, BorderLayout.CENTER);
 
 
 
@@ -198,13 +245,16 @@ public class CardView extends JFrame {
             JPanel submit = new JPanel(new FlowLayout(FlowLayout.CENTER));
             JButton submitButton = new JButton("Soumettre");
             submitButton.setSize(100, 100);
-            JFrame frame = this;
             submitButton.addActionListener((e) -> {
                 try {
                     if ((snFieldText.getText() != null && snFieldText.getText().length() >= 20) && (comboBox.getSelectedItem() != null || comboBox.getSelectedIndex() != -1)) {
                         Request insertCardReq = new Request();
                         insertCardReq.setEvent("card_insert");
-                        insertCardReq.setData(Map.of("cardUId", snFieldText.getText(), "expirable", expirable.isSelected(), "expireDate", expirableDate.getText(), "user", comboBox.getSelectedItem()));
+                        String expireDateValue = "";
+                        if(expirable.isSelected())
+                            expireDateValue = expirableDate.getText();
+
+                        insertCardReq.setData(Map.of("cardUId", snFieldText.getText(), "expirable", expirable.isSelected(), "expireDate", expireDateValue, "user", comboBox.getSelectedItem()));
                         writer.println(mapper.writeValueAsString(insertCardReq));
                         while (true) {
                             Response response = mapper.readValue(reader.readLine(), Response.class);
@@ -214,12 +264,12 @@ public class CardView extends JFrame {
                                 Boolean isAdded = Boolean.valueOf((Boolean) response.getMessage());
                                 if (isAdded) {
                                     new Thread(() -> SwingUtilities.invokeLater(() -> {
+                                        table.clearSelection();
                                         getCardList();
+                                        table.setModel(tableModel);
                                         tableModel.fireTableDataChanged();
-                                        frame.invalidate();
-                                        frame.validate();
-                                        frame.repaint();
                                     })).start();
+
                                 }
                             }
                         }
@@ -246,18 +296,27 @@ public class CardView extends JFrame {
             });
             submit.add(submitButton);
 
+            JButton returnBack = new JButton("Retourner");
+            returnBack.addActionListener(e -> {
+                context.returnHere();
+                panel.setVisible(false);
+            });
+            Box buttonsPanel = Box.createVerticalBox();
+            buttonsPanel.setBorder(new LineBorder(Color.RED));
+            buttonsPanel.add(returnBack);
+            returnBack.setBackground(new Color(2, 117, 216));
+            returnBack.setOpaque(true);
+
+            panel.add(buttonsPanel, FlowLayout.LEFT);
             panel.add(sp);
             panel.add(btnPanel);
             panel.add(formPanel);
             panel.add(submit);
-            add(panel);
-            setVisible(true);
-            pack();
-            Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
+
+            frame.add(panel);
 
 
-            addWindowListener(new WindowAdapter() {
+            frame.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
                     super.windowClosing(e);
@@ -274,46 +333,5 @@ public class CardView extends JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void getCardList() {
-            try {
-                Request request = new Request();
-                request.setEvent("card_list");
-                String requestSerialized = mapper.writeValueAsString(request);
-                writer.println(requestSerialized);
-                while (true) {
-                    String req = reader.readLine();
-                    Response response = mapper.readValue(req, Response.class);
-                    if (response.getMessage().equals("end"))
-                        break;
-                    if (response.getEvent().equals("card_list")) {
-                        List<Map<String, Object>> data = (List) response.getMessage();
-                        logger.info(data.get(data.size() - 1).toString());
-                        String[][] arr = new String[data.size()][data.get(0).size()];
-                        int i = 0;
-                        for (Map map : data) {
-                            int w = 0;
-                            for (Object key : map.keySet()) {
-                                if (map.get(key) != null) {
-                                    if (map.get(key) instanceof Map)
-                                        arr[i][w] = ((Map<?, ?>) map.get(key)).get("name").toString();
-                                    else
-                                        arr[i][w] = map.get(key).toString();
-                                    w++;
-                                } else {
-                                    arr[i][w] = "0";
-                                    w++;
-                                }
-                            }
-                            i++;
-                        }
-                        tableData = arr;
-                    }
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
     }
 }

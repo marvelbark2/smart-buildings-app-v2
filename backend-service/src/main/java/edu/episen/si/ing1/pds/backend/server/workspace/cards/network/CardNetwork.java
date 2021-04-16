@@ -39,7 +39,7 @@ public class CardNetwork {
                 List data = service.findAll();
                 Map<String, Object> msgResponseT = Utils.responseFactory(data, "card_list");
                 String reponseMsg = mapper.writeValueAsString(msgResponseT);
-                logger.info(data.get(data.size() - 1).toString());
+//                logger.info(data.get(data.size() - 1).toString());
                 writer.println(reponseMsg);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();

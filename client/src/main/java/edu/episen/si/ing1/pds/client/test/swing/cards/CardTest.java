@@ -8,6 +8,7 @@ import javax.swing.*;
 public class CardTest {
     public static void main(String[] args) {
         SocketConfig.Instance.setEnv(true);
-        SwingUtilities.invokeLater(CardView::new);
+
+        SwingUtilities.invokeLater(ContextFrame::new);
     }
 }
