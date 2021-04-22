@@ -39,16 +39,20 @@ public class ContextFrame implements ActionListener {
 
         JPanel buttons = new JPanel();
         JButton cardTest = new JButton("Manipuler les cartes");
+        JButton userTest = new JButton("Manipuler les users");
         JButton roleTest = new JButton("Tester les cartes");
 
+        userTest.addActionListener(this);
         cardTest.addActionListener(this);
         roleTest.addActionListener(this);
 
         frames.put(cardTest, new CardView());
         frames.put(roleTest, new CardRoleTest());
+        frames.put(userTest, new UsersView());
 
         buttons.add(cardTest);
         buttons.add(roleTest);
+        buttons.add(userTest);
 
         context.add(buttons);
 

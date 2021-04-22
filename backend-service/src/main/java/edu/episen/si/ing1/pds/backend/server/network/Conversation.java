@@ -14,11 +14,13 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class Conversation implements Runnable {
     private final Socket socket;
     private final int clientId;
     private boolean active = true;
     private Connection connection;
+    private PrintWriter writer;
 	private final Logger logger = LoggerFactory.getLogger(Conversation.class.getName());
 
     public Conversation(Socket socket, int clientId) {
@@ -43,7 +45,7 @@ public class Conversation implements Runnable {
 
             // Init Writting
             OutputStream outputStream = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(outputStream, true);
+            writer = new PrintWriter(outputStream, true);
 
             //Client IP
             String ip = socket.getRemoteSocketAddress().toString();
@@ -65,8 +67,9 @@ public class Conversation implements Runnable {
             //Request Handling
             String request;
             while ((request = reader.readLine()) != null && active) {
+                System.out.println(request);
                 Request requestObj = mapper.readValue(request, Request.class);
-                String event = requestObj.getEvent();
+
                 logger.info("Request ID: {}",requestObj.getRequestId());
 
                 CardNetwork cardNetwork = new CardNetwork(connection, writer);
@@ -74,7 +77,6 @@ public class Conversation implements Runnable {
 
                 UsersNetwork usersNetwork = new UsersNetwork(connection, writer);
                 usersNetwork.execute(requestObj);
-
 
                 Map<String, Object> endResponse = Utils.responseFactory("end", "end");
                 String createMessage = mapper.writeValueAsString(endResponse);
@@ -110,14 +112,16 @@ public class Conversation implements Runnable {
 
             message.put("message", "Server Error: " + error);;
             String errprMessage = mapper.writeValueAsString(message);
-
             writer.println(errprMessage);
-
             stringVar.close();
             writer.close();
             socket.close();
         } catch (IOException ioException) {
             logger.error(ioException.getMessage(), ioException);
         }
+    }
+
+    public PrintWriter getWriter() {
+        return writer;
     }
 }

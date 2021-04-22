@@ -1,11 +1,9 @@
 package edu.episen.si.ing1.pds.client.test.swing.cards;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
-import edu.episen.si.ing1.pds.client.network.SocketConfig;
-import edu.episen.si.ing1.pds.client.network.SocketFactory;
+import edu.episen.si.ing1.pds.client.network.SocketFacade;
 import edu.episen.si.ing1.pds.client.test.swing.Routes;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 import org.slf4j.Logger;
@@ -13,19 +11,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -52,6 +46,9 @@ public class CardView implements Routes {
                 writer.println(requestSerialized);
                 while (true) {
                     String req = reader.readLine();
+                    if(req == null)
+                        break;
+
                     Response response = mapper.readValue(req, Response.class);
                     if (response.getMessage().equals("end"))
                         break;
@@ -70,7 +67,7 @@ public class CardView implements Routes {
                                         arr[i][w] = map.get(key).toString();
                                     w++;
                                 } else {
-                                    arr[i][w] = "0";
+                                    arr[i][w] = "Infini";
                                     w++;
                                 }
                             }
@@ -90,12 +87,11 @@ public class CardView implements Routes {
         JFrame frame = context.getFrame();
         frame.setTitle("Gerer les cartes");
         frame.pack();
-//        JPanel panel = new JPanel(new GridLayout(5, 1, 5, 5));
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         try {
-            Socket socket = SocketFactory.Instance.getSocket();
+            Socket socket = SocketFacade.Instance.getSocket();
             writer = new PrintWriter(socket.getOutputStream(), true);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -103,7 +99,9 @@ public class CardView implements Routes {
             getCardList();
             DefaultTableModel tableModel = new DefaultTableModel(tableData, cols);
             JTable table = new JTable(tableModel);
-
+            JTableHeader header = table.getTableHeader();
+            header.setBackground(Color.black);
+            header.setForeground(Color.white);
             JScrollPane sp = new JScrollPane(table);
 
             ListSelectionModel select = table.getSelectionModel();
@@ -302,12 +300,13 @@ public class CardView implements Routes {
                 panel.setVisible(false);
             });
             Box buttonsPanel = Box.createVerticalBox();
-            buttonsPanel.setBorder(new LineBorder(Color.RED));
             buttonsPanel.add(returnBack);
             returnBack.setBackground(new Color(2, 117, 216));
             returnBack.setOpaque(true);
 
-            panel.add(buttonsPanel, FlowLayout.LEFT);
+            buttonsPanel.setAlignmentX( Component.LEFT_ALIGNMENT );//0.0
+
+            panel.add(buttonsPanel, Component.LEFT_ALIGNMENT);
             panel.add(sp);
             panel.add(btnPanel);
             panel.add(formPanel);

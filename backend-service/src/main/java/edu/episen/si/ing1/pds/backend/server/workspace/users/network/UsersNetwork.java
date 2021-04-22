@@ -6,6 +6,8 @@ import edu.episen.si.ing1.pds.backend.server.network.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
 import edu.episen.si.ing1.pds.backend.server.workspace.users.services.UsersService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -16,6 +18,7 @@ public class UsersNetwork {
     private Services service;
     private final PrintWriter writer;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final Logger logger = LoggerFactory.getLogger(UsersNetwork.class.getName());
 
     public UsersNetwork(Connection connection, PrintWriter writer) {
         this.writer = writer;
@@ -28,6 +31,7 @@ public class UsersNetwork {
             try {
                 Map<String, Object> usersCollection = Utils.responseFactory(service.findAll(), "user_list");
                 String collectionSerialized = mapper.writeValueAsString(usersCollection);
+                logger.info("Receiving user_list request");
                 writer.println(collectionSerialized);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();

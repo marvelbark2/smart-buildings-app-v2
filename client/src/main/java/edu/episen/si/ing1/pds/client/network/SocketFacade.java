@@ -3,11 +3,11 @@ package edu.episen.si.ing1.pds.client.network;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public enum SocketFactory {
+public enum SocketFacade {
     Instance;
     private Socket socket;
 
-    SocketFactory() {
+    SocketFacade() {
         try {
             String host = SocketConfig.Instance.HOST;
             InetAddress address = InetAddress.getByName(host);

@@ -21,7 +21,6 @@ public class Server {
     private int nbConnection;
     private ExecutorService executor = Executors.newCachedThreadPool();
     private ServerSocket serverSocket;
-    
     public Server(int nPool) {
     	ds = new DataSource(nPool);
     }
@@ -41,6 +40,7 @@ public class Server {
                     logger.info("Pool is Empty !");
                 }
                 conversation.setConnection(connection);
+
                 executor.execute(conversation);
                 ds.release(connection);
             }
@@ -53,6 +53,10 @@ public class Server {
                 logger.info(ioException.getMessage());
             }
         }
+
+    }
+
+    private void broadcast() {
 
     }
 }
