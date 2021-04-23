@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -103,14 +104,18 @@ public class Mapping_Window extends JFrame {
 		
 		JPanel bloc = new JPanel(new GridLayout(3,1));
 		
-		ImageIcon icon_ecran = new ImageIcon("/Users/selim/smart-buildings-app/client/src/main/resources/icon/capteur.png");
+		
 		JLabel ecran = new JLabel("Ecran");
-		ecran.setIcon(new ImageIcon(new ImageIcon("/Users/selim/smart-buildings-app/client/src/main/resources/icon/capteur.png").getImage()));
+		ecran.setIcon(new ImageIcon(new ImageIcon("/Users/selim/smart-buildings-app/client/src/main/resources/icon/ecran.jpg").getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
 		ecran.setPreferredSize(new Dimension(100,30));
+		
 		JLabel prise = new JLabel("Prise");
 		prise.setPreferredSize(new Dimension(100,30));
+		prise.setIcon(new ImageIcon(new ImageIcon("/Users/selim/smart-buildings-app/client/src/main/resources/icon/prise.jpg").getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
+		
 		JLabel capteur = new JLabel("Capteur");
 		capteur.setPreferredSize(new Dimension(100,30));
+		capteur.setIcon(new ImageIcon(new ImageIcon("/Users/selim/smart-buildings-app/client/src/main/resources/icon/capteur.png").getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
 		
 		bloc.add(ecran);
 		bloc.add(capteur);
@@ -121,7 +126,7 @@ public class Mapping_Window extends JFrame {
 	}
 	
 	public static void main(String[] args) {
-		TestCanvas frame = new TestCanvas();
+		Mapping_Window frame = new Mapping_Window();
 		frame.setVisible(true);
 	
 	}
