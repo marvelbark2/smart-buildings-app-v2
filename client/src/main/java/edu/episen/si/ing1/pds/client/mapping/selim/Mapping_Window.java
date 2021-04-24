@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -64,7 +66,17 @@ public class Mapping_Window extends JFrame {
 		
 		JToolBar toolBar = new JToolBar();
 		
-		JButton retour = new JButton("Retour");
+		 JButton retour = new JButton("Retour");
+	        retour.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	                // global will be a frame containing our different panels
+	            	//global.returnBack();
+	            }
+	        });
+	        toolBar.add(retour);
+		
+		
 		toolBar.add(retour);
 		
 		return toolBar;
