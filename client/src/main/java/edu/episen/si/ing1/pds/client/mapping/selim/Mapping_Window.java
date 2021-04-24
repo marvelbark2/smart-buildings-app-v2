@@ -4,13 +4,16 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,6 +23,7 @@ import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.plaf.basic.BasicTreeUI;
 
 public class Mapping_Window extends JFrame {
 	
@@ -53,14 +57,32 @@ public class Mapping_Window extends JFrame {
 		
 	}
 	
-	private JScrollPane menuScroll() {
-		
-		JScrollPane menu = new JScrollPane(new JTree());
-		menu.setPreferredSize(new Dimension(200,0));
-		
-		return menu;
-		
-	}
+	 private JScrollPane menuScroll() {
+	        JTree tree = new JTree();
+	        tree.setUI(new BasicTreeUI() {
+	            @Override
+	            public void setExpandedIcon(Icon newG) {
+	                super.setExpandedIcon(null);
+	            }
+
+	            @Override
+	            public void setCollapsedIcon(Icon newG) {
+	                super.setCollapsedIcon(null);
+	            }
+
+	            protected void paintHorizontalLine(Graphics g, JComponent c, int y, int left, int right){
+	                super.paintHorizontalLine(g,c,y,left,right);
+	            }
+	            protected void paintVerticalLine(Graphics g,JComponent c,int x,int top,int bottom){
+	                super.paintVerticalLine(g,c,x,top,bottom);
+	            }
+	        });
+	        JScrollPane menu = new JScrollPane(tree);
+	        menu.setPreferredSize(new Dimension(200,0));
+
+	        return menu;
+
+	    }
 	
 	private JToolBar createToolBar() {
 		
