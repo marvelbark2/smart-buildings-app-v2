@@ -39,9 +39,6 @@ public class CardRoleTest implements Routes {
 
         frame.add(panel);
         frame.setVisible(true);
-        //frame.pack();
-        //Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        //frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
     }
     private void getData() {
         try {
@@ -63,12 +60,9 @@ public class CardRoleTest implements Routes {
                 if(!line.equals("end"))
                     break;
 
-                System.out.println(line);
-
                 Response response = mapper.readValue(line, Response.class);
                 if(response.getEvent().equals(event)) {
                     List<Map<String, String>> data = (List) response.getMessage();
-                    System.out.println(data);
                 }
             }
         } catch (Exception e) {

@@ -10,6 +10,7 @@ import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class CardService implements Services<CardRequest, CardsResponse> {
@@ -125,6 +126,22 @@ public class CardService implements Services<CardRequest, CardsResponse> {
             e.printStackTrace();
         }
         return response;
+    }
+
+    public List<Map> getItemAccessList(String serialId) {
+        List<Map> list = new ArrayList<>();
+        String sql = "SELECT * from getCardAccessibiliy(?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, serialId);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                list.add(Map.of("id", rs.getInt("id"), "title", rs.getString("name"), "type", rs.getString("type"), "accessible", rs.getBoolean("access")));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return list;
     }
 
 }

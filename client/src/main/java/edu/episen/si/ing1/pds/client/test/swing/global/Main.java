@@ -1,32 +1,35 @@
 package edu.episen.si.ing1.pds.client.test.swing.global;
 
 import edu.episen.si.ing1.pds.client.network.SocketConfig;
-import edu.episen.si.ing1.pds.client.test.swing.Global;
 import edu.episen.si.ing1.pds.client.test.swing.cards.ContextFrame;
+import edu.episen.si.ing1.pds.client.test.swing.shared.Ui;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Main implements ActionListener {
+public class Main implements MouseListener {
     private final JPanel global;
     private JPanel menu;
     private JPanel context;
     private JPanel bloc;
+    private final JFrame frame;
 
 
 
-    private Map<JButton, Navigate> frames;
+    private Map<JLabel, Navigate> frames;
     public Main() {
+        frame = new JFrame("Smart building app");
         global = new JPanel();
         frames = new HashMap<>();
         BorderLayout borderLayout = new BorderLayout();
         borderLayout.setHgap(5);
-//        borderLayout.setVgap(20);
         global.setLayout(borderLayout);
 
         JPanel logo = new JPanel(new FlowLayout());
@@ -60,24 +63,29 @@ public class Main implements ActionListener {
         realize.setBorderPainted(false);
         realize.setFocusPainted(false);
 
-        JButton consult = new JButton("Consulter une location");
+        JLabel consult = new JLabel("Consulter une location", SwingUtilities.CENTER);
         consult.setMinimumSize(new Dimension(Integer.MAX_VALUE, 75));
         consult.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         consult.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
-        consult.setOpaque(false);
+        consult.setOpaque(true);
+        frames.put(consult, new ContextFrame(this));
+        consult.addMouseListener(this);
 
-        consult.setBackground(new Color(145, 115, 207));
+        consult.setBackground(new Color(54, 38, 90));
         consult.setForeground(Color.white);
-        consult.setBorderPainted(false);
-        consult.setFocusPainted(false);
 
-        JButton staff = new JButton("Configurer les cartes d'acces");
+        JLabel staff = new JLabel("Configurer les cartes d'acces", SwingUtilities.CENTER);
         staff.setMinimumSize(new Dimension(Integer.MAX_VALUE, 75));
         staff.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         staff.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
+        staff.setBackground(new Color(54, 38, 90));
+        staff.setForeground(Color.white);
+
         staff.setOpaque(true);
+
+        Main app = this;
+        staff.addMouseListener(this);
         frames.put(staff, new ContextFrame(this));
-        staff.addActionListener(this);
 
         JPanel underMenu = new JPanel(new FlowLayout(FlowLayout.LEFT));
         underMenu.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
@@ -115,6 +123,7 @@ public class Main implements ActionListener {
     private void setupContext() {
         context = new JPanel();
         context.setBorder(new LineBorder(Color.GREEN));
+        context.setBackground(Ui.COLOR_INTERACTIVE);
     }
     private void setupBloc() {
         bloc = new JPanel();
@@ -124,9 +133,9 @@ public class Main implements ActionListener {
     private static void createAndShowGUI() {
         SocketConfig.Instance.setEnv(true);
         Main app = new Main();
-        JFrame frame = new JFrame("Smart building app");
+        JFrame frame = app.frame;
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1200, 1000);
+        frame.setSize(1800, 1000);
         frame.setPreferredSize(frame.getSize());
         frame.setVisible(true);
         frame.setContentPane(app.getGlobal());
@@ -157,16 +166,51 @@ public class Main implements ActionListener {
         return bloc;
     }
 
+    public JFrame getFrame() {
+        return frame;
+    }
+
+
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() instanceof JButton) {
+    public void mouseClicked(MouseEvent e) {
+        if(e.getSource() instanceof JLabel) {
             context.removeAll();
-            JButton clickedButton = (JButton) e.getSource();
+            JLabel clickedButton = (JLabel) e.getSource();
+            clickedButton.setBackground(new Color(72, 64, 92));
+
             Navigate goTo = frames.get(clickedButton);
             goTo.start();
             context.invalidate();
             context.validate();
             context.repaint();
         }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        JLabel label = (JLabel) e.getSource();
+        label.setBackground(new Color(72, 64, 92));
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        for (JLabel l: frames.keySet()) {
+            l.setBackground(new Color(54, 38, 90));
+            l.repaint();
+        }
+        JLabel label = (JLabel) e.getSource();
+        label.setBackground(new Color(72, 64, 92));
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        JLabel label = (JLabel) e.getSource();
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        JLabel label = (JLabel) e.getSource();
+        label.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 }
