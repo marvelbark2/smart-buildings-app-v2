@@ -18,4 +18,13 @@ public class Request {
     public String getRequestId() {
         return requestId;
     }
+
+    @Override
+    public String toString() {
+        return "Request{" +
+                "requestId='" + requestId + '\'' +
+                ", event='" + event + '\'' +
+                ", data=" + data +
+                '}';
+    }
 }

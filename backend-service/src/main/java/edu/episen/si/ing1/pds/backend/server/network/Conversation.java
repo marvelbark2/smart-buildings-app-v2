@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.network.CardNetwork;
+import edu.episen.si.ing1.pds.backend.server.workspace.mapping.MappingNetwork;
 import edu.episen.si.ing1.pds.backend.server.workspace.users.network.UsersNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,9 +68,8 @@ public class Conversation implements Runnable {
             //Request Handling
             String request;
             while ((request = reader.readLine()) != null && active) {
-                System.out.println(request);
                 Request requestObj = mapper.readValue(request, Request.class);
-
+                logger.info(requestObj.toString());
                 logger.info("Request ID: {}",requestObj.getRequestId());
 
                 CardNetwork cardNetwork = new CardNetwork(connection, writer);
@@ -77,6 +77,8 @@ public class Conversation implements Runnable {
 
                 UsersNetwork usersNetwork = new UsersNetwork(connection, writer);
                 usersNetwork.execute(requestObj);
+
+                new MappingNetwork(requestObj, connection, writer);
 
                 Map<String, Object> endResponse = Utils.responseFactory("end", "end");
                 String createMessage = mapper.writeValueAsString(endResponse);

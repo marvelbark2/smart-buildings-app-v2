@@ -87,7 +87,8 @@ public class CardNetwork {
                 cardRequest.setCardId(data.get("ID").asLong());
                 cardRequest.setCardUId(data.get("Matricule").asText());
                 cardRequest.setExpirable(data.get("Provisoire").asBoolean());
-                if(data.get("Date d'expiration").asText().equals("0"))
+
+                if(data.get("Date d'expiration").asText().equals("Infini"))
                     cardRequest.setExpiredDate(null);
                 else
                     cardRequest.setExpiredDate(localDateParser(data.get("Date d'expiration").asText()));

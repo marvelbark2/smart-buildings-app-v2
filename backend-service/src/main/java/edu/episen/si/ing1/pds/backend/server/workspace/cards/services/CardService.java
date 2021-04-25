@@ -23,7 +23,7 @@ public class CardService implements Services<CardRequest, CardsResponse> {
         CardsResponse response = null;
         try {
             Cards card = new Cards();
-            String query = "SELECT * FROM cards WHERE cardid = ?";
+            String query = "SELECT * FROM cards c JOIN users u on u.userId = c.userId WHERE cardid = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
@@ -36,6 +36,11 @@ public class CardService implements Services<CardRequest, CardsResponse> {
                 } else {
                     card.setExpiredDate(null);
                 }
+                Users user = new Users();
+                user.setUserId(rs.getLong("userid"));
+                user.setUserUId(rs.getString("user_uid"));
+                user.setName(rs.getString("name"));
+                card.setUser(user);
                 response = new CardsResponse(card);
             } else
                 if(card.getCardId() == null)
