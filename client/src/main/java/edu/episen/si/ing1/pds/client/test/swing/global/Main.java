@@ -2,6 +2,7 @@ package edu.episen.si.ing1.pds.client.test.swing.global;
 
 import edu.episen.si.ing1.pds.client.network.SocketConfig;
 import edu.episen.si.ing1.pds.client.test.swing.cards.ContextFrame;
+import edu.episen.si.ing1.pds.client.test.swing.location.LocationMenu;
 import edu.episen.si.ing1.pds.client.test.swing.shared.Ui;
 
 import javax.swing.*;
@@ -53,15 +54,15 @@ public class Main implements MouseListener {
         menu.setLayout(new BoxLayout(menu, BoxLayout.Y_AXIS));
         menu.add(Box.createVerticalStrut(100));
 
-        JButton realize = new JButton("Realiser une location");
+        JLabel realize = new JLabel("Realiser une location", SwingUtilities.CENTER);
         realize.setMinimumSize(new Dimension(Integer.MAX_VALUE, 75));
         realize.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         realize.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
-        realize.setOpaque(false);
+        realize.setOpaque(true);
         realize.setBackground(new Color(54, 38, 90));
         realize.setForeground(Color.white);
-        realize.setBorderPainted(false);
-        realize.setFocusPainted(false);
+        frames.put(realize, new LocationMenu(this));
+        realize.addMouseListener(this);
 
         JLabel consult = new JLabel("Consulter une location", SwingUtilities.CENTER);
         consult.setMinimumSize(new Dimension(Integer.MAX_VALUE, 75));
