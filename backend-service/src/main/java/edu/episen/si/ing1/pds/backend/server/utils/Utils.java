@@ -1,9 +1,17 @@
 package edu.episen.si.ing1.pds.backend.server.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.episen.si.ing1.pds.backend.server.network.Conversation;
+
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class Utils {
 
@@ -20,8 +28,35 @@ public class Utils {
         return map;
     }
 
+    public static String generateStringId(int length) {
+        StringBuilder returnValue = new StringBuilder(length);
+        final Random RANDOM = new SecureRandom();
+        final String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        for (int i = 0; i < length; i++) {
+            returnValue.append(ALPHABET.charAt(RANDOM.nextInt(ALPHABET.length())));
+        }
+        return new String(returnValue);
+    }
+
     public static File getFileContent(String varEnv) {
         String varValue = System.getenv(varEnv);
         return new File(varValue);
+    }
+
+    public static Map<String, Object> responseFactory(Object msg, String event) {
+        Map<String, Object> message = new HashMap<>();
+        message.put("success", true);
+        message.put("message", msg);
+        message.put("event", event);
+        if(msg instanceof List) {
+            message.put("dataType", "list");
+        } else if(msg instanceof Map) {
+            message.put("dataType", "map");
+        } else if (msg instanceof String) {
+            message.put("dataType", "string");
+        } else {
+            message.put("dataType", "object");
+        }
+        return message;
     }
 }

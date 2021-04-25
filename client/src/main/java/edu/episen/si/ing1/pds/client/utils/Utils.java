@@ -1,8 +1,16 @@
 package edu.episen.si.ing1.pds.client.utils;
 
-import java.io.File;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.episen.si.ing1.pds.client.network.Request;
+import edu.episen.si.ing1.pds.client.network.Response;
+import edu.episen.si.ing1.pds.client.network.SocketFacade;
+
+import java.io.*;
+import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -32,5 +40,52 @@ public class Utils {
     public static File getFileContent(String varEnv) {
         String varValue = System.getenv(varEnv);
         return new File(varValue);
+    }
+    public static String generateSerialNumber() {
+        String randomString = generateStringId(20).toUpperCase(Locale.ROOT);
+        StringBuilder builder = new StringBuilder(randomString);
+        for (int i = 0; i < builder.length(); i++) {
+            if(i % 5 == 0 && i != 0)
+                builder.insert(i, "-");
+        }
+        return builder.toString();
+    }
+    public static Response sendRequest(Request request) {
+        PrintWriter writer = null;
+        BufferedReader reader = null;
+        Response response = null;
+        try {
+            String event = request.getEvent();
+            ObjectMapper mapper = new ObjectMapper();
+            Socket socket = SocketFacade.Instance.getSocket();
+            writer = new PrintWriter(socket.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String requestSerialized = mapper.writeValueAsString(request);
+            writer.println(requestSerialized);
+            while (true) {
+                String req = reader.readLine();
+                if(req == null)
+                    break;
+                Response res = mapper.readValue(req, Response.class);
+                if(res.getEvent().equals("end"))
+                    break;
+                else if(res.getEvent().equals(event))
+                    response = res;
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        finally {
+//            if(reader != null && writer != null) {
+//                writer.close();
+//                try {
+//                    reader.close();
+//                } catch (IOException ex) {
+//                    ex.printStackTrace();
+//                }
+//            }
+//        }
+        return response;
     }
 }

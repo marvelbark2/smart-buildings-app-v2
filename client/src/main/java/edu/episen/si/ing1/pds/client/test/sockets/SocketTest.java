@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.client.test;
+package edu.episen.si.ing1.pds.client.test.sockets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
