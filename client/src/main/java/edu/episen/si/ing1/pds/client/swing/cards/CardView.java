@@ -1,0 +1,411 @@
+package edu.episen.si.ing1.pds.client.swing.cards;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.episen.si.ing1.pds.client.network.Request;
+import edu.episen.si.ing1.pds.client.network.Response;
+import edu.episen.si.ing1.pds.client.network.SocketFacade;
+import edu.episen.si.ing1.pds.client.swing.Routes;
+import edu.episen.si.ing1.pds.client.swing.toast.Toast;
+import edu.episen.si.ing1.pds.client.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
+
+public class CardView implements Routes {
+    private final ObjectMapper mapper = new ObjectMapper();
+    private String[][] tableData;
+    private PrintWriter writer;
+    private BufferedReader reader;
+    private final Logger logger = LoggerFactory.getLogger(CardView.class.getName());
+    private Toast toast;
+
+    private void getCardList() {
+        try {
+            Request request = new Request();
+            request.setEvent("card_list");
+            String requestSerialized = mapper.writeValueAsString(request);
+            writer.println(requestSerialized);
+            while (true) {
+                String req = reader.readLine();
+                if (req == null)
+                    break;
+
+                Response response = mapper.readValue(req, Response.class);
+                if (response.getMessage().equals("end"))
+                    break;
+                if (response.getEvent().equals("card_list")) {
+                    List<Map<String, Object>> data = (List) response.getMessage();
+                    logger.info(data.get(data.size() - 1).toString());
+                    String[][] arr = new String[data.size()][data.get(0).size()];
+                    int i = 0;
+                    for (Map map : data) {
+                        int w = 0;
+                        for (Object key : map.keySet()) {
+                            if (map.get(key) != null) {
+                                if (map.get(key) instanceof Map)
+                                    arr[i][w] = ((Map<?, ?>) map.get(key)).get("name").toString();
+                                else
+                                    arr[i][w] = map.get(key).toString();
+                                w++;
+                            } else {
+                                arr[i][w] = "Infini";
+                                w++;
+                            }
+                        }
+                        i++;
+                    }
+                    tableData = arr;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void launch(ContextFrame context) {
+        JPanel frame = context.getApp().getContext();
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        toast = new Toast(panel);
+        try {
+            Socket socket = SocketFacade.Instance.getSocket();
+            writer = new PrintWriter(socket.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            String[] cols = {"ID", "Matricule", "Provisoire", "Date d'expiration", "user"};
+            getCardList();
+            DefaultTableModel tableModel = new DefaultTableModel(tableData, cols);
+            JTable table = new JTable(tableModel);
+            JTableHeader header = table.getTableHeader();
+            header.setBackground(Color.black);
+            header.setForeground(Color.white);
+            JScrollPane sp = new JScrollPane(table);
+
+            ListSelectionModel select = table.getSelectionModel();
+            JPanel btnPanel = new JPanel(new GridLayout(1, 3, 20, 30));
+
+            btnPanel.setBorder(BorderFactory.createTitledBorder("Operations"));
+
+
+            JButton edit = new JButton("Modifier");
+            edit.setPreferredSize(new Dimension(40, 40));
+            JButton delete = new JButton("Supprimer");
+            delete.setPreferredSize(new Dimension(40, 40));
+            JButton details = new JButton("details");
+            details.setPreferredSize(new Dimension(40, 40));
+
+            details.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int selectedRow = table.getSelectedRow();
+                    if (table.isRowSelected(selectedRow)) {
+                        Request request = new Request();
+                        request.setEvent("card_byid");
+                        request.setData(Map.of("id", Integer.parseInt(tableData[selectedRow][0])));
+                        Response response = Utils.sendRequest(request);
+                        Map<String, Object> data = (Map<String, Object>) response.getMessage();
+                        JDialog dialog = new JDialog();
+                        dialog.setSize(500, 500);
+                        JPanel dialogPanel = new JPanel();
+                        dialogPanel.setLayout(null);
+
+                        JPanel formPanel = new JPanel();
+                    }
+                }
+            });
+
+            delete.addActionListener((e) -> {
+                int selectedRow = table.getSelectedRow();
+                if (table.isRowSelected(selectedRow)) {
+                    Map<String, String> hm = new HashMap<>();
+                    for (int i = 0; i < cols.length; i++) {
+                        hm.put(cols[i], tableData[selectedRow][i]);
+                    }
+                    try {
+                        Request request = new Request();
+                        request.setEvent("card_delete");
+                        request.setData(hm);
+                        writer.println(mapper.writeValueAsString(request));
+                        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                            Response response = mapper.readValue(line, Response.class);
+                            if (response.getMessage().equals("end"))
+                                break;
+                            if (response.getEvent().equals("card_delete")) {
+                                toast.success("La suppression est bien faite");
+                                logger.info("Data Deleted");
+                                logger.info(response.toString());
+                                table.clearSelection();
+                            }
+                        }
+                    } catch (Exception jsonProcessingException) {
+                        jsonProcessingException.printStackTrace();
+                    }
+                } else {
+                    toast.error("Selectionner une ligne pour lui supprimer");
+                    logger.error("Select a row");
+                }
+            });
+
+            edit.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int selectedRow = table.getSelectedRow();
+                    if (table.isRowSelected(selectedRow)) {
+                        Request request = new Request();
+                        request.setEvent("card_byid");
+                        request.setData(Map.of("id", Integer.parseInt(tableData[selectedRow][0])));
+                        Response response = Utils.sendRequest(request);
+                        Map<String, Object> data = (Map<String, Object>) response.getMessage();
+                        JDialog dialog = new JDialog(context.frame());
+                        dialog.setSize(500, 500);
+                        dialog.setPreferredSize(dialog.getSize());
+                        JPanel dialogPanel = new JPanel(new GridLayout(2,2, 25, 25));
+                        dialogPanel.setBorder(BorderFactory.createTitledBorder("Modifer la carte"));
+
+                        try {
+                            Request requestUserList = new Request();
+                            requestUserList.setEvent("user_list");
+                            Response rsponse = Utils.sendRequest(requestUserList);
+                            List userList = (List) rsponse.getMessage();
+                            JComboBox comboBox = new JComboBox(new Vector(userList));
+                            comboBox.setPreferredSize(new Dimension(250, 25));
+
+                            comboBox.setRenderer(new DefaultListCellRenderer() {
+                                @Override
+                                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                    if (value instanceof Map) {
+                                        Map<String, String> val = (Map<String, String>) value;
+                                        setText(val.get("name"));
+                                        if(val.equals(data.get("user"))) {
+                                            list.setSelectedIndex(index);
+                                        }
+                                    }
+
+
+                                    return this;
+                                }
+                            });
+
+                            comboBox.addActionListener(evt -> {
+                                JComboBox self = (JComboBox) evt.getSource();
+                                Map o = (Map) self.getSelectedItem();
+                            });
+
+                            comboBox.setSelectedIndex(-1);
+
+                            JPanel userFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                            JLabel userFieldFor = new JLabel("Utilisateur");
+                            userFieldPanel.add(userFieldFor);
+                            userFieldPanel.add(comboBox);
+
+                            JPanel serialFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                            JLabel serialFieldFor = new JLabel("Matricule");
+                            JTextField serialField = new JTextField(20);
+                            serialField.setText(data.get("cardUId").toString());
+                            JButton snGenerator = new JButton("Generer 1");
+                            snGenerator.addActionListener(evt -> serialField.setText(Utils.generateSerialNumber()));
+                            serialFieldPanel.add(serialFieldFor);
+                            serialFieldPanel.add(serialField);
+                            serialFieldPanel.add(snGenerator);
+
+                            dialogPanel.add(userFieldPanel);
+                            dialogPanel.add(serialFieldPanel);
+
+                            dialog.setContentPane(dialogPanel);
+                            dialog.setVisible(true);
+                            dialog.pack();
+
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            });
+
+            btnPanel.add(edit, BorderLayout.CENTER);
+            btnPanel.add(delete, BorderLayout.CENTER);
+            btnPanel.add(details);
+
+            select.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+            Border blackline = BorderFactory.createTitledBorder("Inserer une carte");
+            JPanel formPanel = new JPanel();
+            LayoutManager layout = new GridLayout(2, 2);
+            formPanel.setLayout(layout);
+            formPanel.setBorder(blackline);
+
+            Request requestUserList = new Request();
+            requestUserList.setEvent("user_list");
+            writer.println(mapper.writeValueAsString(requestUserList));
+            List userList = null;
+
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                Response response = mapper.readValue(line, Response.class);
+                if (response.getMessage().equals("end"))
+                    break;
+                userList = (List) response.getMessage();
+            }
+            JComboBox comboBox = new JComboBox(new Vector(userList));
+            comboBox.setPreferredSize(new Dimension(250, 25));
+            comboBox.setSelectedIndex(-1);
+            comboBox.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    if (value instanceof Map)
+                        setText(((Map<String, String>) value).get("name"));
+                    if (index == -1 && value == null)
+                        setText("Selectionner un utilisateur");
+
+                    return this;
+                }
+            });
+
+            comboBox.addActionListener(e -> {
+                JComboBox self = (JComboBox) e.getSource();
+                Map o = (Map) self.getSelectedItem();
+            });
+
+            //ComboBox field
+            JPanel comboField = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+            JLabel comboFieldFor = new JLabel("User: ");
+            Border comboBorder = BorderFactory.createTitledBorder("Champ Utilisateur");
+            comboField.add(comboFieldFor);
+            comboField.add(comboBox);
+            comboField.setBorder(comboBorder);
+            formPanel.add(comboField);
+
+            //Serial Number flied
+            JPanel sNField = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+            JLabel sNFieldFor = new JLabel("Matricule: ");
+            JTextField snFieldText = new JTextField(20);
+            JButton snGenerator = new JButton("Generer 1");
+            snGenerator.addActionListener(e -> snFieldText.setText(Utils.generateSerialNumber()));
+            Border sNBorder = BorderFactory.createTitledBorder("Champ Matricule");
+            sNField.add(sNFieldFor);
+            sNField.add(snFieldText);
+            sNField.add(snGenerator);
+            sNField.setBorder(sNBorder);
+            formPanel.add(sNField);
+
+            //tmp card field
+            JPanel expirableField = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            Border expirableBorder = BorderFactory.createTitledBorder("Expirable");
+            expirableField.setBorder(expirableBorder);
+            JCheckBox expirable = new JCheckBox("Carte Provisoire ?");
+            DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            JFormattedTextField expirableDate = new JFormattedTextField(format);
+            expirableDate.setColumns(12);
+            expirableDate.setEnabled(false);
+            try {
+                expirableDate.commitEdit();
+            } catch (ParseException e) {
+
+            }
+            expirable.addChangeListener((e) -> expirableDate.setEnabled(expirable.isSelected()));
+            expirableField.add(expirable);
+            formPanel.add(expirableField);
+
+            // Expire Date Field
+            JPanel expireDate = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            Border expireDateBorder = BorderFactory.createTitledBorder("Date d'expiration");
+            expireDate.setBorder(expireDateBorder);
+            JLabel expireDateLabel = new JLabel("Date: ");
+            expireDate.add(expireDateLabel);
+            expireDate.add(expirableDate);
+            formPanel.add(expireDate);
+
+            //Submit Button
+            JPanel submit = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            JButton submitButton = new JButton("Soumettre");
+            submitButton.setSize(100, 100);
+            submitButton.addActionListener((e) -> {
+                try {
+                    if ((snFieldText.getText() != null && snFieldText.getText().length() >= 20) && (comboBox.getSelectedItem() != null || comboBox.getSelectedIndex() != -1)) {
+                        Request insertCardReq = new Request();
+                        insertCardReq.setEvent("card_insert");
+                        String expireDateValue = "";
+                        if (expirable.isSelected())
+                            expireDateValue = expirableDate.getText();
+
+                        insertCardReq.setData(Map.of("cardUId", snFieldText.getText(), "expirable", expirable.isSelected(), "expireDate", expireDateValue, "user", comboBox.getSelectedItem()));
+                        writer.println(mapper.writeValueAsString(insertCardReq));
+                        while (true) {
+                            Response response = mapper.readValue(reader.readLine(), Response.class);
+                            if (response.getMessage().equals("end"))
+                                break;
+                            if (response.getEvent().equals("card_insert")) {
+                                Boolean isAdded = Boolean.valueOf((Boolean) response.getMessage());
+                                if (isAdded) {
+                                    new Thread(() -> SwingUtilities.invokeLater(() -> {
+                                        table.clearSelection();
+                                        getCardList();
+                                        table.setModel(tableModel);
+                                        tableModel.fireTableDataChanged();
+                                    })).start();
+
+                                }
+                            }
+                        }
+                        snFieldText.setText("");
+                        expirable.setSelected(false);
+                        expirableDate.setText("");
+                        comboBox.setSelectedIndex(-1);
+
+                    } else {
+                        toast.error("Erreur ! Veuillez remplir la formulaire");
+                    }
+
+                } catch (Exception jsonProcessingException) {
+                    jsonProcessingException.printStackTrace();
+                }
+            });
+            submit.add(submitButton);
+
+            JButton returnBack = new JButton("Retourner");
+            returnBack.addActionListener(e -> {
+                context.returnHere();
+                panel.setVisible(false);
+            });
+            Box buttonsPanel = Box.createVerticalBox();
+            buttonsPanel.add(returnBack);
+            returnBack.setBackground(new Color(2, 117, 216));
+            returnBack.setOpaque(true);
+
+            buttonsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);//0.0
+
+            panel.add(buttonsPanel, Component.LEFT_ALIGNMENT);
+            panel.add(sp);
+            panel.add(btnPanel);
+            panel.add(formPanel);
+            panel.add(submit);
+
+            frame.add(panel);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

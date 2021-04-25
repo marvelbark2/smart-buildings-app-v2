@@ -1,9 +1,8 @@
 package edu.episen.si.ing1.pds.backend.server;
 
-import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.network.Server;
+import edu.episen.si.ing1.pds.backend.server.pool.PoolFactory;
 import edu.episen.si.ing1.pds.backend.server.pool.config.DBConfig;
-import edu.episen.si.ing1.pds.backend.server.test.TestPool;
-import edu.episen.si.ing1.pds.backend.server.test.TestType;
 import org.apache.commons.cli.*;
 
 import org.slf4j.Logger;
@@ -20,12 +19,6 @@ public class BackendService {
         final Option maxConnection = Option.builder().longOpt("maxConnection").hasArg().build();
         options.addOption(maxConnection);
 
-        final Option testType = Option.builder().longOpt("testType").hasArg().build();
-        options.addOption(testType);
-
-        final Option testPoolSize = Option.builder().longOpt("testPoolSize").hasArg().build();
-        options.addOption(testPoolSize);
-
         final CommandLineParser parser = new DefaultParser();
         final CommandLine commandLine = parser.parse(options, args);
 
@@ -37,49 +30,16 @@ public class BackendService {
         if (commandLine.hasOption("maxConnection"))
             iMaxConnection = Integer.parseInt(commandLine.getOptionValue("maxConnection"));
 
-        TestType iTestType = null;
-        if (commandLine.hasOption("testType"))
-            iTestType = TestType.Instance.getType(Integer.parseInt(commandLine.getOptionValue("testType")));
+        boolean iNotReturnable = false;
 
-        int ItestSize = 20;
-        if (commandLine.hasOption("testPoolSize"))
-            ItestSize = Integer.parseInt(commandLine.getOptionValue("testPoolSize"));
+        logger.info("TestSocket Started");
+
+        DBConfig.Instance.setEnv(itestMode);
+        PoolFactory.Instance.setNotReturnable(iNotReturnable);
 
 
-        return;
-//        if (iMaxConnection > 0) {
-//            //DataSource ds = new DataSource(iMaxConnection);
-//           // TestPool test = new TestPool(ds);
-//            DBConfig.Instance.setEnv(itestMode);
-//            try {
-//                if (!itestMode) {
-//                    if (iTestType == null) {
-//                        test.handleError();
-//                    } else if (iTestType.equals(TestType.Create)) {
-//                        test.create();
-//                    } else if (iTestType.equals(TestType.Read)) {
-//                        test.read();
-//                    } else if (iTestType.equals(TestType.Update)) {
-//                        test.update();
-//                    } else if (iTestType.equals(TestType.Delete)) {
-//                        test.delete();
-//                    } else if (iTestType.equals(TestType.Loop)) {
-//                        test.testPool(ItestSize);
-//                    }
-//
-//                } else {
-//                    test.testModeTest();
-//                }
-//
-//            } finally {
-//                ds.shutdownPool();
-//                System.exit(1);
-//            }
-//
-//        } else {
-//            logger.info("Backend Service is running (testMode = " + itestMode + ") , (maxconnection = " + iMaxConnection
-//                    + "}.");
-//        }
+        Server serverSocket = new Server(iMaxConnection);
+        serverSocket.serve();
 
     }
 }

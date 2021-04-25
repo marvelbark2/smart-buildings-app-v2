@@ -3,7 +3,7 @@ package edu.episen.si.ing1.pds.backend.server.workspace.cards.network;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.*;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.CardRequest;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.services.CardService;
 import edu.episen.si.ing1.pds.backend.server.network.Request;
