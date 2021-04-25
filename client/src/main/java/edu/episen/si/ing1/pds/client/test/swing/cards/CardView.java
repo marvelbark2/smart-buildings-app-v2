@@ -5,6 +5,7 @@ import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.network.SocketFacade;
 import edu.episen.si.ing1.pds.client.test.swing.Routes;
+import edu.episen.si.ing1.pds.client.test.swing.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +15,8 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,63 +34,63 @@ public class CardView implements Routes {
     private PrintWriter writer;
     private BufferedReader reader;
     private final Logger logger = LoggerFactory.getLogger(CardView.class.getName());
+    private Toast toast;
 
     public CardView() {
 
     }
 
     private void getCardList() {
-            try {
-                Request request = new Request();
-                request.setEvent("card_list");
-                String requestSerialized = mapper.writeValueAsString(request);
-                writer.println(requestSerialized);
-                while (true) {
-                    String req = reader.readLine();
-                    if(req == null)
-                        break;
+        try {
+            Request request = new Request();
+            request.setEvent("card_list");
+            String requestSerialized = mapper.writeValueAsString(request);
+            writer.println(requestSerialized);
+            while (true) {
+                String req = reader.readLine();
+                if (req == null)
+                    break;
 
-                    Response response = mapper.readValue(req, Response.class);
-                    if (response.getMessage().equals("end"))
-                        break;
-                    if (response.getEvent().equals("card_list")) {
-                        List<Map<String, Object>> data = (List) response.getMessage();
-                        logger.info(data.get(data.size() - 1).toString());
-                        String[][] arr = new String[data.size()][data.get(0).size()];
-                        int i = 0;
-                        for (Map map : data) {
-                            int w = 0;
-                            for (Object key : map.keySet()) {
-                                if (map.get(key) != null) {
-                                    if (map.get(key) instanceof Map)
-                                        arr[i][w] = ((Map<?, ?>) map.get(key)).get("name").toString();
-                                    else
-                                        arr[i][w] = map.get(key).toString();
-                                    w++;
-                                } else {
-                                    arr[i][w] = "Infini";
-                                    w++;
-                                }
+                Response response = mapper.readValue(req, Response.class);
+                if (response.getMessage().equals("end"))
+                    break;
+                if (response.getEvent().equals("card_list")) {
+                    List<Map<String, Object>> data = (List) response.getMessage();
+                    logger.info(data.get(data.size() - 1).toString());
+                    String[][] arr = new String[data.size()][data.get(0).size()];
+                    int i = 0;
+                    for (Map map : data) {
+                        int w = 0;
+                        for (Object key : map.keySet()) {
+                            if (map.get(key) != null) {
+                                if (map.get(key) instanceof Map)
+                                    arr[i][w] = ((Map<?, ?>) map.get(key)).get("name").toString();
+                                else
+                                    arr[i][w] = map.get(key).toString();
+                                w++;
+                            } else {
+                                arr[i][w] = "Infini";
+                                w++;
                             }
-                            i++;
                         }
-                        tableData = arr;
+                        i++;
                     }
+                    tableData = arr;
                 }
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void launch(ContextFrame context) {
-        JFrame frame = context.getFrame();
-        frame.setTitle("Gerer les cartes");
-        frame.pack();
+        JPanel frame = context.getApp().getContext();
+
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
+        toast = new Toast(panel);
         try {
             Socket socket = SocketFacade.Instance.getSocket();
             writer = new PrintWriter(socket.getOutputStream(), true);
@@ -105,22 +106,24 @@ public class CardView implements Routes {
             JScrollPane sp = new JScrollPane(table);
 
             ListSelectionModel select = table.getSelectionModel();
-            JPanel btnPanel = new JPanel(new GridLayout(1, 2));
+            JPanel btnPanel = new JPanel(new GridLayout(1, 3, 20, 30));
 
             btnPanel.setBorder(BorderFactory.createTitledBorder("Operations"));
 
 
-            JButton edit = new JButton("Edit");
+            JButton edit = new JButton("Modifier");
             edit.setPreferredSize(new Dimension(40, 40));
-            JButton delete = new JButton("Delete");
+            JButton delete = new JButton("Supprimer");
             delete.setPreferredSize(new Dimension(40, 40));
+            JButton details = new JButton("details");
+            details.setPreferredSize(new Dimension(40, 40));
 
             delete.addActionListener((e) -> {
                 int selectedRow = table.getSelectedRow();
-                if(table.isRowSelected(selectedRow)) {
+                if (table.isRowSelected(selectedRow)) {
                     Map<String, String> hm = new HashMap<>();
                     for (int i = 0; i < cols.length; i++) {
-                        hm.put(cols[i],tableData[selectedRow][i]);
+                        hm.put(cols[i], tableData[selectedRow][i]);
                     }
                     try {
                         Request request = new Request();
@@ -129,9 +132,10 @@ public class CardView implements Routes {
                         writer.println(mapper.writeValueAsString(request));
                         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                             Response response = mapper.readValue(line, Response.class);
-                            if(response.getMessage().equals("end"))
+                            if (response.getMessage().equals("end"))
                                 break;
-                            if(response.getEvent().equals("card_delete")) {
+                            if (response.getEvent().equals("card_delete")) {
+                                toast.success("La suppression est bien faite");
                                 logger.info("Data Deleted");
                                 logger.info(response.toString());
                                 table.clearSelection();
@@ -141,13 +145,28 @@ public class CardView implements Routes {
                         jsonProcessingException.printStackTrace();
                     }
                 } else {
+                    toast.error("Selectionner une ligne pour lui supprimer");
                     logger.error("Select a row");
+                }
+            });
+
+            details.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int selectedRow = table.getSelectedRow();
+                    if (table.isRowSelected(selectedRow)) {
+                        Request request = new Request();
+                        request.setEvent("card_byid");
+                        request.setData(Map.of("id", Integer.parseInt(tableData[selectedRow][0])));
+
+                        Response response = Utils.sendRequest(request);
+                    }
+
                 }
             });
 
             btnPanel.add(edit, BorderLayout.CENTER);
             btnPanel.add(delete, BorderLayout.CENTER);
-
 
 
             select.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -249,7 +268,7 @@ public class CardView implements Routes {
                         Request insertCardReq = new Request();
                         insertCardReq.setEvent("card_insert");
                         String expireDateValue = "";
-                        if(expirable.isSelected())
+                        if (expirable.isSelected())
                             expireDateValue = expirableDate.getText();
 
                         insertCardReq.setData(Map.of("cardUId", snFieldText.getText(), "expirable", expirable.isSelected(), "expireDate", expireDateValue, "user", comboBox.getSelectedItem()));
@@ -277,15 +296,7 @@ public class CardView implements Routes {
                         comboBox.setSelectedIndex(-1);
 
                     } else {
-                        JDialog d = new JDialog(frame , "Erreur", true);
-                        d.setLayout( new GridLayout(2,1) );
-                        JButton b = new JButton ("OK");
-                        b.addActionListener (e1 -> d.setVisible(false));
-                        d.add( new JLabel ("Veuillez bien saisie le formulaire."));
-                        d.add(b);
-                        d.setSize(300,200);
-                        d.setVisible(true);
-
+                        toast.error("Erreur ! Veuillez remplir la formulaire");
                     }
 
                 } catch (Exception jsonProcessingException) {
@@ -304,7 +315,7 @@ public class CardView implements Routes {
             returnBack.setBackground(new Color(2, 117, 216));
             returnBack.setOpaque(true);
 
-            buttonsPanel.setAlignmentX( Component.LEFT_ALIGNMENT );//0.0
+            buttonsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);//0.0
 
             panel.add(buttonsPanel, Component.LEFT_ALIGNMENT);
             panel.add(sp);
@@ -315,19 +326,19 @@ public class CardView implements Routes {
             frame.add(panel);
 
 
-            frame.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    super.windowClosing(e);
-                    try {
-                        writer.close();
-                        reader.close();
-                        socket.close();
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    }
-                }
-            });
+//            frame.addWindowListener(new WindowAdapter() {
+//                @Override
+//                public void windowClosing(WindowEvent e) {
+//                    super.windowClosing(e);
+//                    try {
+//                        writer.close();
+//                        reader.close();
+//                        socket.close();
+//                    } catch (IOException ioException) {
+//                        ioException.printStackTrace();
+//                    }
+//                }
+//            });
 
         } catch (IOException e) {
             e.printStackTrace();

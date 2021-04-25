@@ -30,8 +30,7 @@ public class UsersView implements Routes {
 
     @Override
     public void launch(ContextFrame context) {
-        JFrame frame = context.getFrame();
-        frame.setTitle("Tester Permission");
+        JPanel frame = context.getApp().getContext();
 
         JPanel panel = new JPanel();
 
@@ -53,9 +52,8 @@ public class UsersView implements Routes {
 
         frame.add(panel);
         frame.setVisible(true);
-        frame.pack();
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
+//        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+//        frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
     }
 
     private void getData() {

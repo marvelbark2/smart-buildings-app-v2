@@ -12,6 +12,6 @@ public class CardTest {
     public static void main(String[] args) {
         logger.info("Gui service started");
         SocketConfig.Instance.setEnv(true);
-        SwingUtilities.invokeLater(ContextFrame::new);
+        //SwingUtilities.invokeLater(ContextFrame::new);
     }
 }
