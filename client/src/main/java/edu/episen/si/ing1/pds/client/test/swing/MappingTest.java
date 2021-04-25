@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.client.test.sockets;
+package edu.episen.si.ing1.pds.client.test.swing;
 
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;

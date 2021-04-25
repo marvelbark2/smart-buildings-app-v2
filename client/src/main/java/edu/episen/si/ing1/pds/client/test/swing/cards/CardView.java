@@ -37,10 +37,6 @@ public class CardView implements Routes {
     private final Logger logger = LoggerFactory.getLogger(CardView.class.getName());
     private Toast toast;
 
-    public CardView() {
-
-    }
-
     private void getCardList() {
         try {
             Request request = new Request();

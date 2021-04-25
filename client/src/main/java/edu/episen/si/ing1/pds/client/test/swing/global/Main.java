@@ -70,7 +70,6 @@ public class Main implements MouseListener {
         consult.setOpaque(true);
         frames.put(consult, new ContextFrame(this));
         consult.addMouseListener(this);
-
         consult.setBackground(new Color(54, 38, 90));
         consult.setForeground(Color.white);
 
@@ -83,7 +82,6 @@ public class Main implements MouseListener {
 
         staff.setOpaque(true);
 
-        Main app = this;
         staff.addMouseListener(this);
         frames.put(staff, new ContextFrame(this));
 
