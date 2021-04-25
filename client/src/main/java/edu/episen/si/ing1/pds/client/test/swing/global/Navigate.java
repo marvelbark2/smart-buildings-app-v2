@@ -5,3 +5,4 @@ import java.awt.event.ActionListener;
 public interface Navigate extends ActionListener {
     void start();
 }
+

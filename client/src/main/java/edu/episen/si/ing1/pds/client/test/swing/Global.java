@@ -1,5 +1,7 @@
 package edu.episen.si.ing1.pds.client.test.swing;
 
+import edu.episen.si.ing1.pds.client.test.swing.shared.Ui;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -125,6 +127,7 @@ public class Global {
         frame.setSize(new Dimension(1250, 800));
         frame.setVisible(true);
         frame.setPreferredSize(frame.getSize());
+
 
         Global global = new Global();
         global.setWelcome();

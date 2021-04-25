@@ -41,40 +41,6 @@ public class ContextFrame implements Navigate {
         }
     }
 
-//    private void run() {
-//
-//        JPanel context = new JPanel();
-//        context.setBackground(new Color(237, 250, 252));
-//        context.setPreferredSize(frame.getSize());
-//
-//        JPanel buttons = new JPanel(new GridLayout(2, 2, 60, 60));
-//        JButton cardTest = new JButton("Manipuler les cartes");
-//        JButton userTest = new JButton("Manipuler les users");
-//        JButton roleTest = new JButton("Manipuler les roles");
-//        JButton permissionTest = new JButton("Tester les cartes");
-//
-//        userTest.addActionListener(this);
-//        cardTest.addActionListener(this);
-//        roleTest.addActionListener(this);
-//
-//        frames.put(cardTest, new CardView());
-//        frames.put(roleTest, new CardRoleTest());
-//        frames.put(userTest, new UsersView());
-//
-//        buttons.add(cardTest);
-//        buttons.add(roleTest);
-//        buttons.add(userTest);
-//        buttons.add(permissionTest);
-//
-//        context.add(buttons);
-//
-//        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-//        frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
-//        frame.getContentPane().add(context);
-//        frame.setVisible(true);
-//        frame.pack();
-//    }
-
     public void returnHere() {
         app.getContext().invalidate();
         app.getContext().validate();
@@ -82,22 +48,19 @@ public class ContextFrame implements Navigate {
         start();
     }
 
-//    public JFrame getFrame() {
-//        return frame;
-//    }
-
     @Override
     public void start() {
         JPanel context = app.getContext();
         context.setBackground(new Color(90, 64, 149));
-//        context.setPreferredSize(frame.getSize());
+        context.setLayout(new BorderLayout());
 
-        JPanel buttons = new JPanel(new GridLayout(2, 2, 60, 60));
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton cardTest = new JButton("Manipuler les cartes");
         JButton userTest = new JButton("Manipuler les users");
         JButton roleTest = new JButton("Manipuler les roles");
         JButton permissionTest = new JButton("Tester les cartes");
 
+        buttons.setBackground(context.getBackground());
         userTest.addActionListener(this);
         cardTest.addActionListener(this);
         roleTest.addActionListener(this);
@@ -111,6 +74,10 @@ public class ContextFrame implements Navigate {
         buttons.add(userTest);
         buttons.add(permissionTest);
 
-        context.add(buttons);
+        context.add(buttons, BorderLayout.CENTER);
+    }
+
+    public JFrame frame() {
+        return app.getFrame();
     }
 }

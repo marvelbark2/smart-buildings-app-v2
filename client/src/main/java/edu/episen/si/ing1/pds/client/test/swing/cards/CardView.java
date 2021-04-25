@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.client.test.swing.cards;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
@@ -118,6 +119,26 @@ public class CardView implements Routes {
             JButton details = new JButton("details");
             details.setPreferredSize(new Dimension(40, 40));
 
+            details.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int selectedRow = table.getSelectedRow();
+                    if (table.isRowSelected(selectedRow)) {
+                        Request request = new Request();
+                        request.setEvent("card_byid");
+                        request.setData(Map.of("id", Integer.parseInt(tableData[selectedRow][0])));
+                        Response response = Utils.sendRequest(request);
+                        Map<String, Object> data = (Map<String, Object>) response.getMessage();
+                        JDialog dialog = new JDialog();
+                        dialog.setSize(500, 500);
+                        JPanel dialogPanel = new JPanel();
+                        dialogPanel.setLayout(null);
+
+                        JPanel formPanel = new JPanel();
+                    }
+                }
+            });
+
             delete.addActionListener((e) -> {
                 int selectedRow = table.getSelectedRow();
                 if (table.isRowSelected(selectedRow)) {
@@ -150,7 +171,7 @@ public class CardView implements Routes {
                 }
             });
 
-            details.addActionListener(new ActionListener() {
+            edit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     int selectedRow = table.getSelectedRow();
@@ -158,16 +179,78 @@ public class CardView implements Routes {
                         Request request = new Request();
                         request.setEvent("card_byid");
                         request.setData(Map.of("id", Integer.parseInt(tableData[selectedRow][0])));
-
                         Response response = Utils.sendRequest(request);
-                    }
+                        Map<String, Object> data = (Map<String, Object>) response.getMessage();
+                        JDialog dialog = new JDialog(context.frame());
+                        dialog.setSize(500, 500);
+                        dialog.setPreferredSize(dialog.getSize());
+                        JPanel dialogPanel = new JPanel(new GridLayout(2,2, 25, 25));
+                        dialogPanel.setBorder(BorderFactory.createTitledBorder("Modifer la carte"));
 
+                        try {
+                            Request requestUserList = new Request();
+                            requestUserList.setEvent("user_list");
+                            Response rsponse = Utils.sendRequest(requestUserList);
+                            List userList = (List) rsponse.getMessage();
+                            JComboBox comboBox = new JComboBox(new Vector(userList));
+                            comboBox.setPreferredSize(new Dimension(250, 25));
+
+                            comboBox.setRenderer(new DefaultListCellRenderer() {
+                                @Override
+                                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                    if (value instanceof Map) {
+                                        Map<String, String> val = (Map<String, String>) value;
+                                        setText(val.get("name"));
+                                        if(val.equals(data.get("user"))) {
+                                            list.setSelectedIndex(index);
+                                        }
+                                    }
+
+
+                                    return this;
+                                }
+                            });
+
+                            comboBox.addActionListener(evt -> {
+                                JComboBox self = (JComboBox) evt.getSource();
+                                Map o = (Map) self.getSelectedItem();
+                            });
+
+                            comboBox.setSelectedIndex(-1);
+
+                            JPanel userFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                            JLabel userFieldFor = new JLabel("Utilisateur");
+                            userFieldPanel.add(userFieldFor);
+                            userFieldPanel.add(comboBox);
+
+                            JPanel serialFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                            JLabel serialFieldFor = new JLabel("Matricule");
+                            JTextField serialField = new JTextField(20);
+                            serialField.setText(data.get("cardUId").toString());
+                            JButton snGenerator = new JButton("Generer 1");
+                            snGenerator.addActionListener(evt -> serialField.setText(Utils.generateSerialNumber()));
+                            serialFieldPanel.add(serialFieldFor);
+                            serialFieldPanel.add(serialField);
+                            serialFieldPanel.add(snGenerator);
+
+                            dialogPanel.add(userFieldPanel);
+                            dialogPanel.add(serialFieldPanel);
+
+                            dialog.setContentPane(dialogPanel);
+                            dialog.setVisible(true);
+                            dialog.pack();
+
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
                 }
             });
 
             btnPanel.add(edit, BorderLayout.CENTER);
             btnPanel.add(delete, BorderLayout.CENTER);
-
+            btnPanel.add(details);
 
             select.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -325,20 +408,6 @@ public class CardView implements Routes {
 
             frame.add(panel);
 
-
-//            frame.addWindowListener(new WindowAdapter() {
-//                @Override
-//                public void windowClosing(WindowEvent e) {
-//                    super.windowClosing(e);
-//                    try {
-//                        writer.close();
-//                        reader.close();
-//                        socket.close();
-//                    } catch (IOException ioException) {
-//                        ioException.printStackTrace();
-//                    }
-//                }
-//            });
 
         } catch (IOException e) {
             e.printStackTrace();

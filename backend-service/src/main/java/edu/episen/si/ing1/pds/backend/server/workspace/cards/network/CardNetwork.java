@@ -23,10 +23,12 @@ import java.util.Optional;
 public class CardNetwork {
     private Services service;
     private final PrintWriter writer;
+    private final Connection connection;
     private final ObjectMapper mapper = new ObjectMapper();
     private final Logger logger = LoggerFactory.getLogger(CardNetwork.class.getName());
 
     public CardNetwork(Connection connection, PrintWriter writer) {
+        this.connection = connection;
         service = new CardService(connection);
         this.writer = writer;
         mapper.registerModule(new JavaTimeModule());
@@ -42,7 +44,7 @@ public class CardNetwork {
                 logger.info(reponseMsg);
                 writer.println(reponseMsg);
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
         else if(event.equals("card_byid")) {
@@ -58,7 +60,7 @@ public class CardNetwork {
                 String reponseMsg = mapper.writeValueAsString(msgResponseT);
                 writer.println(reponseMsg);
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
         else if(event.equals("card_insert")) {
@@ -74,7 +76,7 @@ public class CardNetwork {
                 boolean response = service.add(cardRequest);
                 writer.println(mapper.writeValueAsString(Utils.responseFactory(response, "card_insert")));
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
         else if(event.equals("card_delete")) {
@@ -97,6 +99,16 @@ public class CardNetwork {
 
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+        else if (event.equals("card_access_list")) {
+            JsonNode data = request.getData();
+            CardService cardService = new CardService(connection);
+            List<Map> response = cardService.getItemAccessList(data.get("serialId").asText());
+            try {
+                writer.println(mapper.writeValueAsString(Utils.responseFactory(response, event)));
+            } catch (JsonProcessingException e) {
+                logger.error(e.getMessage(), e);
             }
         }
     }
