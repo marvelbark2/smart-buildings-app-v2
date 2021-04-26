@@ -1,169 +1,159 @@
 package edu.episen.si.ing1.pds.client.mapping.selim;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import edu.episen.si.ing1.pds.client.swing.global.Main;
+import edu.episen.si.ing1.pds.client.swing.global.Navigate;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.JTree;
-import javax.swing.border.EmptyBorder;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicTreeUI;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Objects;
 
-public class Mapping_Window extends JFrame {
-	
-	public Mapping_Window() {
-		super("Smart Building APP");
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setVisible(true);
-		this.setSize(1200, 800);
-		this.setPreferredSize(null);
-		
-		
-		JPanel contentPane = (JPanel) this.getContentPane();
-		contentPane.setLayout(new BorderLayout());
-		
-		
-		
-		JPanel logo = new JPanel(new FlowLayout());
-		JLabel label = new JLabel("Logo");
-		logo.add(label, BorderLayout.CENTER);
-		contentPane.add(logo, BorderLayout.PAGE_START);
-		
-	
-		
-		contentPane.add(menuScroll(), BorderLayout.WEST);
-	
-		contentPane.add(carte(), BorderLayout.CENTER);
-		
-		contentPane.add(bloc_equipement(), BorderLayout.EAST);
-		
-		contentPane.add(createToolBar(), BorderLayout.SOUTH);
-		
-	}
-	
-	 private JScrollPane menuScroll() {
-	        JTree tree = new JTree();
-	        tree.setUI(new BasicTreeUI() {
-	            @Override
-	            public void setExpandedIcon(Icon newG) {
-	                super.setExpandedIcon(null);
-	            }
+public class Mapping_Window implements Navigate {
+    Main global;
 
-	            @Override
-	            public void setCollapsedIcon(Icon newG) {
-	                super.setCollapsedIcon(null);
-	            }
+    public Mapping_Window(Main global) {
+        this.global = global;
 
-	            protected void paintHorizontalLine(Graphics g, JComponent c, int y, int left, int right){
-	                super.paintHorizontalLine(g,c,y,left,right);
-	            }
-	            protected void paintVerticalLine(Graphics g,JComponent c,int x,int top,int bottom){
-	                super.paintVerticalLine(g,c,x,top,bottom);
-	            }
-	        });
-	        JScrollPane menu = new JScrollPane(tree);
-	        menu.setPreferredSize(new Dimension(200,0));
 
-	        return menu;
+    }
 
-	    }
-	
-	private JToolBar createToolBar() {
-		
-		JToolBar toolBar = new JToolBar();
-		
-		 JButton retour = new JButton("Retour");
-	        retour.addActionListener(new ActionListener() {
-	            @Override
-	            public void actionPerformed(ActionEvent e) {
-	                // global will be a frame containing our different panels
-	            	//global.returnBack();
-	            }
-	        });
-	        toolBar.add(retour);
-		
-		
-		toolBar.add(retour);
-		
-		return toolBar;
-	}
-	
-	private JPanel carte() {
-		
-		JPanel carte = new JPanel(new GridLayout(3,3,10,10));
-		carte.setBorder(new LineBorder(Color.black));
-		
-		JTextField emplacement1 = new JTextField("Deposer un équipement");
-		emplacement1.setBorder(new LineBorder(Color.GREEN));
-		carte.add(emplacement1);
-		
-		JTextField emplacement2 = new JTextField("Deposer un équipement");
-		emplacement2.setBorder(new LineBorder(Color.GREEN));
-		carte.add(emplacement2);
-		
-		JTextField emplacement3 = new JTextField("Deposer un équipement");
-		emplacement3.setBorder(new LineBorder(Color.RED));
-		carte.add(emplacement3);
-		
-		JTextField emplacement4 = new JTextField("Deposer un équipement");
-		emplacement4.setBorder(new LineBorder(Color.GREEN));
-		carte.add(emplacement4);
-		
-		JTextField emplacement5 = new JTextField("Deposer un équipement");
-		emplacement5.setBorder(new LineBorder(Color.RED));
-		carte.add(emplacement5);
-		
-		
-		return carte;
-		
-	}
+    private void menuScroll() {
+        JPanel menuPanel = global.getMenu();
+        JTree tree = new JTree();
+        tree.setUI(new BasicTreeUI() {
+            @Override
+            public void setExpandedIcon(Icon newG) {
+                super.setExpandedIcon(null);
+            }
 
-	private JPanel bloc_equipement() {
-		
-		JPanel bloc = new JPanel(new GridLayout(3,1));
-		
-		
-		JLabel ecran = new JLabel("Ecran");
-		ecran.setIcon(new ImageIcon(new ImageIcon("/Users/selim/smart-buildings-app/client/src/main/resources/icon/ecran.jpg").getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
-		ecran.setPreferredSize(new Dimension(100,30));
-		
-		JLabel prise = new JLabel("Prise");
-		prise.setPreferredSize(new Dimension(100,30));
-		prise.setIcon(new ImageIcon(new ImageIcon("/Users/selim/smart-buildings-app/client/src/main/resources/icon/prise.jpg").getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
-		
-		JLabel capteur = new JLabel("Capteur");
-		capteur.setPreferredSize(new Dimension(100,30));
-		capteur.setIcon(new ImageIcon(new ImageIcon("/Users/selim/smart-buildings-app/client/src/main/resources/icon/capteur.png").getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
-		
-		bloc.add(ecran);
-		bloc.add(capteur);
-		bloc.add(prise);
-		
-		
-		return bloc;
-	}
-	
-	public static void main(String[] args) {
-		Mapping_Window frame = new Mapping_Window();
-		frame.setVisible(true);
-	
-	}
-	
+            @Override
+            public void setCollapsedIcon(Icon newG) {
+                super.setCollapsedIcon(null);
+            }
+
+            protected void paintHorizontalLine(Graphics g, JComponent c, int y, int left, int right){
+                super.paintHorizontalLine(g,c,y,left,right);
+            }
+            protected void paintVerticalLine(Graphics g,JComponent c,int x,int top,int bottom){
+                super.paintVerticalLine(g,c,x,top,bottom);
+            }
+        });
+        JScrollPane menu = new JScrollPane(tree);
+
+        menuPanel.removeAll();
+        menu.setPreferredSize(new Dimension(200,0));
+
+        menuPanel.add(menu);
+        menuPanel.invalidate();
+        menuPanel.validate();
+        menuPanel.repaint();
+
+
+    }
+
+    private JToolBar createToolBar() {
+
+        JToolBar toolBar = new JToolBar();
+
+        JButton retour = new JButton("Retour");
+        retour.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                global.setupFrame();
+            }
+        });
+        toolBar.add(retour);
+
+        return toolBar;
+    }
+
+    private JPanel carte() {
+
+        JPanel carte = new JPanel(new GridLayout(3,3,10,10));
+        carte.setBorder(new LineBorder(Color.black));
+
+        JTextField emplacement1 = new JTextField("Deposer un équipement");
+        emplacement1.setBorder(new LineBorder(Color.GREEN));
+        carte.add(emplacement1);
+
+        JTextField emplacement2 = new JTextField("Deposer un équipement");
+        emplacement2.setBorder(new LineBorder(Color.GREEN));
+        carte.add(emplacement2);
+
+        JTextField emplacement3 = new JTextField("Deposer un équipement");
+        emplacement3.setBorder(new LineBorder(Color.RED));
+        carte.add(emplacement3);
+
+        JTextField emplacement4 = new JTextField("Deposer un équipement");
+        emplacement4.setBorder(new LineBorder(Color.GREEN));
+        carte.add(emplacement4);
+
+        JTextField emplacement5 = new JTextField("Deposer un équipement");
+        emplacement5.setBorder(new LineBorder(Color.RED));
+        carte.add(emplacement5);
+
+
+        return carte;
+
+    }
+
+    private void bloc_equipement() {
+
+        JPanel bloc = global.getBloc();
+        bloc.setLayout(new GridLayout(3,1));
+
+        JLabel ecran = new JLabel("Ecran");
+        ecran.setIcon(new ImageIcon(new ImageIcon(getUriOfFile("icon/ecran.jpg")).getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
+        ecran.setPreferredSize(new Dimension(100,30));
+
+        JLabel prise = new JLabel("Prise");
+        prise.setPreferredSize(new Dimension(100,30));
+        prise.setIcon(new ImageIcon(new ImageIcon(getUriOfFile("icon/prise.jpg")).getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
+
+        JLabel capteur = new JLabel("Capteur");
+        capteur.setPreferredSize(new Dimension(100,30));
+        capteur.setIcon(new ImageIcon(new ImageIcon(getUriOfFile("icon/capteur.png")).getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
+
+        bloc.add(ecran);
+        bloc.add(capteur);
+        bloc.add(prise);
+
+        bloc.repaint();
+    }
+
+    private String getUriOfFile(String file) {
+        String uri = null;
+        try {
+            uri = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(file)).getPath();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return uri;
+    }
+
+    @Override
+    public void start() {
+        JPanel contentPane = global.getContext();
+        BorderLayout borderLayout = new BorderLayout();
+        borderLayout.setHgap(20);
+        borderLayout.setVgap(20);
+        contentPane.setLayout(borderLayout);
+        menuScroll();
+        bloc_equipement();
+
+        contentPane.add(carte());
+
+        contentPane.add(createToolBar(), BorderLayout.SOUTH);
+        global.getFrame().pack();
+
+
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+    }
 }
-

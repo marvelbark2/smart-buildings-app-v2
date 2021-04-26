@@ -1,8 +1,8 @@
 package edu.episen.si.ing1.pds.client.swing.global;
 
-import edu.episen.si.ing1.pds.client.swing.Window;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.location.LocationMenu;
+import edu.episen.si.ing1.pds.client.mapping.selim.*;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -76,7 +76,7 @@ public class Main implements MouseListener {
         consult.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         consult.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
         consult.setOpaque(true);
-        frames.put(consult, new Window(this));
+        frames.put(consult, new Mapping_Window(this));
         consult.addMouseListener(this);
         consult.setBackground(new Color(54, 38, 90));
         consult.setForeground(Color.white);
