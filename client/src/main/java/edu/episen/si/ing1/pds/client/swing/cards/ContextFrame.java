@@ -1,6 +1,5 @@
 package edu.episen.si.ing1.pds.client.swing.cards;
 
-import edu.episen.si.ing1.pds.client.swing.Routes;
 import edu.episen.si.ing1.pds.client.swing.global.Main;
 import edu.episen.si.ing1.pds.client.swing.global.Navigate;
 

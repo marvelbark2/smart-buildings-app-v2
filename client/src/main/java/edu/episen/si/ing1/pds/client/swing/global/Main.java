@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.client.swing.global;
 
+import edu.episen.si.ing1.pds.client.swing.Window;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.location.LocationMenu;
 import edu.episen.si.ing1.pds.client.swing.shared.*;
@@ -29,7 +30,13 @@ public class Main implements MouseListener {
         BorderLayout borderLayout = new BorderLayout();
         borderLayout.setHgap(5);
         global.setLayout(borderLayout);
+        setupFrame();
 
+
+    }
+
+    public void setupFrame() {
+        global.removeAll();
         JPanel logo = new JPanel(new FlowLayout());
         JLabel label = new JLabel("Logo");
         logo.setBackground(new Color(54, 38, 90));
@@ -43,6 +50,10 @@ public class Main implements MouseListener {
         setupBloc();
         global.add(bloc, BorderLayout.EAST);
 
+        global.invalidate();
+        global.validate();
+        global.repaint();
+        frame.pack();
     }
 
     private void setupMenu() {
@@ -66,7 +77,7 @@ public class Main implements MouseListener {
         consult.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
         consult.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
         consult.setOpaque(true);
-        frames.put(consult, new ContextFrame(this));
+        frames.put(consult, new Window(this));
         consult.addMouseListener(this);
         consult.setBackground(new Color(54, 38, 90));
         consult.setForeground(Color.white);

@@ -1,7 +1,6 @@
 package edu.episen.si.ing1.pds.client.swing.cards;
 
 import edu.episen.si.ing1.pds.client.network.Request;
-import edu.episen.si.ing1.pds.client.swing.Routes;
 import edu.episen.si.ing1.pds.client.swing.cards.models.UserTableModel;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 import org.slf4j.Logger;

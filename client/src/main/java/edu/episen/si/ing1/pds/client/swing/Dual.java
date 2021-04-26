@@ -119,7 +119,6 @@ class DualListBox extends JPanel {
 
     private void fillListModel(SortedListModel model, Object newValues[]) {
         model.addAll(newValues);
-        model.add(Map.of("id", 23));
     }
 
     public Iterator sourceIterator() {
