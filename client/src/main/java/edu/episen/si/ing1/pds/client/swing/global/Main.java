@@ -3,7 +3,6 @@ package edu.episen.si.ing1.pds.client.swing.global;
 import edu.episen.si.ing1.pds.client.swing.Window;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.location.LocationMenu;
-import edu.episen.si.ing1.pds.client.swing.shared.*;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -130,7 +129,7 @@ public class Main implements MouseListener {
     private void setupContext() {
         context = new JPanel();
         context.setBorder(new LineBorder(Color.GREEN));
-        context.setBackground(Ui.COLOR_INTERACTIVE);
+        context.setBackground(edu.episen.si.ing1.pds.client.swing.shared.Ui.COLOR_INTERACTIVE);
     }
     private void setupBloc() {
         bloc = new JPanel();
