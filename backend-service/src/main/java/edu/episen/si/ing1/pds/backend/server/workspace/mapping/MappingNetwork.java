@@ -16,7 +16,8 @@ import java.util.Map;
 
 public class MappingNetwork {
     public MappingNetwork(Request request, Connection connection, PrintWriter writer) {
-        String event = request.getEvent();
+        
+    	String event = request.getEvent();
         ObjectMapper mapper = new ObjectMapper();
         if(event.equalsIgnoreCase("building_list")) {
             try {
@@ -37,6 +38,25 @@ public class MappingNetwork {
                 throwables.printStackTrace();
             }
 
+        }
+        else if(event.equalsIgnoreCase("floors_list")) {
+        	try {
+        		List<Map> response = new ArrayList<>();
+                Statement statement = connection.createStatement();
+                ResultSet rs = statement.executeQuery("SELECT * FROM floors");
+                while(rs.next()) {
+                	Map hMap=new HashMap();
+                	hMap.put("floors", rs.getInt("floors"));
+                	hMap.put("designation", rs.getString("designation"));
+                	response.add(hMap);
+                }
+                Map responseMsg=Utils.responseFactory(response, event);
+                String serializedMsgString=mapper.writeValueAsString(responseMsg);
+        		writer.println(serializedMsgString);
+        		
+        	} catch (Exception throwables) {
+        		throwables.printStackTrace();
+        	}
         }
     }
 }

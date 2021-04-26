@@ -1,23 +1,49 @@
-package edu.episen.si.ing1.pds.client.swing;
+package edu.episen.si.ing1.pds.client.mapping.selim;
 
+import edu.episen.si.ing1.pds.client.network.Request;
+import edu.episen.si.ing1.pds.client.network.Response;
+import edu.episen.si.ing1.pds.client.network.SocketConfig;
 import edu.episen.si.ing1.pds.client.swing.global.Main;
 import edu.episen.si.ing1.pds.client.swing.global.Navigate;
+import edu.episen.si.ing1.pds.client.utils.Utils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.TreeModel;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Map;
 import java.util.Objects;
 
-public class Window implements Navigate {
+public class Mapping_Window implements Navigate {
     Main global;
 
-    public Window(Main global) {
+    public Mapping_Window(Main global) {
         this.global = global;
 
 
+    }
+    
+    private void getBatiment() {
+    	try {
+    		SocketConfig.Instance.setEnv(true);
+    		Request request=new Request();
+    		
+    		request.setEvent("building_list");
+            Response response = Utils.sendRequest(request);
+            List<Map> data = (List<Map>) response.getMessage();
+            for ( Map e: data) {
+                JLabel label = new JLabel(e.get("abbreviation").toString());
+                label.setBorder(new LineBorder(Color.BLUE));
+                panel.add(label);
+            }
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+        
     }
 
     private void menuScroll() {
