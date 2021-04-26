@@ -1,5 +1,8 @@
 package edu.episen.si.ing1.pds.client.swing;
 
+import edu.episen.si.ing1.pds.client.swing.global.Main;
+import edu.episen.si.ing1.pds.client.swing.global.Navigate;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -8,38 +11,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
 
-public class Window {
-    Global global;
+public class Window implements Navigate {
+    Main global;
 
-    public Window(Global global) {
+    public Window(Main global) {
         this.global = global;
-        JPanel contentPane = global.getPanel();
-        BorderLayout borderLayout = new BorderLayout();
-        borderLayout.setHgap(20);
-        borderLayout.setVgap(20);
-        contentPane.setLayout(borderLayout);
 
-
-
-        JPanel logo = new JPanel(new FlowLayout());
-        JLabel label = new JLabel("Logo");
-        logo.add(label, BorderLayout.CENTER);
-        contentPane.add(logo, BorderLayout.PAGE_START);
-
-
-
-        contentPane.add(menuScroll(), BorderLayout.WEST);
-
-        contentPane.add(carte(), BorderLayout.CENTER);
-
-        contentPane.add(bloc_equipement(), BorderLayout.EAST);
-
-        contentPane.add(createToolBar(), BorderLayout.SOUTH);
 
     }
 
-    private JScrollPane menuScroll() {
-        JPanel menuPanel = new JPanel();
+    private void menuScroll() {
+        JPanel menuPanel = global.getMenu();
         JTree tree = new JTree();
         tree.setUI(new BasicTreeUI() {
             @Override
@@ -60,9 +42,15 @@ public class Window {
             }
         });
         JScrollPane menu = new JScrollPane(tree);
+
+        menuPanel.removeAll();
         menu.setPreferredSize(new Dimension(200,0));
 
-        return menu;
+        menuPanel.add(menu);
+        menuPanel.invalidate();
+        menuPanel.validate();
+        menuPanel.repaint();
+
 
     }
 
@@ -74,7 +62,7 @@ public class Window {
         retour.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                global.returnBack();
+                global.setupFrame();
             }
         });
         toolBar.add(retour);
@@ -112,10 +100,10 @@ public class Window {
 
     }
 
-    private JPanel bloc_equipement() {
+    private void bloc_equipement() {
 
-        JPanel bloc = new JPanel(new GridLayout(3,1));
-
+        JPanel bloc = global.getBloc();
+        bloc.setLayout(new GridLayout(3,1));
 
         JLabel ecran = new JLabel("Ecran");
         ecran.setIcon(new ImageIcon(new ImageIcon(getUriOfFile("icon/ecran.jpg")).getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
@@ -133,8 +121,7 @@ public class Window {
         bloc.add(capteur);
         bloc.add(prise);
 
-
-        return bloc;
+        bloc.repaint();
     }
 
     private String getUriOfFile(String file) {
@@ -145,5 +132,28 @@ public class Window {
             e.printStackTrace();
         }
         return uri;
+    }
+
+    @Override
+    public void start() {
+        JPanel contentPane = global.getContext();
+        BorderLayout borderLayout = new BorderLayout();
+        borderLayout.setHgap(20);
+        borderLayout.setVgap(20);
+        contentPane.setLayout(borderLayout);
+        menuScroll();
+        bloc_equipement();
+
+        contentPane.add(carte());
+
+        contentPane.add(createToolBar(), BorderLayout.SOUTH);
+        global.getFrame().pack();
+
+
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
     }
 }
