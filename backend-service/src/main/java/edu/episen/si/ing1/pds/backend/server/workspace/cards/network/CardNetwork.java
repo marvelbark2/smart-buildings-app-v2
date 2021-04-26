@@ -41,7 +41,6 @@ public class CardNetwork {
                 List data = service.findAll();
                 Map<String, Object> msgResponseT = Utils.responseFactory(data, "card_list");
                 String reponseMsg = mapper.writeValueAsString(msgResponseT);
-                logger.info(reponseMsg);
                 writer.println(reponseMsg);
             } catch (JsonProcessingException e) {
                 logger.error(e.getMessage(), e);

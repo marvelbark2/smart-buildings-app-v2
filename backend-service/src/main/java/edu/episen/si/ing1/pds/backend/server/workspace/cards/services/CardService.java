@@ -136,7 +136,14 @@ public class CardService implements Services<CardRequest, CardsResponse> {
             statement.setString(1, serialId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
-                list.add(Map.of("id", rs.getInt("id"), "title", rs.getString("name"), "type", rs.getString("type"), "accessible", rs.getBoolean("access")));
+                list.add(
+                        Map.of(
+                                "id", rs.getInt("id"),
+                                "title", rs.getString("name"),
+                                "type", rs.getString("type"),
+                                "accessible", rs.getBoolean("access")
+                        )
+                );
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();

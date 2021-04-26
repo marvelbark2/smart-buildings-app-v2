@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.network.SocketFacade;
+import edu.episen.si.ing1.pds.client.swing.cards.models.DualListBox;
 import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CardView implements Routes {
     private final ObjectMapper mapper = new ObjectMapper();
@@ -200,6 +202,9 @@ public class CardView implements Routes {
                                             list.setSelectedIndex(index);
                                         }
                                     }
+                                    if(index == -1 && value == null) {
+                                        setText(((Map) data.get("user")).get("name").toString());
+                                    }
 
 
                                     return this;
@@ -228,8 +233,40 @@ public class CardView implements Routes {
                             serialFieldPanel.add(serialField);
                             serialFieldPanel.add(snGenerator);
 
-                            dialogPanel.add(userFieldPanel);
-                            dialogPanel.add(serialFieldPanel);
+                            JPanel textFields = new JPanel(new GridLayout(2,2, 25,25));
+
+                            textFields.add(userFieldPanel);
+                            textFields.add(serialFieldPanel);
+
+                            dialogPanel.add(textFields);
+
+                            DualListBox dual = new DualListBox();
+
+                            Request requestAccessList = new Request();
+                            requestAccessList.setEvent("card_access_list");
+                            requestAccessList.setData(Map.of("serialId", data.get("cardUId")));
+
+                            Response responseAccessList = Utils.sendRequest(requestAccessList);
+
+                            List<Map> dataAccessList = (List<Map>) responseAccessList.getMessage();
+                            List<Map> accessible = dataAccessList.stream().filter(map -> (boolean)map.get("accessible")).collect(Collectors.toList());
+                            List<Map> notAccessible = dataAccessList.stream().filter(map -> ! (boolean)map.get("accessible")).collect(Collectors.toList());
+
+                            dual.addSourceElements(notAccessible.toArray(new Map[0]));
+                            dual.addDestinationElements(accessible.toArray(new Map[0]));
+                            dual.setRenderer(new DefaultListCellRenderer() {
+                                    @Override
+                                    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                        super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                        if (value instanceof Map) {
+                                            Map<String, String> val = (Map<String, String>) value;
+                                            setText(val.get("title"));
+                                        }
+                                        return this;
+                                    }
+                                });
+                            dual.setBorder(BorderFactory.createTitledBorder("Gérer les accès"));
+                            dialogPanel.add(dual);
 
                             dialog.setContentPane(dialogPanel);
                             dialog.setVisible(true);

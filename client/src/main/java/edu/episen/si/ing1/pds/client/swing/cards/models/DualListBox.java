@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.client.swing;
+package edu.episen.si.ing1.pds.client.swing.cards.models;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,38 +7,17 @@ import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 
-public class Dual {
-    public static void main(String args[]) {
-        JFrame f = new JFrame("Dual List Box Tester");
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        DualListBox dual = new DualListBox();
-
-        List<Map> data = List.of(
-                Map.of("id", "1222", "name", "d", "modified", false),
-                Map.of("id", "1321", "name", "e", "modified", false),
-                Map.of("id", "2251", "name", "s", "modified", false),
-                Map.of("id", "5333", "name", "a", "modified", false)
-        );
-        dual.addSourceElements(
-                new String[] {"id", "DEE"}
-        );
-
-        f.getContentPane().add(dual, BorderLayout.CENTER);
-        f.setSize(400, 300);
-        f.setVisible(true);
-    }
-}
-class DualListBox extends JPanel {
+public class DualListBox extends JPanel {
 
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
 
-    private static final String ADD_BUTTON_LABEL = "Add >>";
+    private static final String ADD_BUTTON_LABEL = ">>";
 
-    private static final String REMOVE_BUTTON_LABEL = "<< Remove";
+    private static final String REMOVE_BUTTON_LABEL = "<<";
 
-    private static final String DEFAULT_SOURCE_CHOICE_LABEL = "Available Choices";
+    private static final String DEFAULT_SOURCE_CHOICE_LABEL = "Salles et equipement non accessible";
 
-    private static final String DEFAULT_DEST_CHOICE_LABEL = "Your Choices";
+    private static final String DEFAULT_DEST_CHOICE_LABEL = "Accessible";
 
     private JLabel sourceLabel;
 
@@ -145,10 +124,16 @@ class DualListBox extends JPanel {
         return destList.getCellRenderer();
     }
 
+    public void setRenderer(ListCellRenderer newValue) {
+        setDestinationCellRenderer(newValue);
+        setSourceCellRenderer(newValue);
+    }
+
     public void setVisibleRowCount(int newValue) {
         sourceList.setVisibleRowCount(newValue);
         destList.setVisibleRowCount(newValue);
     }
+
 
     public int getVisibleRowCount() {
         return sourceList.getVisibleRowCount();
@@ -224,10 +209,11 @@ class DualListBox extends JPanel {
     }
 
 
-
     private class AddListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             Object selected[] = sourceList.getSelectedValues();
+            Map selectedMap = (Map) selected[0];
+            selectedMap.put("accessible", !(Boolean) selectedMap.get("accessible"));
             addDestinationElements(selected);
             clearSourceSelected();
         }
@@ -236,12 +222,13 @@ class DualListBox extends JPanel {
     private class RemoveListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             Object selected[] = destList.getSelectedValues();
+            Map selectedMap = (Map) selected[0];
+            selectedMap.put("accessible", !(Boolean) selectedMap.get("accessible"));
             addSourceElements(selected);
             clearDestinationSelected();
         }
     }
 }
-
 class SortedListModel extends AbstractListModel {
     List model;
 
@@ -297,5 +284,4 @@ class SortedListModel extends AbstractListModel {
         }
         return removed;
     }
-
 }
