@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.client.swing.toast;
+package edu.episen.si.ing1.pds.client.swing.global.shared.toast;
 
 import edu.episen.si.ing1.pds.client.swing.shared.Ui;
 
