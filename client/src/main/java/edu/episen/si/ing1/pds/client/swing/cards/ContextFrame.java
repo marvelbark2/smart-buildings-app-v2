@@ -31,8 +31,6 @@ public class ContextFrame implements Navigate {
             app.getContext().invalidate();
             app.getContext().validate();
             app.getContext().repaint();
-            app.getContext().setVisible(true);
-
         }
     }
 
@@ -46,7 +44,6 @@ public class ContextFrame implements Navigate {
     @Override
     public void start() {
         JPanel context = app.getContext();
-        context.setBackground(new Color(90, 64, 149));
         context.setLayout(new BorderLayout());
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));

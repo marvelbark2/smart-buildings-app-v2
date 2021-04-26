@@ -2,7 +2,7 @@ package edu.episen.si.ing1.pds.client.swing.global;
 
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.location.LocationMenu;
-import edu.episen.si.ing1.pds.client.mapping.selim.*;
+import edu.episen.si.ing1.pds.client.swing.mapping.selim.*;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -48,6 +48,8 @@ public class Main implements MouseListener {
         global.add(context, BorderLayout.CENTER);
         setupBloc();
         global.add(bloc, BorderLayout.EAST);
+
+        global.setBackground(Color.white);
 
         global.invalidate();
         global.validate();
@@ -128,8 +130,7 @@ public class Main implements MouseListener {
 
     private void setupContext() {
         context = new JPanel();
-        context.setBorder(new LineBorder(Color.GREEN));
-        context.setBackground(edu.episen.si.ing1.pds.client.swing.shared.Ui.COLOR_INTERACTIVE);
+        context.setOpaque(false);
     }
     private void setupBloc() {
         bloc = new JPanel();

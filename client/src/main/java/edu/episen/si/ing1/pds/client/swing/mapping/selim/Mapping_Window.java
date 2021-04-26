@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.client.mapping.selim;
+package edu.episen.si.ing1.pds.client.swing.mapping.selim;
 
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
@@ -10,12 +10,12 @@ import edu.episen.si.ing1.pds.client.utils.Utils;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.tree.TreeModel;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 public class Mapping_Window implements Navigate {
@@ -31,7 +31,8 @@ public class Mapping_Window implements Navigate {
     	try {
     		SocketConfig.Instance.setEnv(true);
     		Request request=new Request();
-    		
+
+    		JPanel panel = new JPanel();
     		request.setEvent("building_list");
             Response response = Utils.sendRequest(request);
             List<Map> data = (List<Map>) response.getMessage();

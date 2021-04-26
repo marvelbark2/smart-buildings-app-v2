@@ -325,6 +325,7 @@ public class CardView implements Routes {
 
             //ComboBox field
             JPanel comboField = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+            comboField.setOpaque(false);
             JLabel comboFieldFor = new JLabel("User: ");
             Border comboBorder = BorderFactory.createTitledBorder("Champ Utilisateur");
             comboField.add(comboFieldFor);
@@ -334,6 +335,7 @@ public class CardView implements Routes {
 
             //Serial Number flied
             JPanel sNField = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+            sNField.setOpaque(false);
             JLabel sNFieldFor = new JLabel("Matricule: ");
             JTextField snFieldText = new JTextField(20);
             JButton snGenerator = new JButton("Generer 1");
@@ -347,6 +349,7 @@ public class CardView implements Routes {
 
             //tmp card field
             JPanel expirableField = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            expirableField.setOpaque(false);
             Border expirableBorder = BorderFactory.createTitledBorder("Expirable");
             expirableField.setBorder(expirableBorder);
             JCheckBox expirable = new JCheckBox("Carte Provisoire ?");
@@ -365,6 +368,7 @@ public class CardView implements Routes {
 
             // Expire Date Field
             JPanel expireDate = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            expireDate.setOpaque(false);
             Border expireDateBorder = BorderFactory.createTitledBorder("Date d'expiration");
             expireDate.setBorder(expireDateBorder);
             JLabel expireDateLabel = new JLabel("Date: ");
@@ -431,11 +435,17 @@ public class CardView implements Routes {
 
             buttonsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);//0.0
 
-            panel.add(buttonsPanel, Component.LEFT_ALIGNMENT);
             panel.add(sp);
             panel.add(btnPanel);
             panel.add(formPanel);
             panel.add(submit);
+
+            panel.setOpaque(false);
+            sp.setOpaque(false);
+            formPanel.setOpaque(false);
+            btnPanel.setOpaque(false);
+            submit.setOpaque(false);
+
 
             frame.add(panel);
 

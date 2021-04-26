@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.client.swing.shared;
+package edu.episen.si.ing1.pds.client.swing.global.shared;
 
 import java.awt.*;
 import java.util.HashMap;

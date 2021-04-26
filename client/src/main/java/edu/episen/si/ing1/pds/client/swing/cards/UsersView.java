@@ -18,12 +18,10 @@ public class UsersView implements Routes {
 
     private final Logger logger = LoggerFactory.getLogger(UsersView.class.getName());
 
-    public UsersView() {
-        getData();
-    }
 
     @Override
     public void launch(ContextFrame context) {
+        getData();
         JPanel frame = context.getApp().getContext();
 
         JPanel panel = new JPanel();
