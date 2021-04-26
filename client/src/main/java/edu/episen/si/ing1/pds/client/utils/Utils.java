@@ -1,6 +1,5 @@
 package edu.episen.si.ing1.pds.client.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
@@ -76,16 +75,6 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        finally {
-//            if(reader != null && writer != null) {
-//                writer.close();
-//                try {
-//                    reader.close();
-//                } catch (IOException ex) {
-//                    ex.printStackTrace();
-//                }
-//            }
-//        }
         return response;
     }
 }

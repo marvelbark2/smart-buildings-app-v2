@@ -1,12 +1,26 @@
 package edu.episen.si.ing1.pds.client;
 
-import edu.episen.si.ing1.pds.client.roles.RoleType;
+import edu.episen.si.ing1.pds.client.network.SocketConfig;
+import edu.episen.si.ing1.pds.client.swing.global.Main;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+
 public class Client {
     private final static Logger logger = LoggerFactory.getLogger(Client.class.getName());
+
+    private static void createAndShowGUI() {
+        Main app = new Main();
+        JFrame frame = app.getFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1800, 1000);
+        frame.setPreferredSize(frame.getSize());
+        frame.setVisible(true);
+        frame.setContentPane(app.getGlobal());
+        frame.pack();
+    }
 
     public static void main(String[] args) throws Exception {
         final Options options = new Options();
@@ -23,12 +37,15 @@ public class Client {
         if (commandLine.hasOption("testMode"))
             iTestMode = true;
 
-        RoleType roleType = RoleType.Instance.findRole(5);
-        if (commandLine.hasOption("userRole")) {
-            int id = Integer.parseInt(commandLine.getOptionValue("userRole"));
-            roleType = RoleType.Instance.findRole(id);
-        }
-        logger.info("Client is running (testMode = {}) under a {}", iTestMode, roleType);
+        SocketConfig.Instance.setEnv(iTestMode);
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                createAndShowGUI();
+            }
+        });
+        logger.info("Client is running (testMode = {}) ", iTestMode);
 
     }
 }
