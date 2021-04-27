@@ -1,5 +1,27 @@
 package edu.episen.si.ing1.pds.client.swing.mapping.selim;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.JTree;
+import javax.swing.border.LineBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.network.SocketConfig;
@@ -7,19 +29,9 @@ import edu.episen.si.ing1.pds.client.swing.global.Main;
 import edu.episen.si.ing1.pds.client.swing.global.Navigate;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.plaf.basic.BasicTreeUI;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Map;
-import java.util.List;
-import java.util.Objects;
-
 public class Mapping_Window implements Navigate {
     Main global;
+    private JTree arbre;
 
     public Mapping_Window(Main global) {
         this.global = global;
@@ -47,28 +59,11 @@ public class Mapping_Window implements Navigate {
         
     }
 
-    private void menuScroll() {
+    private void menuScroll(JTree arbre2) {
         JPanel menuPanel = global.getMenu();
-        JTree tree = new JTree();
-        tree.setUI(new BasicTreeUI() {
-            @Override
-            public void setExpandedIcon(Icon newG) {
-                super.setExpandedIcon(null);
-            }
-
-            @Override
-            public void setCollapsedIcon(Icon newG) {
-                super.setCollapsedIcon(null);
-            }
-
-            protected void paintHorizontalLine(Graphics g, JComponent c, int y, int left, int right){
-                super.paintHorizontalLine(g,c,y,left,right);
-            }
-            protected void paintVerticalLine(Graphics g,JComponent c,int x,int top,int bottom){
-                super.paintVerticalLine(g,c,x,top,bottom);
-            }
-        });
-        JScrollPane menu = new JScrollPane(tree);
+        
+      
+        JScrollPane menu = new JScrollPane(arbre2);
 
         menuPanel.removeAll();
         menu.setPreferredSize(new Dimension(200,0));
@@ -79,6 +74,23 @@ public class Mapping_Window implements Navigate {
         menuPanel.repaint();
 
 
+    }
+    
+    private JTree buildTree() {
+    	
+    	DefaultMutableTreeNode racine = new DefaultMutableTreeNode("Racine");    
+    	
+    	for(int i = 1; i < 6; i++){
+    		DefaultMutableTreeNode rep = new DefaultMutableTreeNode("Noeud n°"+i);
+    		if(i < 4){   
+    			DefaultMutableTreeNode rep2 = new DefaultMutableTreeNode("Fichier enfant");
+    			rep.add(rep2);
+    			}
+    		racine.add(rep);
+    		}
+    	
+    	arbre = new JTree(racine); 
+    	return arbre;
     }
 
     private JToolBar createToolBar() {
@@ -168,7 +180,8 @@ public class Mapping_Window implements Navigate {
         borderLayout.setHgap(20);
         borderLayout.setVgap(20);
         contentPane.setLayout(borderLayout);
-        menuScroll();
+        arbre = buildTree();
+        menuScroll(arbre);
         bloc_equipement();
 
         contentPane.add(carte());
