@@ -63,4 +63,10 @@ public class LocationMenu implements Navigate {
 	}
 
 
+
+
+    public Main getApp() {
+        return app;
+    }
+
 }
