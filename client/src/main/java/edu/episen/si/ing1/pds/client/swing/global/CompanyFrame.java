@@ -76,9 +76,9 @@ public class CompanyFrame extends JPanel {
     }
 
     private void addLogo(JPanel panel1) {
-        JLabel label1 = new JLabel();
+        JLabel label1 = new JLabel("SmartBuildings");
         label1.setFocusable(false);
-        label1.setIcon(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("icon/logo.png")).getFile()));
+        label1.setIcon(new ImageIcon(new ImageIcon(getUriOfFile("icon/prise.jpg")).getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
         label1.setBounds(55, 146, 200, 110);
         panel1.add(label1);
     }
@@ -164,5 +164,14 @@ public class CompanyFrame extends JPanel {
         toaster.success("Veuillez Patientez ...");
         Utils.setCompanyId(1);
         app.loadSystemWindow();
+    }
+    private String getUriOfFile(String file) {
+        String uri = null;
+        try {
+            uri = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(file)).getPath();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return uri;
     }
 }
