@@ -23,11 +23,13 @@ public class MappingNetwork {
             try {
                 List<Map> response = new ArrayList<>();
                 Statement statement = connection.createStatement();
-                ResultSet rs = statement.executeQuery("SELECT * FROM buildings");
+                ResultSet rs = statement.executeQuery("SELECT DISTINCT buildings.name FROM workspace\n"
+                		+ "INNER JOIN floors ON workspace.floor_number = floors.floor_number\n"
+                		+ "INNER JOIN buildings ON floors.building_number = buildings.id_buildings");
                 while (rs.next()) {
                     Map hm = new HashMap();
-                    hm.put("buildingid", rs.getInt("buildingid"));
-                    hm.put("abbreviation", rs.getString("abbreviation"));
+                   // hm.put("buildingid", rs.getInt("buildingid"));
+                    hm.put("name", rs.getString("name"));
                     response.add(hm);
                 }
                 Map responseMsg = Utils.responseFactory(response, event);
@@ -43,11 +45,13 @@ public class MappingNetwork {
         	try {
         		List<Map> response = new ArrayList<>();
                 Statement statement = connection.createStatement();
-                ResultSet rs = statement.executeQuery("SELECT * FROM floors");
+                ResultSet rs = statement.executeQuery("SELECT b.id_buildings, f.floor_number FROM workspace\n"
+                		+ "join floors f on f.id_floor = workspace.floor_number\n"
+                		+ "join buildings b on b.id_buildings = f.building_number;");
                 while(rs.next()) {
                 	Map hMap=new HashMap();
-                	hMap.put("floors", rs.getInt("floors"));
-                	hMap.put("designation", rs.getString("designation"));
+                	//hMap.put("building_number", rs.getInt("building_number"));
+                	hMap.put("floor_number", rs.getInt("floor_number"));
                 	response.add(hMap);
                 }
                 Map responseMsg=Utils.responseFactory(response, event);
@@ -57,6 +61,25 @@ public class MappingNetwork {
         	} catch (Exception throwables) {
         		throwables.printStackTrace();
         	}
+        }
+        else if(event.equalsIgnoreCase("companies_list")) {
+            try {
+                List<Map> response = new ArrayList<>();
+                Statement statement = connection.createStatement();
+                ResultSet rs = statement.executeQuery("SELECT * FROM companies");
+                while (rs.next()) {
+                    Map hMap=new HashMap();
+                    hMap.put("id_companies", rs.getInt("id_companies"));
+                    hMap.put("name", rs.getString("name"));
+                    response.add(hMap);
+                }
+                Map responseMsg=Utils.responseFactory(response, event);
+                String serializedMsgString=mapper.writeValueAsString(responseMsg);
+                writer.println(serializedMsgString);
+
+            } catch (Exception e ){
+                e.printStackTrace();
+            }
         }
     }
 }
