@@ -7,6 +7,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.SocketException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +33,7 @@ import edu.episen.si.ing1.pds.client.utils.Utils;
 public class Mapping_Window implements Navigate {
     Main global;
     private JTree arbre;
+    
 
     public Mapping_Window(Main global) {
         this.global = global;
@@ -39,7 +41,7 @@ public class Mapping_Window implements Navigate {
 
     }
     
-    private void getBatiment() {
+    /*private void getBatiment() {
     	try {
     		SocketConfig.Instance.setEnv(true);
     		Request request=new Request();
@@ -57,7 +59,7 @@ public class Mapping_Window implements Navigate {
 			// TODO: handle exception
 		}
         
-    }
+    }*/
 
     private void menuScroll(JTree arbre2) {
         JPanel menuPanel = global.getMenu();
@@ -76,22 +78,38 @@ public class Mapping_Window implements Navigate {
 
     }
     
-    private JTree buildTree() {
+   private JTree buildTree() {
     	
+	   	try {
+			SocketConfig.Instance.setEnv(true);
+			Request request=new Request();
+			request.setEvent("building_list");
+			Response response = Utils.sendRequest(request);
+			List<Map> data=(List<Map>) response.getMessage();
+			
+			Request request2 = new Request();
+			request2.setEvent("floors_list");
+			Response response2 = Utils.sendRequest(request2);
+			List<Map> data2 = (List<Map>) response2.getMessage();
+			
     	DefaultMutableTreeNode racine = new DefaultMutableTreeNode("Racine");    
     	
-    	for(int i = 1; i < 6; i++){
-    		DefaultMutableTreeNode rep = new DefaultMutableTreeNode("Noeud n°"+i);
-    		if(i < 4){   
-    			DefaultMutableTreeNode rep2 = new DefaultMutableTreeNode("Fichier enfant");
+    	for(Map e:data) {
+    		DefaultMutableTreeNode rep = new DefaultMutableTreeNode(e.get("name").toString());
+    		for(Map e2: data2) {
+    			DefaultMutableTreeNode rep2 = new DefaultMutableTreeNode("Etage" + e2.get("floor_number").toString());
     			rep.add(rep2);
-    			}
-    		racine.add(rep);
     		}
+    		racine.add(rep);
+    	}
     	
     	arbre = new JTree(racine); 
-    	return arbre;
-    }
+    	
+    } catch (Exception e) {
+		// TODO: handle exception
+	}
+		return arbre;
+ }
 
     private JToolBar createToolBar() {
 
@@ -102,6 +120,7 @@ public class Mapping_Window implements Navigate {
             @Override
             public void actionPerformed(ActionEvent e) {
                 global.setupFrame();
+                global.getFrame().pack();
             }
         });
         toolBar.add(retour);
