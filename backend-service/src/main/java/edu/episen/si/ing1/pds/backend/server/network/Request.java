@@ -6,6 +6,7 @@ public class Request {
     private String requestId;
     private String event;
     private JsonNode data;
+    private Integer companyId;
 
     public String getEvent() {
         return event;
@@ -19,9 +20,14 @@ public class Request {
         return requestId;
     }
 
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
     @Override
     public String toString() {
         return "Request{" +
+                "companyId='" + companyId + '\'' +
                 "requestId='" + requestId + '\'' +
                 ", event='" + event + '\'' +
                 ", data=" + data +

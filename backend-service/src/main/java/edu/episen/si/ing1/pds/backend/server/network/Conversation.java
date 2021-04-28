@@ -69,6 +69,7 @@ public class Conversation implements Runnable {
             String request;
             while ((request = reader.readLine()) != null && active) {
                 Request requestObj = mapper.readValue(request, Request.class);
+                logger.info(request);
                 logger.info(requestObj.toString());
                 logger.info("Request ID: {}",requestObj.getRequestId());
 

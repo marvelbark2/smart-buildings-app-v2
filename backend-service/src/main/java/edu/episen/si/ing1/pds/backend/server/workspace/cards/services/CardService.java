@@ -15,9 +15,15 @@ import java.util.Optional;
 
 public class CardService implements Services<CardRequest, CardsResponse> {
     private final Connection connection;
+    private int companyId;
 
     public CardService(Connection connection) {
         this.connection = connection;
+    }
+
+    public void setCompanyId(int companyId) {
+        this.companyId = companyId;
+
     }
 
     public Optional<CardsResponse> findById(Long id) {
@@ -54,14 +60,16 @@ public class CardService implements Services<CardRequest, CardsResponse> {
     public List<CardsResponse> findAll() {
         List<CardsResponse> cards = new ArrayList<>();
         try {
-            String query = "SELECT * FROM cards c JOIN users u on u.userId = c.userId";
+            String query = "SELECT * FROM cards c JOIN users u on u.userId = c.userId and u.company_id = ?";
             PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, companyId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 Cards card = new Cards();
                 card.setCardId(rs.getLong("cardid"));
                 card.setCardUId(rs.getString("carduid"));
                 card.setExpirable(rs.getBoolean("expirable"));
+
                 if (rs.getDate("expired_date") != null) {
                     card.setExpiredDate(rs.getDate("expired_date").toLocalDate());
                 } else {

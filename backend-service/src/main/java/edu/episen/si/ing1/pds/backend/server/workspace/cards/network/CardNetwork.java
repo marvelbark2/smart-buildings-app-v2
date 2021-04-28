@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CardNetwork {
-    private Services service;
+    private CardService service;
     private final PrintWriter writer;
     private final Connection connection;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -36,6 +36,7 @@ public class CardNetwork {
 
     public void execute(Request request) {
         String event = request.getEvent();
+        service.setCompanyId(request.getCompanyId());
         if(event.equals("card_list")) {
             try {
                 List data = service.findAll();
