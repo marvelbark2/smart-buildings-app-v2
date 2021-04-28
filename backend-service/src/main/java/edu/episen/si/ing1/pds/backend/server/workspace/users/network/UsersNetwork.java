@@ -29,6 +29,7 @@ public class UsersNetwork {
 
     public void execute(Request request) {
         String event = request.getEvent();
+        service.setCompanyId(request.getCompanyId());
         if(event.equals("user_list")) {
             try {
                 Map<String, Object> usersCollection = Utils.responseFactory(service.findAll(), "user_list");

@@ -2,6 +2,7 @@ package edu.episen.si.ing1.pds.client.swing.cards;
 
 import edu.episen.si.ing1.pds.client.swing.global.Main;
 import edu.episen.si.ing1.pds.client.swing.global.Navigate;
+import edu.episen.si.ing1.pds.client.utils.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +46,7 @@ public class ContextFrame implements Navigate {
     public void start() {
         JPanel context = app.getContext();
         context.setLayout(new BorderLayout());
-
+        
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton cardTest = new JButton("Manipuler les cartes");
         JButton userTest = new JButton("Manipuler les users");

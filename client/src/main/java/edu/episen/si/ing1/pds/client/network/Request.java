@@ -6,6 +6,7 @@ public class Request {
     private String requestId = Utils.generateStringId(25);
     private String event;
     private Object data;
+    private Integer companyId = Utils.getCompanyId();
 
     public String getEvent() {
         return event;
@@ -29,5 +30,13 @@ public class Request {
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
     }
 }

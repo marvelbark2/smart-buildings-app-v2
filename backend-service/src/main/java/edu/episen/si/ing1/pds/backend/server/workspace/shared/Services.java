@@ -9,4 +9,5 @@ public interface Services <Req, Res> {
     Optional<Res> findById(Long id);
     Boolean add(Req request) throws SQLException;
     Boolean delete(Req request);
+    void setCompanyId(int companyId);
 }

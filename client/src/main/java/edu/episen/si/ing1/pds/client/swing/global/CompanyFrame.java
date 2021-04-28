@@ -1,5 +1,7 @@
 package edu.episen.si.ing1.pds.client.swing.global;
 
+import edu.episen.si.ing1.pds.client.network.Request;
+import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.swing.global.shared.Ui;
 import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
@@ -8,10 +10,15 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Map;
+import java.util.List;
 import java.util.Objects;
+import java.util.Vector;
 
 public class CompanyFrame extends JPanel {
     private final Toast toaster;
+    private JComboBox comboBox;
+    private List<Map> companies;
 
     private Main app;
     public CompanyFrame(Main app) {
@@ -84,9 +91,19 @@ public class CompanyFrame extends JPanel {
     }
 
     private void addComboBoxField(JPanel panel1) {
-        String[] companies = {"Microsoft", "Mozerratti", "Corps"};
-        JComboBox comboBox = new JComboBox(companies);
+        companies = getCompanyList();
+        comboBox = new JComboBox(new Vector(companies));
 
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if(value instanceof Map) {
+                    setText(((Map) value).get("name").toString());
+                }
+                return this;
+            }
+        });
 
         comboBox.setBounds(423, 109, 250, 44);
         comboBox.addFocusListener(new FocusListener() {
@@ -162,9 +179,23 @@ public class CompanyFrame extends JPanel {
 
     private void loginEventHandler() {
         toaster.success("Veuillez Patientez ...");
-        Utils.setCompanyId(1);
+        Map selectedMap = (Map) comboBox.getSelectedItem();
+        Utils.setCompanyId((Integer) selectedMap.get("id_companies"));
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         app.loadSystemWindow();
     }
+
+    private List<Map> getCompanyList() {
+        Request req = new Request();
+        req.setEvent("companies_list");
+        Response response = Utils.sendRequest(req);
+        return  (List<Map>) response.getMessage();
+    }
+
     private String getUriOfFile(String file) {
         String uri = null;
         try {

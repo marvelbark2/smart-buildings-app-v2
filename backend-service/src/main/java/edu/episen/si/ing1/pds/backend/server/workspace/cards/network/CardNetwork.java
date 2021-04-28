@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CardNetwork {
-    private CardService service;
+    private Services service;
     private final PrintWriter writer;
     private final Connection connection;
     private final ObjectMapper mapper = new ObjectMapper();

@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public class UsersService implements Services<UsersRequest, UsersResponse> {
     private final Connection connection;
+    private int companyId;
 
     public UsersService(Connection connection) {
         this.connection = connection;
@@ -23,7 +24,7 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
         List<UsersResponse> response = new ArrayList<>();
         try {
             Statement statement = connection.createStatement();
-            String query = "SELECT * FROM users";
+            String query = "SELECT * FROM users WHERE compay_id = " + companyId;
             ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
                 Users user = new Users();
@@ -51,8 +52,6 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, request.getUserUId());
             statement.setString(2, request.getName());
-
-            int companyId = 1;
             statement.setInt(3, companyId);
 
             response = statement.executeUpdate();
@@ -65,5 +64,10 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
     @Override
     public Boolean delete(UsersRequest request) {
         return null;
+    }
+
+    @Override
+    public void setCompanyId(int companyId) {
+        this.companyId = companyId;
     }
 }
