@@ -2,11 +2,13 @@ package edu.episen.si.ing1.pds.client.swing.cards;
 
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.swing.cards.models.UserTableModel;
+import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -14,63 +16,69 @@ import java.util.Map;
 
 public class UsersView implements Routes {
     private JTable table;
-    private String[][] tableData;
-
     private final Logger logger = LoggerFactory.getLogger(UsersView.class.getName());
-
+    private Toast toast;
 
     @Override
     public void launch(ContextFrame context) {
-        getData();
         JPanel frame = context.getApp().getContext();
 
-        JPanel panel = new JPanel();
+        toast = new Toast(frame);
+        frame.setLayout(new GridLayout(3,1, 100, 100));
 
         UserTableModel model = new UserTableModel();
         table = new JTable(model);
 
+        table.setVisible(true);
+
         JScrollPane jScrollPane = new JScrollPane(table);
-        panel.add(jScrollPane);
+        jScrollPane.setPreferredSize( new Dimension(400, 600) );
+
 
         JButton button = new JButton("Refresh Table");
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                model.dataChanged(); // Repaint one cell.
+                refresh();
             }
         });
 
-        panel.add(button);
+        JPanel formPanel = new JPanel();
+        JTextField nameField = new JTextField(10);
+        formPanel.add(new JLabel("Nom"));
+        formPanel.add(nameField);
 
-        frame.add(panel);
-        frame.setVisible(true);
-//        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-//        frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
-    }
+        JPanel buttonPanel = new JPanel(new BorderLayout());
 
-    private void getData() {
-        Request request = new Request();
-        request.setEvent("user_list");
-        List<Map> data = (List<Map>) Utils.sendRequest(request).getMessage();
-        logger.info(data.get(data.size() - 1).toString());
-        String[][] arr = new String[data.size()][data.get(0).size()];
-        int i = 0;
-        for (Map map : data) {
-            int w = 0;
-            for (Object key : map.keySet()) {
-                if (map.get(key) != null) {
-                    if (map.get(key) instanceof Map)
-                        arr[i][w] = ((Map<?, ?>) map.get(key)).get("name").toString();
-                    else
-                        arr[i][w] = map.get(key).toString();
-                    w++;
-                } else {
-                    arr[i][w] = "Infini";
-                    w++;
+        JButton insert = new JButton("Soumettre");
+        insert.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Map data = Map.of("name", nameField.getText());
+                Boolean response = model.addData(data);
+                if(response) {
+                    toast.success("Utilisateur est bien enregister");
+                    refresh();
                 }
+
             }
-            i++;
-        }
-        tableData = arr;
+        });
+
+        buttonPanel.add(button, BorderLayout.PAGE_START);
+
+
+        frame.add(jScrollPane);
+        formPanel.add(insert);
+        frame.add(buttonPanel);
+        frame.add(formPanel);
+
+        frame.setVisible(true);
+    }
+    private void refresh() {
+        table.setModel(new UserTableModel());
+        table.invalidate();
+        table.validate();
+        table.repaint();
+        toast.success("Tableau est bien rafraîchi");
     }
 }

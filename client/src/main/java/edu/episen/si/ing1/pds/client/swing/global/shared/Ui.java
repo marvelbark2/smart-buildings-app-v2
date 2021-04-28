@@ -9,15 +9,12 @@ public class Ui {
 
     public static final Color COLOR_OUTLINE = new Color(103, 107, 120);
     public static final Color COLOR_BACKGROUND = new Color(37, 47, 61);
-    public static final Color COLOR_INTERACTIVE = new Color(108, 110, 216);
-    public static final Color COLOR_INTERACTIVE_DARKER = new Color(93, 87, 171);
+    public static final Color COLOR_INTERACTIVE = new Color(54, 38, 90);
+    public static final Color COLOR_INTERACTIVE_DARKER = new Color(72, 64, 92);
     public static final Color OFFWHITE = new Color(229, 229, 229);
 
-    public static final String BUTTON_TEXT_LOGIN = "Login";
-    public static final String BUTTON_TEXT_FORGOT_PASS = "Forgot your password?";
-    public static final String BUTTON_TEXT_REGISTER = "Register";
+    public static final String BUTTON_TEXT_LOGIN = "Acceder au Systeme";
 
-    public static final String PLACEHOLDER_TEXT_USERNAME = "Username/email";
 
     public static final int ROUNDNESS = 8;
 

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class Client {
     private final static Logger logger = LoggerFactory.getLogger(Client.class.getName());
@@ -15,10 +16,10 @@ public class Client {
         Main app = new Main();
         JFrame frame = app.getFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1800, 1000);
-        frame.setPreferredSize(frame.getSize());
         frame.setVisible(true);
         frame.setContentPane(app.getGlobal());
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(screenSize.width / 2 - frame.getWidth() / 2, screenSize.height / 2 - frame.getHeight() / 2);
         frame.pack();
     }
 

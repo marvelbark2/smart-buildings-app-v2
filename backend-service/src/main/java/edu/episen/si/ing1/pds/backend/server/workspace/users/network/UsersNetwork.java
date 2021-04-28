@@ -1,10 +1,12 @@
 package edu.episen.si.ing1.pds.backend.server.workspace.users.network;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.backend.server.network.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
+import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest;
 import edu.episen.si.ing1.pds.backend.server.workspace.users.services.UsersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,18 +41,32 @@ public class UsersNetwork {
         }
         else if(event.equals("user_byid")) {
             try {
-                Optional card = service.findById(request.getData().get("id").asLong());
+                Optional user = service.findById(request.getData().get("id").asLong());
                 Object msg;
-                if(card.isPresent()) {
-                    msg = card.get();
+                if(user.isPresent()) {
+                    msg = user.get();
                 } else {
                     msg = "No record found";
                 }
                 Map<String, Object> msgResponseT = Utils.responseFactory(msg, "user_byid");
                 String reponseMsg = mapper.writeValueAsString(msgResponseT);
-                System.out.println(reponseMsg);
                 writer.println(reponseMsg);
             } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        else if(event.equals("user_insert")) {
+            try {
+                JsonNode data = request.getData();
+                UsersRequest usersRequest = new UsersRequest();
+                usersRequest.setName(data.get("name").asText());
+                usersRequest.setUserUId(Utils.generateStringId(15));
+                Boolean isUserInserted = service.add(usersRequest);
+                String response = mapper.writeValueAsString(Utils.responseFactory(isUserInserted, event));
+                writer.println(response);
+                logger.info(response);
+
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

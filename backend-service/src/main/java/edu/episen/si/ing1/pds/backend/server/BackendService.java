@@ -32,7 +32,7 @@ public class BackendService {
 
         boolean iNotReturnable = false;
 
-        logger.info("TestSocket Started");
+        logger.info("Backend Service has been started");
 
         DBConfig.Instance.setEnv(itestMode);
         PoolFactory.Instance.setNotReturnable(iNotReturnable);

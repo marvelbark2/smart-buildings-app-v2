@@ -15,6 +15,27 @@ import java.util.Random;
 
 public class Utils {
 
+    private static int companyId;
+    private static boolean guestPage = true;
+
+    public static void setCompanyId(int companyId) {
+        Utils.companyId = companyId;
+        Utils.guestPage = false;
+    }
+
+    public static void logOut() {
+        Utils.companyId = -1;
+        Utils.guestPage = false;
+    }
+
+    public static int getCompanyId() {
+        return companyId;
+    }
+
+    public static boolean isGuestPage() {
+        return guestPage;
+    }
+
     public static Map<String, String> toMap(String value) {
         value = value.substring(1, value.length()-1);
         String[] keyValuePairs = value.split(",");

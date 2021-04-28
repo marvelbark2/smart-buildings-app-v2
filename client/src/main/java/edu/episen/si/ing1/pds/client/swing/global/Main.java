@@ -3,6 +3,7 @@ package edu.episen.si.ing1.pds.client.swing.global;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.location.LocationMenu;
 import edu.episen.si.ing1.pds.client.swing.mapping.selim.*;
+import edu.episen.si.ing1.pds.client.utils.Utils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -25,23 +26,104 @@ public class Main implements MouseListener {
     public Main() {
         frame = new JFrame("Smart building app");
         global = new JPanel();
+        if(Utils.isGuestPage()) {
+            loadCompanyWindows();
+        } else {
+            loadSystemWindow();
+        }
+
+    }
+
+    public void loadCompanyWindows() {
+        frame.setSize(800, 400);
+        frame.setPreferredSize(frame.getSize());
+        global.add(new CompanyFrame(this));
+        frame.setResizable(false);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(screenSize.width / 2 - frame.getWidth() / 2, screenSize.height / 2 - frame.getHeight() / 2);
+        global.invalidate();
+        global.validate();
+        global.repaint();
+        frame.pack();
+    }
+    public void loadSystemWindow() {
         frames = new HashMap<>();
         BorderLayout borderLayout = new BorderLayout();
         borderLayout.setHgap(5);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(screenSize.width / 2 - frame.getWidth() / 2, screenSize.height / 2 - frame.getHeight() / 2);
+        frame.setSize(1800, 1000);
+        frame.setPreferredSize(frame.getSize());
+        frame.setResizable(false);
         global.setLayout(borderLayout);
         setupFrame();
-
-
+        global.invalidate();
+        global.validate();
+        global.repaint();
+        frame.pack();
     }
 
     public void setupFrame() {
         global.removeAll();
-        JPanel logo = new JPanel(new FlowLayout());
-        JLabel label = new JLabel("Logo");
-        logo.setBackground(new Color(54, 38, 90));
+
+        JPanel header = new JPanel(new BorderLayout());
+
+        JPanel logo = new JPanel();
+        JLabel label = new JLabel("Logo", SwingUtilities.CENTER);
+        header.setBackground(new Color(54, 38, 90));
         label.setForeground(Color.white);
-        logo.add(label, BorderLayout.CENTER);
-        global.add(logo, BorderLayout.PAGE_START);
+        logo.add(label);
+        logo.setOpaque(false);
+
+        JPanel leftPanel = new JPanel();
+        JLabel disconnect = new JLabel("Deconnecté", SwingUtilities.CENTER);
+        disconnect.setSize(100, 75);
+        disconnect.setMinimumSize(disconnect.getSize());
+        disconnect.setPreferredSize(disconnect.getSize());
+        disconnect.setMaximumSize(disconnect.getSize());
+        disconnect.setOpaque(true);
+        disconnect.setBackground(new Color(72, 64, 92));
+        disconnect.setForeground(Color.white);
+        disconnect.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Utils.logOut();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                frame.getContentPane().removeAll();
+                loadCompanyWindows();
+                frame.invalidate();
+                frame.validate();
+                frame.repaint();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                JLabel label = (JLabel) e.getSource();
+                label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                JLabel label = (JLabel) e.getSource();
+                label.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+
+        leftPanel.add(disconnect);
+        leftPanel.setOpaque(false);
+
+        header.add(leftPanel, BorderLayout.WEST);
+        header.add(logo, BorderLayout.CENTER);
+
+        global.add(header, BorderLayout.PAGE_START);
         setupMenu();
         global.add(menu, BorderLayout.WEST);
         setupContext();
@@ -50,11 +132,6 @@ public class Main implements MouseListener {
         global.add(bloc, BorderLayout.EAST);
 
         global.setBackground(Color.white);
-
-        global.invalidate();
-        global.validate();
-        global.repaint();
-        frame.pack();
     }
 
     private void setupMenu() {
@@ -95,33 +172,10 @@ public class Main implements MouseListener {
         staff.addMouseListener(this);
         frames.put(staff, new ContextFrame(this));
 
-        JPanel underMenu = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        underMenu.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
-        underMenu.setOpaque(true);
-
-        JButton disconnect = new JButton("Deconnecter");
-        disconnect.setMaximumSize(new Dimension(100, 100));
-        disconnect.setOpaque(true);
-
-        ImageIcon iconHome = new ImageIcon(new ImageIcon("C:\\Users\\cedri\\Bureau\\pds\\image\\maison.png").getImage().getScaledInstance(18,18,Image.SCALE_DEFAULT));
-        JButton home = new JButton(iconHome);
-        home.setOpaque(true);
-
-        ImageIcon iconRefresh = new ImageIcon(new ImageIcon("C:\\Users\\cedri\\Bureau\\pds\\image\\actualiser.png").getImage().getScaledInstance(18,18,Image.SCALE_DEFAULT));
-        JButton refresh = new JButton(iconRefresh);
-        refresh.setOpaque(true);
-        realize.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-
-        underMenu.add(disconnect);
-        underMenu.add(home);
-        underMenu.add(refresh);
-
         menu.add(realize);
         menu.add(consult);
         menu.add(staff);
         menu.add(Box.createGlue());
-        menu.add(underMenu);
 
         menu.setBackground(new Color(54, 38, 90));
         menu.setOpaque(true);

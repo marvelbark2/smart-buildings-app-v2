@@ -5,10 +5,7 @@ import edu.episen.si.ing1.pds.backend.server.workspace.users.models.Users;
 import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest;
 import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersResponse;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +45,21 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
 
     @Override
     public Boolean add(UsersRequest request) {
-        return null;
+        int response = 0;
+        try {
+            String sql = "INSERT INTO users(user_uid, name, company_id) values(?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, request.getUserUId());
+            statement.setString(2, request.getName());
+
+            int companyId = 1;
+            statement.setInt(3, companyId);
+
+            response = statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  response > 0 ? true : false;
     }
 
     @Override
