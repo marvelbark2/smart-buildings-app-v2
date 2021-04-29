@@ -4,8 +4,7 @@ import java.awt.*;
 import java.util.HashMap;
 
 public class Ui {
-    public static final Font FONT_GENERAL_UI = new Font("Segoe UI", Font.PLAIN, 20);
-    public static final Font FONT_FORGOT_PASSWORD = new Font("Segoe UI", Font.PLAIN, 12);
+    public static final Font FONT_GENERAL_UI = new Font("Segoe UI", Font.PLAIN, 14);
 
     public static final Color COLOR_OUTLINE = new Color(103, 107, 120);
     public static final Color COLOR_BACKGROUND = new Color(37, 47, 61);

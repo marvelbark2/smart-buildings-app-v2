@@ -65,14 +65,8 @@ public class CardNetwork {
         }
         else if(event.equals("card_insert")) {
             try {
-                UsersRequest usersRequest = mapper.treeToValue(request.getData().get("user"), UsersRequest.class);
-                CardRequest cardRequest = new CardRequest();
-                cardRequest.setUser(usersRequest);
-                cardRequest.setCardUId(request.getData().get("cardUId").asText());
-                cardRequest.setExpirable(request.getData().get("expirable").asBoolean());
-                String expireDate = request.getData().get("expireDate").asText();
-                if(!expireDate.equals(null) && expireDate.length() > 0)
-                    cardRequest.setExpiredDate(localDateParser(expireDate));
+                JsonNode data = request.getData();
+                CardRequest cardRequest = mapper.treeToValue(data, CardRequest.class);
                 boolean response = service.add(cardRequest);
                 writer.println(mapper.writeValueAsString(Utils.responseFactory(response, "card_insert")));
             } catch (Exception e) {
@@ -82,21 +76,9 @@ public class CardNetwork {
         else if(event.equals("card_delete")) {
             try {
                 JsonNode data = request.getData();
-                UsersRequest usersRequest = new UsersRequest();
-                usersRequest.setName(data.get("user").asText());
-                CardRequest cardRequest = new CardRequest();
-                cardRequest.setUser(usersRequest);
-                cardRequest.setCardId(data.get("ID").asLong());
-                cardRequest.setCardUId(data.get("Matricule").asText());
-                cardRequest.setExpirable(data.get("Provisoire").asBoolean());
-
-                if(data.get("Date d'expiration").asText().equals("Infini"))
-                    cardRequest.setExpiredDate(null);
-                else
-                    cardRequest.setExpiredDate(localDateParser(data.get("Date d'expiration").asText()));
+                CardRequest cardRequest = mapper.treeToValue(data, CardRequest.class);
                 Boolean response = service.delete(cardRequest);
                 writer.println(mapper.writeValueAsString(Utils.responseFactory(response, "card_delete")));
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -111,11 +93,5 @@ public class CardNetwork {
                 logger.error(e.getMessage(), e);
             }
         }
-    }
-
-
-    private LocalDate localDateParser(String date) {
-        String[] dateArr = date.split("/");
-        return LocalDate.of(Integer.parseInt(dateArr[2]), Integer.parseInt(dateArr[1]), Integer.parseInt(dateArr[0]));
     }
 }

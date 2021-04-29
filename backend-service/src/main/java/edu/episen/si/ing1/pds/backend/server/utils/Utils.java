@@ -2,6 +2,7 @@ package edu.episen.si.ing1.pds.backend.server.utils;
 
 import java.io.File;
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,5 +53,9 @@ public class Utils {
             message.put("dataType", "object");
         }
         return message;
+    }
+    public static LocalDate localDateParser(String date) {
+        String[] dateArr = date.split("/");
+        return LocalDate.of(Integer.parseInt(dateArr[2]), Integer.parseInt(dateArr[1]), Integer.parseInt(dateArr[0]));
     }
 }

@@ -24,7 +24,7 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
         List<UsersResponse> response = new ArrayList<>();
         try {
             Statement statement = connection.createStatement();
-            String query = "SELECT * FROM users WHERE compay_id = " + companyId;
+            String query = "SELECT * FROM users WHERE company_id = " + companyId;
             ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
                 Users user = new Users();

@@ -1,6 +1,7 @@
 package edu.episen.si.ing1.pds.client.swing.global;
 
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
+import edu.episen.si.ing1.pds.client.swing.global.shared.Ui;
 import edu.episen.si.ing1.pds.client.swing.location.LocationMenu;
 import edu.episen.si.ing1.pds.client.swing.mapping.selim.*;
 import edu.episen.si.ing1.pds.client.utils.Utils;
@@ -47,19 +48,24 @@ public class Main implements MouseListener {
         frame.pack();
     }
     public void loadSystemWindow() {
-        frames = new HashMap<>();
-        BorderLayout borderLayout = new BorderLayout();
-        borderLayout.setHgap(5);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation(screenSize.width / 2 - frame.getWidth() / 2, screenSize.height / 2 - frame.getHeight() / 2);
         frame.setSize(1800, 1000);
         frame.setPreferredSize(frame.getSize());
         frame.setResizable(false);
+
+        frames = new HashMap<>();
+
+        BorderLayout borderLayout = new BorderLayout();
+        borderLayout.setHgap(5);
         global.setLayout(borderLayout);
+
         setupFrame();
+
         global.invalidate();
         global.validate();
         global.repaint();
+
         frame.pack();
     }
 
@@ -84,6 +90,7 @@ public class Main implements MouseListener {
         disconnect.setOpaque(true);
         disconnect.setBackground(new Color(72, 64, 92));
         disconnect.setForeground(Color.white);
+        disconnect.setFont(Ui.FONT_GENERAL_UI);
         disconnect.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -147,6 +154,7 @@ public class Main implements MouseListener {
         realize.setOpaque(true);
         realize.setBackground(new Color(54, 38, 90));
         realize.setForeground(Color.white);
+        realize.setFont(Ui.FONT_GENERAL_UI);
         frames.put(realize, new LocationMenu(this));
         realize.addMouseListener(this);
 
@@ -159,6 +167,7 @@ public class Main implements MouseListener {
         consult.addMouseListener(this);
         consult.setBackground(new Color(54, 38, 90));
         consult.setForeground(Color.white);
+        consult.setFont(Ui.FONT_GENERAL_UI);
 
         JLabel staff = new JLabel("Configurer les cartes d'acces", SwingUtilities.CENTER);
         staff.setMinimumSize(new Dimension(Integer.MAX_VALUE, 75));
@@ -166,6 +175,7 @@ public class Main implements MouseListener {
         staff.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
         staff.setBackground(new Color(54, 38, 90));
         staff.setForeground(Color.white);
+        staff.setFont(Ui.FONT_GENERAL_UI);
 
         staff.setOpaque(true);
 

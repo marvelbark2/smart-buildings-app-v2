@@ -43,6 +43,15 @@ public class UsersView implements Routes {
             }
         });
 
+        JButton edit = new JButton("Modifier");
+        JButton delete = new JButton("Supprimer");
+        JButton read = new JButton("details");
+
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        actionPanel.add(edit, FlowLayout.LEFT);
+        actionPanel.add(delete, FlowLayout.CENTER);
+        actionPanel.add(read, FlowLayout.RIGHT);
+
         JPanel formPanel = new JPanel();
         JTextField nameField = new JTextField(10);
         formPanel.add(new JLabel("Nom"));
@@ -65,7 +74,7 @@ public class UsersView implements Routes {
         });
 
         buttonPanel.add(button, BorderLayout.PAGE_START);
-
+        buttonPanel.add(actionPanel, BorderLayout.CENTER);
 
         frame.add(jScrollPane);
         formPanel.add(insert);
