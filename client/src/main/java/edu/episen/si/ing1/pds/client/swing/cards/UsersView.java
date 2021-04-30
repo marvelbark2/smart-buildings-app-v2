@@ -76,8 +76,9 @@ public class UsersView implements Routes {
         buttonPanel.add(button, BorderLayout.PAGE_START);
         buttonPanel.add(actionPanel, BorderLayout.CENTER);
 
-        frame.add(jScrollPane);
         formPanel.add(insert);
+
+        frame.add(jScrollPane, JPanel.CENTER_ALIGNMENT);
         frame.add(buttonPanel);
         frame.add(formPanel);
 

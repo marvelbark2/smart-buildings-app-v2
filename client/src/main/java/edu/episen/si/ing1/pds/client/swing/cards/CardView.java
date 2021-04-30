@@ -4,6 +4,7 @@ import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.swing.cards.models.CardTableModel;
 import edu.episen.si.ing1.pds.client.swing.cards.models.DualListBox;
+import edu.episen.si.ing1.pds.client.swing.global.MenuItem;
 import edu.episen.si.ing1.pds.client.swing.global.shared.Ui;
 import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
@@ -12,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -103,12 +106,54 @@ public class CardView implements Routes {
                     JDialog dialog = new JDialog(context.frame());
                     dialog.setSize(1000, 1000);
                     dialog.setPreferredSize(dialog.getSize());
-                    JPanel dialogPanel = new JPanel(new BorderLayout());
 
-                    JPanel formPanel = new JPanel(new BorderLayout());
-                    formPanel.add(new JButton("Historique"), BorderLayout.EAST);
-                    dialogPanel.add(formPanel, BorderLayout.PAGE_START);
-                    dialog.setContentPane(dialogPanel);
+                    UIManager.put("TabbedPane.selected", new Color(72, 64, 92));
+
+                    JPanel contentPane = new JPanel(new BorderLayout(20, 20));
+
+                    JPanel header = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+                    MenuItem title = new MenuItem("Voir détails d'une carte");
+                    header.add(title);
+                    contentPane.add(header, BorderLayout.PAGE_START);
+
+                    JTabbedPane dialogPanel = new JTabbedPane();
+                    dialogPanel.setOpaque(true);
+                    dialogPanel.setForeground(Ui.OFFWHITE);
+                    dialogPanel.setBackground(Ui.COLOR_INTERACTIVE);
+
+                    JPanel infoPanel = new JPanel(new GridLayout(2, 1, 40,40));
+
+                    String[][] rows = {
+                            { "Matricule", data.get("cardUId").toString() },
+                            { "Provisoire", data.get("expirable").equals(true) ? "Oui" : "Non" },
+                            { "Nom d'utilisateur", ( (Map) data.get("user")).get("name").toString() },
+                            { "Expiration", data.get("expiredDate") == null ? "Infini" : data.get("expiredDate").toString()}
+                    };
+                    JTable showTable = new JTable(rows, new String[]{ " ", " " });
+                    showTable.setOpaque(false);
+                    showTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+                        @Override
+                        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                            setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                            return this;
+                        }
+                    });
+                    infoPanel.add(showTable);
+
+                    JPanel history = new JPanel(new GridLayout(1,1));
+
+                    JTable histoTable = new JTable(rows, new String[]{ " ", " " });
+                    histoTable.setOpaque(false);
+                    history.add(histoTable);
+
+                    dialogPanel.add("Info sur Carte", infoPanel);
+                    dialogPanel.add("Historique de carte", histoTable);
+
+                    contentPane.add(dialogPanel, BorderLayout.CENTER);
+
+                    dialog.setContentPane(contentPane);
                     dialog.setVisible(true);
                     dialog.pack();
                 }else {
@@ -176,8 +221,6 @@ public class CardView implements Routes {
                             if(index == -1 && value == null) {
                                 setText(((Map) data.get("user")).get("name").toString());
                             }
-
-
                             return this;
                         }
                     });
