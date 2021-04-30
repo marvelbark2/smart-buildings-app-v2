@@ -73,6 +73,7 @@ public class Utils {
     public static void runCommand(Command command, Object object) {
         command.execute(object);
     }
+
     public static Response sendRequest(Request request) {
         PrintWriter writer = null;
         BufferedReader reader = null;

@@ -48,11 +48,13 @@ public class Main implements MouseListener {
         frame.pack();
     }
     public void loadSystemWindow() {
+        frame.setResizable(true);
+        frame.setSize(1800, 1000);
+        
+        frame.setPreferredSize(frame.getSize());
+
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation(screenSize.width / 2 - frame.getWidth() / 2, screenSize.height / 2 - frame.getHeight() / 2);
-        frame.setSize(1800, 1000);
-        frame.setPreferredSize(frame.getSize());
-        frame.setResizable(false);
 
         frames = new HashMap<>();
 

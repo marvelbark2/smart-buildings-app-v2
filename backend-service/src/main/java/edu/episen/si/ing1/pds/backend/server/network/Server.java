@@ -15,10 +15,12 @@ import java.util.concurrent.Executors;
 
 public class Server {
     private Logger logger = LoggerFactory.getLogger(Server.class.getName());
+
     private final DataSource ds;
     private int nbConnection;
     private ExecutorService executor = Executors.newCachedThreadPool();
     private ServerSocket serverSocket;
+
     public Server(int nPool) {
     	ds = new DataSource(nPool);
     }
@@ -31,9 +33,13 @@ public class Server {
             while(true) {
                 Socket socket = serverSocket.accept();
                 ++nbConnection;
+
                 Conversation conversation = new Conversation(socket, nbConnection);
+
                 ds.returnable(PoolFactory.Instance.isNotReturnable());
+
                 Connection connection = ds.getConnection();
+
                 if(ds.poolSize() == 0) {
                     logger.info("Pool is Empty !");
                 }

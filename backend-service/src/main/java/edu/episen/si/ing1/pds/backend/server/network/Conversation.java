@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.network.CardNetwork;
+import edu.episen.si.ing1.pds.backend.server.workspace.location.LocationNetwork;
 import edu.episen.si.ing1.pds.backend.server.workspace.mapping.MappingNetwork;
 import edu.episen.si.ing1.pds.backend.server.workspace.users.network.UsersNetwork;
 import org.slf4j.Logger;
@@ -55,15 +56,8 @@ public class Conversation implements Runnable {
             //write on server Log
             logger.info(msg);
 
-            // write Map message
-            Map<String, Object> message = Utils.responseFactory("Connected Successfully", "welcome");
-
             // Serialize map's message to json
             ObjectMapper mapper = new ObjectMapper();
-            String successMessage = mapper.writeValueAsString(message);
-
-            //send success message to client
-            //writer.println(successMessage);
 
             //Request Handling
             String request;
@@ -80,6 +74,8 @@ public class Conversation implements Runnable {
                 usersNetwork.execute(requestObj);
 
                 new MappingNetwork(requestObj, connection, writer);
+
+                new LocationNetwork(requestObj, connection, writer);
 
                 Map<String, Object> endResponse = Utils.responseFactory("end", "end");
                 String createMessage = mapper.writeValueAsString(endResponse);

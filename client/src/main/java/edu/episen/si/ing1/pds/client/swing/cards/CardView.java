@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -156,7 +154,7 @@ public class CardView implements Routes {
                     dialog.setContentPane(contentPane);
                     dialog.setVisible(true);
                     dialog.pack();
-                }else {
+                } else {
                     toast.warn("Selectionnez une ligne dans tableau");
                 }
             }
