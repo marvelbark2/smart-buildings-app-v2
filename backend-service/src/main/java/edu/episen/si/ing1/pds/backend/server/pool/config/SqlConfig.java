@@ -12,24 +12,22 @@ import java.io.InputStream;
 public enum SqlConfig {
     Instance;
 
-    String CREATE;
-    String READ;
-    String UPDATE;
-    String DELETE;
-    String ALL;
+    private JsonNode node;
 
     SqlConfig() {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         File reader = Utils.getFileContent("SMARTBUILDCONFIG");
         try {
-            JsonNode jsonNode = mapper.readTree(reader).get("sql");
-            CREATE = jsonNode.get("CREATE").textValue();
-            READ = jsonNode.get("READ").textValue();
-            UPDATE = jsonNode.get("UPDATE").textValue();
-            DELETE = jsonNode.get("DELETE").textValue();
-            ALL = jsonNode.get("ALL").textValue();
+            node = mapper.readTree(reader).get("sql");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    public String getUserSql(String request) {
+        return node.get("users").get(request).asText();
+    }
+    public String getCardSql(String request) {
+        return node.get("cards").get(request).asText();
+    }
+
 }

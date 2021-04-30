@@ -147,38 +147,15 @@ public class Main implements MouseListener {
         menu.setLayout(new BoxLayout(menu, BoxLayout.Y_AXIS));
         menu.add(Box.createVerticalStrut(100));
 
-        JLabel realize = new JLabel("Realiser une location", SwingUtilities.CENTER);
-        realize.setMinimumSize(new Dimension(Integer.MAX_VALUE, 75));
-        realize.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
-        realize.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
-        realize.setOpaque(true);
-        realize.setBackground(new Color(54, 38, 90));
-        realize.setForeground(Color.white);
-        realize.setFont(Ui.FONT_GENERAL_UI);
+        JLabel realize = new MenuItem("Realiser une location");
         frames.put(realize, new LocationMenu(this));
         realize.addMouseListener(this);
 
-        JLabel consult = new JLabel("Consulter une location", SwingUtilities.CENTER);
-        consult.setMinimumSize(new Dimension(Integer.MAX_VALUE, 75));
-        consult.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
-        consult.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
-        consult.setOpaque(true);
+        JLabel consult = new MenuItem("Consulter une location");
         frames.put(consult, new Mapping_Window(this));
         consult.addMouseListener(this);
-        consult.setBackground(new Color(54, 38, 90));
-        consult.setForeground(Color.white);
-        consult.setFont(Ui.FONT_GENERAL_UI);
 
-        JLabel staff = new JLabel("Configurer les cartes d'acces", SwingUtilities.CENTER);
-        staff.setMinimumSize(new Dimension(Integer.MAX_VALUE, 75));
-        staff.setPreferredSize(new Dimension(Integer.MAX_VALUE, 75));
-        staff.setMaximumSize(new Dimension(Integer.MAX_VALUE, 75));
-        staff.setBackground(new Color(54, 38, 90));
-        staff.setForeground(Color.white);
-        staff.setFont(Ui.FONT_GENERAL_UI);
-
-        staff.setOpaque(true);
-
+        JLabel staff = new MenuItem("Configurer les cartes d'acces");
         staff.addMouseListener(this);
         frames.put(staff, new ContextFrame(this));
 

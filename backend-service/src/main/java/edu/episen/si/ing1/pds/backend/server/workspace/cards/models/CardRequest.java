@@ -6,22 +6,14 @@ import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest
 import java.time.LocalDate;
 
 public class CardRequest {
-    private Long cardId;
     private String cardUId;
     private boolean expirable;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate expiredDate;
+    private boolean active;
 
     private UsersRequest user;
-
-    public Long getCardId() {
-        return cardId;
-    }
-
-    public void setCardId(Long cardId) {
-        this.cardId = cardId;
-    }
 
     public String getCardUId() {
         return cardUId;
@@ -53,5 +45,9 @@ public class CardRequest {
 
     public void setUser(UsersRequest user) {
         this.user = user;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 }

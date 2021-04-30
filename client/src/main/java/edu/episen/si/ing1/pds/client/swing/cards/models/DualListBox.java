@@ -10,59 +10,47 @@ import java.util.List;
 public class DualListBox extends JPanel {
 
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
-
     private static final String ADD_BUTTON_LABEL = ">>";
-
     private static final String REMOVE_BUTTON_LABEL = "<<";
-
     private static final String DEFAULT_SOURCE_CHOICE_LABEL = "Salles et equipement non accessible";
-
     private static final String DEFAULT_DEST_CHOICE_LABEL = "Accessible";
 
     private JLabel sourceLabel;
-
     private JList sourceList;
-
     private SortedListModel sourceListModel;
-
     private JList destList;
-
     private SortedListModel destListModel;
-
     private JLabel destLabel;
-
     private JButton addButton;
-
     private JButton removeButton;
 
-    public DualListBox() {
+    private Object modified;
+
+
+
+    public DualListBox(Object modified) {
+        this.modified = modified;
         initScreen();
     }
 
     public String getSourceChoicesTitle() {
         return sourceLabel.getText();
     }
-
     public void setSourceChoicesTitle(String newValue) {
         sourceLabel.setText(newValue);
     }
-
     public String getDestinationChoicesTitle() {
         return destLabel.getText();
     }
-
     public void setDestinationChoicesTitle(String newValue) {
         destLabel.setText(newValue);
     }
-
     public void clearSourceListModel() {
         sourceListModel.clear();
     }
-
     public void clearDestinationListModel() {
         destListModel.clear();
     }
-
     public void addSourceElements(ListModel newValue) {
         fillListModel(sourceListModel, newValue);
     }
@@ -190,12 +178,12 @@ public class DualListBox extends JPanel {
         add(addButton, new GridBagConstraints(1, 2, 1, 2, 0, .25,
                 GridBagConstraints.CENTER, GridBagConstraints.NONE,
                 EMPTY_INSETS, 0, 0));
-        addButton.addActionListener(new AddListener());
+        addButton.addActionListener(new AddListener(modified));
         removeButton = new JButton(REMOVE_BUTTON_LABEL);
         add(removeButton, new GridBagConstraints(1, 4, 1, 2, 0, .25,
                 GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
                 0, 5, 0, 5), 0, 0));
-        removeButton.addActionListener(new RemoveListener());
+        removeButton.addActionListener(new RemoveListener(modified));
 
         destLabel = new JLabel(DEFAULT_DEST_CHOICE_LABEL);
         destListModel = new SortedListModel();
@@ -210,78 +198,36 @@ public class DualListBox extends JPanel {
 
 
     private class AddListener implements ActionListener {
+        private final Object key;
+        public AddListener(Object key) {
+            this.key = key;
+        }
         public void actionPerformed(ActionEvent e) {
-            Object selected[] = sourceList.getSelectedValues();
-            Map selectedMap = (Map) selected[0];
-            selectedMap.put("accessible", !(Boolean) selectedMap.get("accessible"));
-            addDestinationElements(selected);
-            clearSourceSelected();
+            if(!sourceList.isSelectionEmpty()) {
+                Object selected[] = sourceList.getSelectedValues();
+                Map selectedMap = (Map) selected[0];
+                selectedMap.put("accessible", !(Boolean) selectedMap.get("accessible"));
+                addDestinationElements(selected);
+                clearSourceSelected();
+            }
         }
     }
 
     private class RemoveListener implements ActionListener {
+        private final Object key;
+
+        public RemoveListener(Object key) {
+            this.key = key;
+        }
         public void actionPerformed(ActionEvent e) {
-            Object selected[] = destList.getSelectedValues();
-            Map selectedMap = (Map) selected[0];
-            selectedMap.put("accessible", !(Boolean) selectedMap.get("accessible"));
-            addSourceElements(selected);
-            clearDestinationSelected();
+            if(!destList.isSelectionEmpty()) {
+                Object selected[] = destList.getSelectedValues();
+                Map selectedMap = (Map) selected[0];
+                selectedMap.put(key, !(Boolean) selectedMap.get(key));
+                addSourceElements(selected);
+                clearDestinationSelected();
+            }
         }
     }
 }
-class SortedListModel extends AbstractListModel {
-    List model;
 
-    public SortedListModel() {
-        model = new ArrayList();
-    }
-
-    public int getSize() {
-        return model.size();
-    }
-
-    public Object getElementAt(int index) {
-        return model.toArray()[index];
-    }
-
-    public void add(Object element) {
-        if (model.add(element)) {
-            fireContentsChanged(this, 0, getSize());
-        }
-    }
-
-    public void addAll(Object elements[]) {
-        Collection c = Arrays.asList(elements);
-        model.addAll(c);
-        fireContentsChanged(this, 0, getSize());
-    }
-
-    public void clear() {
-        model.clear();
-        fireContentsChanged(this, 0, getSize());
-    }
-
-    public boolean contains(Object element) {
-        return model.contains(element);
-    }
-
-    public Object firstElement() {
-        return model.get(0);
-    }
-
-    public Iterator iterator() {
-        return model.iterator();
-    }
-
-    public Object lastElement() {
-        return model.get(model.size() - 1);
-    }
-
-    public boolean removeElement(Object element) {
-        boolean removed = model.remove(element);
-        if (removed) {
-            fireContentsChanged(this, 0, getSize());
-        }
-        return removed;
-    }
-}

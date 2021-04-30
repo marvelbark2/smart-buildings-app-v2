@@ -6,6 +6,7 @@ import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.network.SocketFacade;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,55 +17,45 @@ import java.util.Map;
 
 public class CardRoleTest implements Routes {
 
-    ObjectMapper mapper = new ObjectMapper();
-
     @Override
     public void launch(ContextFrame context) {
         JPanel frame = context.getApp().getContext();
 
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new GridLayout(3, 1, 100, 100));
+
+        JPanel cardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        cardPanel.setOpaque(true);
+        cardPanel.add(new JLabel("USER"));
+        cardPanel.add(new JLabel("CARD"));
         JTextField serialField = new JTextField(25);
+        cardPanel.add(serialField);
+
+        JPanel workspacePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        workspacePanel.setOpaque(true);
+
+        String[] buildings = { "Batiment 1", "Batiment 2", "Batiment 3", "Batiment 4" };
+        JComboBox buldingsCombobox = new JComboBox(buildings);
+
+        String[] florrs = { "Salle 1", "Salle 2", "Salle 3", "Salle 4" };
+        JComboBox comboBox = new JComboBox(florrs);
+
         String[] desks = { "Salle 1", "Salle 2", "Salle 3", "Salle 4" };
-        DefaultComboBoxModel model = new DefaultComboBoxModel(desks);
-        JComboBox comboBox = new JComboBox(model);
+        JComboBox comboBox2 = new JComboBox(desks);
 
+        workspacePanel.add(buldingsCombobox);
+        workspacePanel.add(comboBox);
+        workspacePanel.add(comboBox2);
+
+        JPanel submitPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton jButton = new JButton("Verifier");
+        submitPanel.setOpaque(true);
+        submitPanel.add(jButton);
 
-
-        panel.add(serialField);
-        panel.add(comboBox);
-        panel.add(jButton);
+        panel.add(cardPanel);
+        panel.add(workspacePanel);
+        panel.add(submitPanel);
 
         frame.add(panel);
         frame.setVisible(true);
-    }
-    private void getData() {
-        try {
-            Socket socket = SocketFacade.Instance.getSocket();
-            PrintWriter writer = new PrintWriter(socket.getOutputStream());
-            InputStream in = socket.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-            Request request = new Request();
-            String event = "user_list";
-            request.setEvent(event);
-            writer.println(mapper.writeValueAsString(request));
-            System.out.println("data Send");
-            while (true) {
-                String line = reader.readLine();
-                if(line == null || line.equals("end"))
-                    break;
-
-                if(!line.equals("end"))
-                    break;
-
-                Response response = mapper.readValue(line, Response.class);
-                if(response.getEvent().equals(event)) {
-                    List<Map<String, String>> data = (List) response.getMessage();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

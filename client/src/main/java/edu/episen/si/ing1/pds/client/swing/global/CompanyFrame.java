@@ -85,8 +85,8 @@ public class CompanyFrame extends JPanel {
     private void addLogo(JPanel panel1) {
         JLabel label1 = new JLabel();
         label1.setFocusable(false);
-        ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource("icon/logo.png")).getFile());
-        label1.setIcon(icon);
+        Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource("icon/logo.png"));
+        label1.setIcon(new ImageIcon(icon));
         label1.setBounds(55, 146, 200, 110);
         label1.setVisible(true);
         panel1.add(label1);
@@ -191,15 +191,5 @@ public class CompanyFrame extends JPanel {
         req.setEvent("companies_list");
         Response response = Utils.sendRequest(req);
         return  (List<Map>) response.getMessage();
-    }
-
-    private String getUriOfFile(String file) {
-        String uri = null;
-        try {
-            uri = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(file)).getPath();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return uri;
     }
 }

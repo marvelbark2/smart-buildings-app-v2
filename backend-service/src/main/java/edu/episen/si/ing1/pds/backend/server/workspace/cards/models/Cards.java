@@ -12,6 +12,7 @@ public class Cards {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate expiredDate;
+    private boolean active;
 
     private Users user;
 
@@ -53,5 +54,13 @@ public class Cards {
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

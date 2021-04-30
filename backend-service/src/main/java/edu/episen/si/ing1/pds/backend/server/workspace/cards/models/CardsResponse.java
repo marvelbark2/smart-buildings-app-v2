@@ -15,6 +15,7 @@ public class CardsResponse implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate expiredDate;
     private UsersResponse user;
+    private boolean active;
 
     public CardsResponse(Cards card) {
         this.cardId = card.getCardId();
@@ -22,6 +23,7 @@ public class CardsResponse implements Serializable {
         this.expirable = card.isExpirable();
         this.expiredDate = card.getExpiredDate();
         this.user = new UsersResponse(card.getUser());
+        this.active = card.isActive();
     }
 
     public Long getCardId() {
@@ -64,6 +66,14 @@ public class CardsResponse implements Serializable {
         this.user = user;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     @Override
     public String toString() {
         return "CardsResponse{" +
@@ -71,6 +81,7 @@ public class CardsResponse implements Serializable {
                 ", cardUId='" + cardUId + '\'' +
                 ", expirable=" + expirable +
                 ", expiredDate=" + expiredDate +
+                ", active=" + active +
                 '}';
     }
 }

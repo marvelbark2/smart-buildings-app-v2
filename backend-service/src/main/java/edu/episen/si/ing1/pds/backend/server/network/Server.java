@@ -41,7 +41,6 @@ public class Server {
 
                 executor.execute(conversation);
                 ds.release(connection);
-                logger.info("Connection has been retented");
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

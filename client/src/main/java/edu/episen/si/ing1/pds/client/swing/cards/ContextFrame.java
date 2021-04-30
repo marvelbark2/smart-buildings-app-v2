@@ -56,10 +56,10 @@ public class ContextFrame implements Navigate {
         buttons.setBackground(context.getBackground());
         userTest.addActionListener(this);
         cardTest.addActionListener(this);
-        roleTest.addActionListener(this);
+        permissionTest.addActionListener(this);
 
         frames.put(cardTest, new CardView());
-        frames.put(roleTest, new CardRoleTest());
+        frames.put(permissionTest, new CardRoleTest());
         frames.put(userTest, new UsersView());
 
         buttons.add(cardTest);

@@ -4,6 +4,7 @@ import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.swing.cards.models.CardTableModel;
 import edu.episen.si.ing1.pds.client.swing.cards.models.DualListBox;
+import edu.episen.si.ing1.pds.client.swing.global.shared.Ui;
 import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 import org.slf4j.Logger;
@@ -11,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
 public class CardView implements Routes {
     private final Logger logger = LoggerFactory.getLogger(CardView.class.getName());
     private Toast toast;
-
+    private List<Map> dataTable;
 
     @Override
     public void launch(ContextFrame context) {
@@ -38,7 +37,21 @@ public class CardView implements Routes {
         toast = new Toast(panel);
 
         CardTableModel tableModel = new CardTableModel();
+        dataTable = tableModel.getDataSource();
         JTable table = new JTable(tableModel);
+
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+           @Override
+           public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+               final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+               final Boolean bool = (Boolean) tableModel.getDataSource().get(row).get("active");
+               c.setBackground(bool ? Ui.OFFWHITE : Color.RED);
+               c.setForeground(bool ? Color.black : Color.white);
+               return c;
+           }
+       } );
+        table.setRowSelectionAllowed(true);
+
         JTableHeader header = table.getTableHeader();
 
         JTableHeader th = table.getTableHeader();
@@ -57,8 +70,8 @@ public class CardView implements Routes {
         tc4.setHeaderValue( "Utilisateur" );
 
         th.repaint();
-        header.setBackground(Color.black);
-        header.setForeground(Color.white);
+        header.setBackground(Ui.COLOR_INTERACTIVE_DARKER);
+        header.setForeground(Ui.OFFWHITE);
         JScrollPane sp = new JScrollPane(table);
 
         ListSelectionModel select = table.getSelectionModel();
@@ -82,44 +95,46 @@ public class CardView implements Routes {
                     request.setData(
                             Map.of(
                                     "id",
-                                    Integer.parseInt(tableModel.getDataSource().get(selectedRow).get(tableModel.getColumnName(0)).toString())
+                                    Integer.parseInt(dataTable.get(selectedRow).get(tableModel.getColumnName(0)).toString())
                             )
                     );
                     Response response = Utils.sendRequest(request);
                     Map<String, Object> data = (Map<String, Object>) response.getMessage();
                     JDialog dialog = new JDialog(context.frame());
-                    dialog.setSize(500, 500);
+                    dialog.setSize(1000, 1000);
                     dialog.setPreferredSize(dialog.getSize());
-                    JPanel dialogPanel = new JPanel();
-                    dialogPanel.setLayout(null);
+                    JPanel dialogPanel = new JPanel(new BorderLayout());
 
-                    JPanel formPanel = new JPanel();
-                    formPanel.add(new JLabel("View Page"));
-                    dialog.add(formPanel);
+                    JPanel formPanel = new JPanel(new BorderLayout());
+                    formPanel.add(new JButton("Historique"), BorderLayout.EAST);
+                    dialogPanel.add(formPanel, BorderLayout.PAGE_START);
                     dialog.setContentPane(dialogPanel);
                     dialog.setVisible(true);
                     dialog.pack();
                 }else {
-                    toast.warn("Selectionnez une ligne dans tableau", "Error");
+                    toast.warn("Selectionnez une ligne dans tableau");
                 }
             }
         });
         delete.addActionListener((e) -> {
             int selectedRow = table.getSelectedRow();
             if (table.isRowSelected(selectedRow)) {
-                Map<String, Object> hm = tableModel.getDataSource().get(tableModel.getDataSource().size() > selectedRow ? selectedRow : selectedRow - 1);
+                int index = dataTable.size() > selectedRow ? selectedRow : selectedRow - 1;
+                Map<String, Object> hm = dataTable.get(index);
+                hm.remove("cardId");
                 Request request = new Request();
                 request.setEvent("card_delete");
                 request.setData(hm);
                 Response response = Utils.sendRequest(request);
-                if (response.getEvent().equals("card_delete")) {
+                logger.info(response.getMessage().toString());
+                if (response.getEvent().equals("card_delete") && response.getMessage().equals(true)) {
                     toast.success("La suppression est bien faite");
-                    logger.info("Data Deleted");
-                    logger.info(response.toString());
-                    table.setModel(new CardTableModel());
+                    updateTable(table, tableModel);
+                } else {
+                    toast.info("Erreur ! Il existe un probleme !");
                 }
             } else {
-                toast.error("Selectionner une ligne pour lui supprimer");
+                toast.warn("Selectionner une ligne pour lui supprimer");
                 logger.error("Select a row");
             }
         });
@@ -132,111 +147,107 @@ public class CardView implements Routes {
                     request.setEvent("card_byid");
                     request.setData(Map.of(
                             "id",
-                            Integer.parseInt(tableModel.getDataSource().get(selectedRow).get(tableModel.getColumnName(0)).toString()))
+                            Integer.parseInt(dataTable.get(selectedRow).get(tableModel.getColumnName(0)).toString()))
                     );
                     Response response = Utils.sendRequest(request);
                     Map<String, Object> data = (Map<String, Object>) response.getMessage();
                     JDialog dialog = new JDialog(context.frame());
-                    dialog.setSize(500, 500);
+                    dialog.setSize(700,800);
+
                     dialog.setPreferredSize(dialog.getSize());
                     JPanel dialogPanel = new JPanel(new GridLayout(3,2, 25, 25));
                     dialogPanel.setBorder(BorderFactory.createTitledBorder("Modifer la carte"));
 
-                    try {
-                        Request requestUserList = new Request();
-                        requestUserList.setEvent("user_list");
-                        Response rsponse = Utils.sendRequest(requestUserList);
-                        List userList = (List) rsponse.getMessage();
-                        JComboBox comboBox = new JComboBox(new Vector(userList));
-                        comboBox.setPreferredSize(new Dimension(250, 25));
+                    Request requestUserList = new Request();
+                    requestUserList.setEvent("user_list");
+                    Response rsponse = Utils.sendRequest(requestUserList);
+                    List userList = (List) rsponse.getMessage();
+                    JComboBox comboBox = new JComboBox(new Vector(userList));
+                    comboBox.setPreferredSize(new Dimension(250, 25));
 
-                        comboBox.setRenderer(new DefaultListCellRenderer() {
-                            @Override
-                            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                                if (value instanceof Map) {
-                                    Map<String, String> val = (Map<String, String>) value;
-                                    setText(val.get("name"));
-                                }
-                                if(index == -1 && value == null) {
-                                    setText(((Map) data.get("user")).get("name").toString());
-                                }
-
-
-                                return this;
+                    comboBox.setRenderer(new DefaultListCellRenderer() {
+                        @Override
+                        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                            if (value instanceof Map) {
+                                Map<String, String> val = (Map<String, String>) value;
+                                setText(val.get("name"));
                             }
-                        });
-
-                        comboBox.addActionListener(evt -> {
-                            JComboBox self = (JComboBox) evt.getSource();
-                            Map o = (Map) self.getSelectedItem();
-                        });
-
-                        comboBox.setSelectedIndex(-1);
-
-                        JPanel userFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-                        JLabel userFieldFor = new JLabel("Utilisateur");
-                        userFieldPanel.add(userFieldFor);
-                        userFieldPanel.add(comboBox);
-
-                        JPanel serialFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-                        JLabel serialFieldFor = new JLabel("Matricule");
-                        JTextField serialField = new JTextField(20);
-                        serialField.setText(data.get("cardUId").toString());
-                        JButton snGenerator = new JButton("Generer 1");
-                        snGenerator.addActionListener(evt -> serialField.setText(Utils.generateSerialNumber()));
-                        serialFieldPanel.add(serialFieldFor);
-                        serialFieldPanel.add(serialField);
-                        serialFieldPanel.add(snGenerator);
-
-                        JPanel textFields = new JPanel(new GridLayout(2,2, 25,25));
-
-                        textFields.add(userFieldPanel);
-                        textFields.add(serialFieldPanel);
-
-                        dialogPanel.add(textFields);
-
-                        DualListBox dual = new DualListBox();
-
-                        Request requestAccessList = new Request();
-                        requestAccessList.setEvent("card_access_list");
-                        requestAccessList.setData(Map.of("serialId", data.get("cardUId")));
-
-                        Response responseAccessList = Utils.sendRequest(requestAccessList);
-
-                        List<Map> dataAccessList = (List<Map>) responseAccessList.getMessage();
-                        List<Map> accessible = dataAccessList.stream().filter(map -> (boolean)map.get("accessible")).collect(Collectors.toList());
-                        List<Map> notAccessible = dataAccessList.stream().filter(map -> ! (boolean)map.get("accessible")).collect(Collectors.toList());
-
-                        dual.addSourceElements(notAccessible.toArray(new Map[0]));
-                        dual.addDestinationElements(accessible.toArray(new Map[0]));
-                        dual.setRenderer(new DefaultListCellRenderer() {
-                            @Override
-                            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                                if (value instanceof Map) {
-                                    Map<String, String> val = (Map<String, String>) value;
-                                    setText(val.get("title"));
-                                }
-                                return this;
+                            if(index == -1 && value == null) {
+                                setText(((Map) data.get("user")).get("name").toString());
                             }
-                        });
-                        dual.setBorder(BorderFactory.createTitledBorder("Gérer les accès"));
-                        dialogPanel.add(dual);
-                        JButton submit = new JButton("Soumttre");
 
-                        dialogPanel.add(submit);
 
-                        dialog.setContentPane(dialogPanel);
-                        dialog.setVisible(true);
-                        dialog.pack();
+                            return this;
+                        }
+                    });
 
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+                    comboBox.addActionListener(evt -> {
+                        JComboBox self = (JComboBox) evt.getSource();
+                        Map o = (Map) self.getSelectedItem();
+                    });
+
+                    comboBox.setSelectedIndex(-1);
+
+                    JPanel userFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                    JLabel userFieldFor = new JLabel("Utilisateur");
+                    userFieldPanel.add(userFieldFor);
+                    userFieldPanel.add(comboBox);
+
+                    JPanel serialFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                    JLabel serialFieldFor = new JLabel("Matricule");
+                    JTextField serialField = new JTextField(20);
+                    serialField.setText(data.get("cardUId").toString());
+                    JButton snGenerator = new JButton("Generer 1");
+                    snGenerator.addActionListener(evt -> serialField.setText(Utils.generateSerialNumber()));
+                    serialFieldPanel.add(serialFieldFor);
+                    serialFieldPanel.add(serialField);
+                    serialFieldPanel.add(snGenerator);
+
+                    JPanel textFields = new JPanel(new GridLayout(2,2, 25,25));
+
+                    textFields.add(userFieldPanel);
+                    textFields.add(serialFieldPanel);
+
+                    dialogPanel.add(textFields);
+
+                    DualListBox dual = new DualListBox("accessible");
+
+                    Request requestAccessList = new Request();
+                    requestAccessList.setEvent("card_access_list");
+                    requestAccessList.setData(Map.of("serialId", data.get("cardUId")));
+
+                    Response responseAccessList = Utils.sendRequest(requestAccessList);
+
+                    List<Map> dataAccessList = (List<Map>) responseAccessList.getMessage();
+                    List<Map> accessible = dataAccessList.stream().filter(map -> (boolean)map.get("accessible")).collect(Collectors.toList());
+                    List<Map> notAccessible = dataAccessList.stream().filter(map -> ! (boolean)map.get("accessible")).collect(Collectors.toList());
+
+                    dual.addSourceElements(notAccessible.toArray(new Map[0]));
+                    dual.addDestinationElements(accessible.toArray(new Map[0]));
+                    dual.setRenderer(new DefaultListCellRenderer() {
+                        @Override
+                        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                            if (value instanceof Map) {
+                                Map<String, String> val = (Map<String, String>) value;
+                                setText(val.get("title"));
+                            }
+                            return this;
+                        }
+                    });
+                    dual.setBorder(BorderFactory.createTitledBorder("Gérer les accès"));
+                    dialogPanel.add(dual);
+                    JButton submit = new JButton("Soumttre");
+
+                    dialogPanel.add(submit);
+
+                    dialog.setContentPane(dialogPanel);
+                    dialog.setVisible(true);
+                    dialog.pack();
                 }
                 else {
-                    toast.info("Selectionnez une ligne dans le tableau");
+                    toast.warn("Selectionnez une ligne dans le tableau");
                 }
             }
         });
@@ -344,9 +355,11 @@ public class CardView implements Routes {
                     expireDateValue = expirableDate.getText();
 
                 insertCardReq.setData(Map.of("cardUId", snFieldText.getText(), "expirable", expirable.isSelected(), "expiredDate", expireDateValue, "user", comboBox.getSelectedItem()));
-                tableModel.addData(insertCardReq);
-                table.setModel(new CardTableModel());
-
+                Boolean inserted = tableModel.addData(insertCardReq);
+                if(inserted)
+                    updateTable(table, tableModel);
+                else
+                    toast.error("Erreur! Duplication cartes pour 1 utilisateur");
 
             } else {
                 toast.error("Erreur ! Veuillez remplir la formulaire");
@@ -379,5 +392,11 @@ public class CardView implements Routes {
 
 
         frame.add(panel);
+    }
+    private void updateTable(JTable table, CardTableModel modelTable) {
+        modelTable = new CardTableModel();
+        dataTable = modelTable.getDataSource();
+        table.setModel(modelTable);
+        table.repaint();
     }
 }

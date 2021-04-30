@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.backend.server.workspace.users.services;
 
+import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
 import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
 import edu.episen.si.ing1.pds.backend.server.workspace.users.models.Users;
 import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest;
@@ -13,6 +14,7 @@ import java.util.Optional;
 public class UsersService implements Services<UsersRequest, UsersResponse> {
     private final Connection connection;
     private int companyId;
+    private SqlConfig sql = SqlConfig.Instance;
 
     public UsersService(Connection connection) {
         this.connection = connection;
@@ -23,9 +25,10 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
     public List<UsersResponse> findAll() {
         List<UsersResponse> response = new ArrayList<>();
         try {
-            Statement statement = connection.createStatement();
-            String query = "SELECT * FROM users WHERE company_id = " + companyId;
-            ResultSet rs = statement.executeQuery(query);
+            String query = sql.getUserSql("selectAll");
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, companyId);
+            ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 Users user = new Users();
                 user.setUserId(rs.getLong("userid"));
@@ -48,8 +51,10 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
     public Boolean add(UsersRequest request) {
         int response = 0;
         try {
-            String sql = "INSERT INTO users(user_uid, name, company_id) values(?, ?, ?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            String query = sql.getUserSql("insert");
+
+            PreparedStatement statement = connection.prepareStatement(query);
+
             statement.setString(1, request.getUserUId());
             statement.setString(2, request.getName());
             statement.setInt(3, companyId);

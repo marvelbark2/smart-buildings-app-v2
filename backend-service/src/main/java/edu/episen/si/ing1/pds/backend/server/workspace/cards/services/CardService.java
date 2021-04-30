@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.backend.server.workspace.cards.services;
 
+import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.CardRequest;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.Cards;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.CardsResponse;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class CardService implements Services<CardRequest, CardsResponse> {
     private final Connection connection;
     private int companyId;
+    private SqlConfig sql = SqlConfig.Instance;
 
     public CardService(Connection connection) {
         this.connection = connection;
@@ -23,14 +25,13 @@ public class CardService implements Services<CardRequest, CardsResponse> {
 
     public void setCompanyId(int companyId) {
         this.companyId = companyId;
-
     }
 
     public Optional<CardsResponse> findById(Long id) {
         CardsResponse response = null;
         try {
             Cards card = new Cards();
-            String query = "SELECT * FROM cards c JOIN users u on u.userId = c.userId WHERE cardid = ?";
+            String query = sql.getCardSql("read");
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
@@ -43,6 +44,8 @@ public class CardService implements Services<CardRequest, CardsResponse> {
                 } else {
                     card.setExpiredDate(null);
                 }
+                card.setActive(rs.getBoolean("active"));
+
                 Users user = new Users();
                 user.setUserId(rs.getLong("userid"));
                 user.setUserUId(rs.getString("user_uid"));
@@ -60,7 +63,7 @@ public class CardService implements Services<CardRequest, CardsResponse> {
     public List<CardsResponse> findAll() {
         List<CardsResponse> cards = new ArrayList<>();
         try {
-            String query = "SELECT * FROM cards c JOIN users u on u.userId = c.userId and u.company_id = ?";
+            String query = sql.getCardSql("selectAll");
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, companyId);
             ResultSet rs = statement.executeQuery();
@@ -69,6 +72,7 @@ public class CardService implements Services<CardRequest, CardsResponse> {
                 card.setCardId(rs.getLong("cardid"));
                 card.setCardUId(rs.getString("carduid"));
                 card.setExpirable(rs.getBoolean("expirable"));
+                card.setActive(rs.getBoolean("active"));
 
                 if (rs.getDate("expired_date") != null) {
                     card.setExpiredDate(rs.getDate("expired_date").toLocalDate());
@@ -92,7 +96,6 @@ public class CardService implements Services<CardRequest, CardsResponse> {
     }
 
     public Boolean add(CardRequest request) {
-        Boolean response = false;
         try {
             Long user_id = 0L;
             UsersRequest usersRequest = request.getUser();
@@ -113,27 +116,27 @@ public class CardService implements Services<CardRequest, CardsResponse> {
                 statement.setDate(4, Date.valueOf(request.getExpiredDate()));
             else
                 statement.setDate(4, null);
-            response = statement.executeUpdate() == 1;
+            return statement.executeUpdate() == 1;
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             return false;
         }
-        return response;
     }
 
     @Override
     public Boolean delete(CardRequest request) {
-        Boolean response = false;
         try {
-            String query = "DELETE FROM cards where cardid = ?";
+            String query = "DELETE FROM cards where carduid = ? and expirable = ? and active = ?";
             PreparedStatement statement = connection.prepareStatement(query);
-            statement.setLong(1, request.getCardId());
-            response = statement.executeUpdate() == 1;
+            statement.setString(1, request.getCardUId());
+            statement.setBoolean(2, request.isExpirable());
+            statement.setBoolean(3, request.isActive());
+            return statement.executeUpdate() == 1;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return response;
     }
 
     public List<Map> getItemAccessList(String serialId) {
