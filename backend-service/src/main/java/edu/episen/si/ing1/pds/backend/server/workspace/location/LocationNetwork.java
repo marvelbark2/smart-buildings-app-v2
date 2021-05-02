@@ -19,41 +19,6 @@ public class LocationNetwork {
         final ObjectMapper mapper = new ObjectMapper();
 
         switch (event) {
-            case "location_building_list":
-                List<Map<String, Object>> buildingList = new ArrayList<>();
-                String query = "SELECT * FROM buildings";
-                Statement statement = connection.createStatement();
-                ResultSet rs = statement.executeQuery(query);
-                while (rs.next()) {
-                    Map<String, Object> hm = new HashMap<>();
-                    hm.put("id", rs.getInt("id_buildings"));
-                    hm.put("name", rs.getString("name"));
-
-                    buildingList.add(hm);
-                }
-                Map responseList = Utils.responseFactory(buildingList, event);
-                String msg = mapper.writeValueAsString(responseList);
-                writer.println(msg);
-                break;
-                
-                
-            case "location_building_byid":
-                Map<String, Object> building = new HashMap<>();
-                Integer building_id = request.getData().get("building_id").asInt();
-                String query2 = "SELECT * FROM buildings WHERE id_buildings = ?";
-                PreparedStatement stmt = connection.prepareStatement(query2);
-                stmt.setInt(1, building_id);
-                ResultSet rs2 = stmt.executeQuery();
-                if (rs2.next()) {
-                    building.put("id", rs2.getInt("id_buildings"));
-                    building.put("name", rs2.getString("name"));
-                }
-                Map responseById = Utils.responseFactory(building, event);
-                String msgById = mapper.writeValueAsString(responseById);
-                writer.println(msgById);
-                break;
-                
-                
             case "random_offer_openspace":
             	List<Map<String,Object>> offeropenspace = new ArrayList<>();
             	String query3 = "SELECT * FROM workspace where workspace_state='disponible' and workspace_type='Espace Ouvert' order by random() limit 1";
@@ -115,18 +80,19 @@ public class LocationNetwork {
                 Integer reserv_numb = request.getData().get("reserv_numb").asInt();
                 Integer id_compa = request.getData().get("id_compa").asInt();
                 Integer id_worksp = request.getData().get("id_worksp").asInt();
-                String query6 = "UPDATE workspace SET workspace_state ='indisponible' where id_workspace= ?;"
-                		+ "INSERT INTO reservations ('reservation_number','id_companies','id_workspace')VALUES('?','?','?');";
+                String query6 = "UPDATE workspace SET workspace_state ='indisponible' where id_workspace= ?";
+                String queryInsert	= "INSERT INTO reservations (reservation_number ,id_companies,id_workspace) VALUES(?,?,?)";
                 PreparedStatement statement4 = connection.prepareStatement(query6);
                 statement4.setInt(1, list_worksp);
-                statement4.setInt(2, reserv_numb);
-                statement4.setInt(3, id_compa);
-                statement4.setInt(4, id_worksp);
-                ResultSet rs6 = statement4.executeQuery();
-                if (rs6.next()) {
-                    reservat.put("id", rs6.getInt("id_workspace"));
-                    reservat.put("state", rs6.getString("workspace_state"));
-                }
+
+                PreparedStatement stmtUpdate = connection.prepareStatement(queryInsert);
+                stmtUpdate.setInt(1, reserv_numb);
+                stmtUpdate.setInt(2, id_compa);
+                stmtUpdate.setInt(3, id_worksp);
+
+                statement4.executeUpdate();
+                stmtUpdate.executeUpdate();
+
                 Map response6 = Utils.responseFactory(reservat, event);
                 String msg6 = mapper.writeValueAsString(response6);
                 writer.println(msg6);
@@ -135,11 +101,11 @@ public class LocationNetwork {
             case "reservation_list":
                 Map<String, Object> list_reserv = new HashMap<>();
                 Integer company = request.getData().get("company_id").asInt();
-                String query7 = "SELECT * FROM buildings WHERE id_companies = ?";
+                String query7 = "SELECT * FROM reservations WHERE id_companies = ?";
                 PreparedStatement statement5 = connection.prepareStatement(query7);
                 statement5.setInt(1, company);
                 ResultSet rs7 = statement5.executeQuery();
-                if (rs7.next()) {
+                while (rs7.next()) {
                     list_reserv.put("id", rs7.getInt("id_workspace"));
                 }
                 Map response7 = Utils.responseFactory(list_reserv, event);
@@ -150,7 +116,7 @@ public class LocationNetwork {
             case "nb_reservation_list":
                 Map<String, Object> nb_reserva = new HashMap<>();
                 Integer company1 = request.getData().get("company_id").asInt();
-                String query8 = "SELECT count(*) FROM buildings WHERE id_companies = ?";
+                String query8 = "SELECT count(*) FROM reservations WHERE id_companies = ?";
                 PreparedStatement statement6 = connection.prepareStatement(query8);
                 statement6.setInt(1, company1);
                 ResultSet rs8 = statement6.executeQuery();
@@ -163,13 +129,17 @@ public class LocationNetwork {
                 break;
                 
             case "kill_reservation":
-                Map<String, Object> ask_destroy = new HashMap<>();
-                Integer company2 = request.getData().get("company_id").asInt();
-                Integer workspace2 = request.getData().get("company_id").asInt();
-                String query9 = "UPDATE workspace SET workspace_state ='disponible' where id_workspace= ?;";
+//                Map<String, Object> ask_destroy = new HashMap<>();
+                int reservationId = request.getData().get("reservation_id").asInt();
+                int idW = request.getData().get("workspace_id").asInt();
+
+                connection.prepareStatement("DELETE FROM reservations WHERE id_reservation = " + reservationId).executeUpdate();
+                String query9 = "UPDATE workspace SET workspace_state ='disponible' where id_workspace = ?";
                 PreparedStatement statement7 = connection.prepareStatement(query9);
-                statement7.setInt(1, company2);
-                statement7.setInt(2, workspace2);
+                statement7.setInt(1, idW);
+                statement7.executeUpdate();
+                writer.println(Utils.responseFactory(true ,event));
+
                 break;
                 
             case "buildings_list":
@@ -184,26 +154,23 @@ public class LocationNetwork {
                 Map response9=Utils.responseFactory(response, event);
                 String msg10=mapper.writeValueAsString(response9);
                 writer.println(msg10);
+                break;
                 
             case "floors_list":
             	List<Map<Map,Object>> response10 = new ArrayList<>();                            
                 Statement statement9 = connection.createStatement();
                 Integer building_id1 = request.getData().get("building_id").asInt();
-                ResultSet rs10 = statement9.executeQuery("SELECT * FROM floors WHERE id_buildings=?");
-                ((PreparedStatement) statement9).setInt(1, building_id1);
+                ResultSet rs10 = statement9.executeQuery("SELECT * FROM floors WHERE building_number=" + building_id1);
                 while (rs10.next()) {
                     Map fMap=new HashMap();
                     fMap.put("number", rs10.getString("floor_number"));
                     response10.add(fMap);
                 }
                 Map rsp11=Utils.responseFactory(response10, event);
-                String msg11=mapper.writeValueAsString(response10);
+                String msg11=mapper.writeValueAsString(rsp11);
                 writer.println(msg11);
-                
-                
-           
-                
-
+                break;
     }
 }
 }
+
