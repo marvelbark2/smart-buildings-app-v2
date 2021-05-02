@@ -6,6 +6,7 @@ import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.network.CardNetwork;
 import edu.episen.si.ing1.pds.backend.server.workspace.location.LocationNetwork;
 import edu.episen.si.ing1.pds.backend.server.workspace.mapping.MappingNetwork;
+import edu.episen.si.ing1.pds.backend.server.workspace.shared.SystemLog;
 import edu.episen.si.ing1.pds.backend.server.workspace.users.network.UsersNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,8 @@ public class Conversation implements Runnable {
                 new MappingNetwork(requestObj, connection, writer);
 
                 new LocationNetwork(requestObj, connection, writer);
+
+                new SystemLog(requestObj, connection, socket, writer);
 
                 Map<String, Object> endResponse = Utils.responseFactory("end", "end");
                 String createMessage = mapper.writeValueAsString(endResponse);

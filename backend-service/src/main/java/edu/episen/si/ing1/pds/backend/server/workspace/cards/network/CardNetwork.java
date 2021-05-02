@@ -3,11 +3,14 @@ package edu.episen.si.ing1.pds.backend.server.workspace.cards.network;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.jsr310.*;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.CardRequest;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.CardsResponse;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.services.CardService;
 import edu.episen.si.ing1.pds.backend.server.network.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.services.ICardService;
 import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
 import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest;
 import org.slf4j.Logger;
@@ -16,12 +19,13 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class CardNetwork {
-    private Services service;
+    private final ICardService<CardRequest, CardsResponse> service;
     private final PrintWriter writer;
     private final Connection connection;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -49,14 +53,20 @@ public class CardNetwork {
         }
         else if(event.equals("card_byid")) {
             try {
-                Optional card = service.findById(request.getData().get("id").asLong());
+                int card_id = request.getData().get("id").asInt();
+                Optional card = service.findById(card_id);
                 Object msg;
                 if(card.isPresent()) {
                     msg = card.get();
                 } else {
                     msg = "No record found";
                 }
-                Map<String, Object> msgResponseT = Utils.responseFactory(msg, "card_byid");
+                Map<Map, List> accessList = service.getAccessList(card_id);
+                Map responseBody = Map.of("card", msg,"access_list", accessList);
+
+                logger.info(responseBody.toString());
+
+                Map<String, Object> msgResponseT = Utils.responseFactory(responseBody, "card_byid");
                 String reponseMsg = mapper.writeValueAsString(msgResponseT);
                 writer.println(reponseMsg);
             } catch (JsonProcessingException e) {
@@ -85,12 +95,26 @@ public class CardNetwork {
         }
         else if (event.equals("card_access_list")) {
             JsonNode data = request.getData();
-            CardService cardService = new CardService(connection);
-            List<Map> response = cardService.getItemAccessList(data.get("serialId").asText());
+            List<Map> response = service.getItemAccessList(data.get("serialId").asText());
             try {
                 writer.println(mapper.writeValueAsString(Utils.responseFactory(response, event)));
             } catch (JsonProcessingException e) {
                 logger.error(e.getMessage(), e);
+            }
+        }
+        else if(event.equals("card_update")) {
+            JsonNode data = request.getData();
+            try {
+                JsonNode card = data.get("card");
+                CardRequest cardRequest = mapper.treeToValue(card, CardRequest.class);
+                Integer card_id = data.get("card_id").asInt();
+                ArrayNode spaces = (ArrayNode) data.get("workspaces");
+                Boolean updateResponse = service.update(cardRequest, card_id);
+                Boolean accessByCard = service.accessByCard(spaces, card_id);
+                writer.println(mapper.writeValueAsString(Utils.responseFactory(updateResponse && accessByCard, event)));
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

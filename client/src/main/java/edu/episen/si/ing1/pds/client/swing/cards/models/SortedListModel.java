@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.util.*;
 
 public class SortedListModel extends AbstractListModel {
-    List model;
+    private List model;
 
     public SortedListModel() {
         model = new ArrayList();

@@ -2,17 +2,14 @@ package edu.episen.si.ing1.pds.client.swing.cards.models;
 
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
-import edu.episen.si.ing1.pds.client.swing.global.shared.Ui;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 
-import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
+
 import java.util.List;
 import java.util.Map;
 
-public class CardTableModel extends AbstractTableModel implements TableCellRenderer {
+public class CardTableModel extends AbstractTableModel {
     List<Map> cardList;
 
     public CardTableModel() {
@@ -68,17 +65,5 @@ public class CardTableModel extends AbstractTableModel implements TableCellRende
 
     public List<Map> getDataSource() {
         return cardList;
-    }
-
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel text = new JLabel(value.toString());
-        text.setFont(Ui.FONT_GENERAL_UI);
-        text.setOpaque(true);
-        Boolean bool = (Boolean) cardList.get(row).get("active");
-        if(!bool)
-            text.setBackground(Color.RED);
-
-        return text;
     }
 }

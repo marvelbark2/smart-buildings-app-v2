@@ -8,12 +8,11 @@ import java.time.LocalDate;
 public class CardRequest {
     private String cardUId;
     private boolean expirable;
+    private boolean active;
+    private UsersRequest user;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate expiredDate;
-    private boolean active;
-
-    private UsersRequest user;
 
     public String getCardUId() {
         return cardUId;
@@ -49,5 +48,9 @@ public class CardRequest {
 
     public boolean isActive() {
         return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

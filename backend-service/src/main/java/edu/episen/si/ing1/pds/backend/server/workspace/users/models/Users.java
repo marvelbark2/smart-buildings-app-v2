@@ -1,15 +1,15 @@
 package edu.episen.si.ing1.pds.backend.server.workspace.users.models;
 
 public class Users {
-    private Long userId;
+    private Integer userId;
     private String userUId;
     private String name;
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 

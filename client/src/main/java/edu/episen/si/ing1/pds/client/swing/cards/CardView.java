@@ -1,5 +1,8 @@
 package edu.episen.si.ing1.pds.client.swing.cards;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.swing.cards.models.CardTableModel;
@@ -13,7 +16,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,16 +48,8 @@ public class CardView implements Routes {
         dataTable = tableModel.getDataSource();
         JTable table = new JTable(tableModel);
 
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-           @Override
-           public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-               final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-               final Boolean bool = (Boolean) tableModel.getDataSource().get(row).get("active");
-               c.setBackground(bool ? Ui.OFFWHITE : Color.RED);
-               c.setForeground(bool ? Color.black : Color.white);
-               return c;
-           }
-       } );
+        handlecardStatus(table, tableModel);
+
         table.setRowSelectionAllowed(true);
 
         JTableHeader header = table.getTableHeader();
@@ -100,7 +99,10 @@ public class CardView implements Routes {
                             )
                     );
                     Response response = Utils.sendRequest(request);
-                    Map<String, Object> data = (Map<String, Object>) response.getMessage();
+                    Map<String, Object> responseBody = (Map<String, Object>) response.getMessage();
+                    Map<String, Object> data = (Map<String, Object>) responseBody.get("card");
+                    Map<String, List<Map<String, List>>> accessList = (Map<String, List<Map<String, List>>>) responseBody.get("access_list");
+
                     JDialog dialog = new JDialog(context.frame());
                     dialog.setSize(1000, 1000);
                     dialog.setPreferredSize(dialog.getSize());
@@ -139,6 +141,48 @@ public class CardView implements Routes {
                         }
                     });
                     infoPanel.add(showTable);
+
+                    DefaultMutableTreeNode root = new DefaultMutableTreeNode("r");
+                    for (String building: accessList.keySet()) {
+                        Map buildingMap = Utils.toMap(building);
+                        DefaultMutableTreeNode buildNode = new DefaultMutableTreeNode(buildingMap.get("name"));
+                        for (Object floor: accessList.get(building)) {
+                            Map<Map, List> floorN = (Map) floor;
+                            for (Object works: floorN.keySet()) {
+                                Map floorMap = Utils.toMap(works.toString());
+                                DefaultMutableTreeNode floorNode = new DefaultMutableTreeNode(floorMap.get("floor"));
+                                buildNode.add(floorNode);
+                                for (List<Map> dataN: floorN.values()) {
+                                    for (Map workspaces: dataN) {
+                                        DefaultMutableTreeNode workNode = new DefaultMutableTreeNode(new HashMap<>(workspaces));
+                                        floorNode.add(workNode);
+                                    }
+                                }
+                            }
+                        }
+                        root.add(buildNode);
+                    }
+                    JTree tree = new JTree(root);
+                    tree.setCellRenderer(new DefaultTreeCellRenderer() {
+                        @Override
+                        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                            Object object = ((DefaultMutableTreeNode) value).getUserObject();
+
+                            if(object instanceof Map) {
+                                Map val = (Map) object;
+                                setText(val.get("workspace_type").toString());
+                                String path = (Boolean)val.get("access") ? "icon/granted.png" : "icon/forbidden.png";
+                                Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource(path));
+                                Image resised = icon.getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH);
+                                setIcon(new ImageIcon(resised));
+                            }
+
+                            return this;
+                        }
+                    });
+                    tree.setRootVisible(false);
+                    infoPanel.add(tree);
 
                     JPanel history = new JPanel(new GridLayout(1,1));
 
@@ -193,12 +237,13 @@ public class CardView implements Routes {
                             Integer.parseInt(dataTable.get(selectedRow).get(tableModel.getColumnName(0)).toString()))
                     );
                     Response response = Utils.sendRequest(request);
-                    Map<String, Object> data = (Map<String, Object>) response.getMessage();
+                    Map<String, Object> responseBody = (Map<String, Object>) response.getMessage();
+                    Map<String, Object> data = (Map<String, Object>) responseBody.get("card");
                     JDialog dialog = new JDialog(context.frame());
                     dialog.setSize(700,800);
 
                     dialog.setPreferredSize(dialog.getSize());
-                    JPanel dialogPanel = new JPanel(new GridLayout(3,2, 25, 25));
+                    JPanel dialogPanel = new JPanel(new GridLayout(4,2, 25, 25));
                     dialogPanel.setBorder(BorderFactory.createTitledBorder("Modifer la carte"));
 
                     Request requestUserList = new Request();
@@ -235,6 +280,8 @@ public class CardView implements Routes {
                     userFieldPanel.add(userFieldFor);
                     userFieldPanel.add(comboBox);
 
+                    System.out.println(data);
+
                     JPanel serialFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
                     JLabel serialFieldFor = new JLabel("Matricule");
                     JTextField serialField = new JTextField(20);
@@ -245,12 +292,42 @@ public class CardView implements Routes {
                     serialFieldPanel.add(serialField);
                     serialFieldPanel.add(snGenerator);
 
-                    JPanel textFields = new JPanel(new GridLayout(2,2, 25,25));
+                    JPanel expirableFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                    JCheckBox expirableField = new JCheckBox();
+                    expirableField.setSelected((Boolean) data.get("expirable"));
+                    JLabel expirableFieldFor = new JLabel("Expirable");
+                    expirableFieldPanel.add(expirableFieldFor);
+                    expirableFieldPanel.add(expirableField);
 
+                    JPanel expiredDate = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                    JTextField expiredDateField = new JTextField(12);
+                    expiredDateField.setText(data.get("expiredDate") == null ? "Infini" : data.get("expiredDate").toString() );
+                    expiredDateField.setEnabled(expirableField.isSelected());
+                    JLabel expiredDateFieldFor = new JLabel("Date d'expiration");
+                    expiredDate.add(expiredDateFieldFor);
+                    expiredDate.add(expiredDateField);
+
+                    expirableField.addChangeListener(new ChangeListener() {
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            expiredDateField.setEnabled(expirableField.isSelected());
+                        }
+                    });
+
+                    JPanel textFields = new JPanel(new GridLayout(2,2, 25,25));
                     textFields.add(userFieldPanel);
                     textFields.add(serialFieldPanel);
+                    textFields.add(expirableFieldPanel);
+                    textFields.add(expiredDate);
 
                     dialogPanel.add(textFields);
+
+                    JPanel active = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                    JCheckBox activeCard = new JCheckBox("Carte Active");
+                    activeCard.setSelected((Boolean) data.get("active"));
+                    active.add(activeCard);
+
+                    dialogPanel.add(active);
 
                     DualListBox dual = new DualListBox("accessible");
 
@@ -261,8 +338,12 @@ public class CardView implements Routes {
                     Response responseAccessList = Utils.sendRequest(requestAccessList);
 
                     List<Map> dataAccessList = (List<Map>) responseAccessList.getMessage();
+                    dataAccessList.forEach(map ->map.put("edited", false));
+
                     List<Map> accessible = dataAccessList.stream().filter(map -> (boolean)map.get("accessible")).collect(Collectors.toList());
                     List<Map> notAccessible = dataAccessList.stream().filter(map -> ! (boolean)map.get("accessible")).collect(Collectors.toList());
+
+
 
                     dual.addSourceElements(notAccessible.toArray(new Map[0]));
                     dual.addDestinationElements(accessible.toArray(new Map[0]));
@@ -280,6 +361,59 @@ public class CardView implements Routes {
                     dual.setBorder(BorderFactory.createTitledBorder("Gérer les accès"));
                     dialogPanel.add(dual);
                     JButton submit = new JButton("Soumttre");
+                    submit.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            Map<String, Object> card = new HashMap<>();
+                            card.put("cardUId", serialField.getText());
+                            card.put("expirable", expirableField.isSelected());
+                            if(expiredDateField.getText().equalsIgnoreCase("infini"))
+                                card.put("expiredDate", null);
+                            else
+                                card.put("expiredDate", expiredDateField.getText());
+                            card.put("active", activeCard.isSelected());
+                            Object user = comboBox.getSelectedItem();
+                            if(user == null)
+                                card.put("user", data.get("user"));
+                            else
+                                card.put("user",user);
+
+                            Iterator source = dual.sourceIterator();
+                            Iterator dest = dual.destinationIterator();
+
+                            List not = new ArrayList();
+                            List accessible = new ArrayList();
+
+                            while (source.hasNext())
+                                not.add(source.next());
+
+                            while (dest.hasNext())
+                                accessible.add(dest.next());
+
+                            List items = new ArrayList();
+                            items.addAll(not);
+                            items.addAll(accessible);
+
+                            Map editData = Map.of(
+                                    "card", card,
+                                    "card_id", data.get("cardId"),
+                                    "workspaces", items
+                            );
+                            Request editReq = new Request();
+                            editReq.setEvent("card_update");
+                            editReq.setData(editData);
+                            Response ediRes = Utils.sendRequest(editReq);
+                            if((Boolean) ediRes.getMessage()) {
+                                toast.success("La modification est bien faite");
+                                updateTable(table, tableModel);
+                                dual.clearDestinationListModel();
+                                dual.clearSourceListModel();
+                                dialog.dispose();
+                            } else {
+                                toast.error("Erreur! Il y a un problème");
+                            }
+                        }
+                    });
 
                     dialogPanel.add(submit);
 
@@ -439,5 +573,19 @@ public class CardView implements Routes {
         dataTable = modelTable.getDataSource();
         table.setModel(modelTable);
         table.repaint();
+    }
+    private void handlecardStatus(JTable table, CardTableModel modelTable) {
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                final Boolean bool = (Boolean) modelTable.getDataSource().get(row).get("active");
+                if(!bool) {
+                    setBackground(Color.RED);
+                }
+                setOpaque(isSelected);
+                return this;
+            }
+        });
     }
 }

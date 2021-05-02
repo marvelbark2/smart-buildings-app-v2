@@ -31,7 +31,7 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 Users user = new Users();
-                user.setUserId(rs.getLong("userid"));
+                user.setUserId(rs.getInt("userid"));
                 user.setUserUId(rs.getString("user_uid"));
                 user.setName(rs.getString("name"));
                 response.add(new UsersResponse(user));
@@ -43,8 +43,25 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
     }
 
     @Override
-    public Optional<UsersResponse> findById(Long id) {
-        return Optional.empty();
+    public Optional<UsersResponse> findById(Integer id) {
+        Optional<UsersResponse> user = null;
+        String query = sql.getUserSql("read");
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            ResultSet rs = statement.executeQuery();
+            if(rs.next()) {
+                Users userEntity = new Users();
+                userEntity.setUserId(rs.getInt("userid"));
+                userEntity.setUserUId(rs.getString("user_uid"));
+                userEntity.setName(rs.getString("name"));
+                UsersResponse usersResponse = new UsersResponse(userEntity);
+                user = Optional.of(usersResponse);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return user;
     }
 
     @Override
@@ -63,11 +80,16 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return  response > 0 ? true : false;
+        return  response > 0;
     }
 
     @Override
     public Boolean delete(UsersRequest request) {
+        return null;
+    }
+
+    @Override
+    public Boolean update(UsersRequest request, Integer id) {
         return null;
     }
 

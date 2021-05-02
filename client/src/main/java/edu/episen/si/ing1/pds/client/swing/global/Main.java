@@ -47,10 +47,11 @@ public class Main implements MouseListener {
         global.repaint();
         frame.pack();
     }
+
     public void loadSystemWindow() {
         frame.setResizable(true);
         frame.setSize(1800, 1000);
-        
+
         frame.setPreferredSize(frame.getSize());
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

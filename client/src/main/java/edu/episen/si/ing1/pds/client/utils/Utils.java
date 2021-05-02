@@ -8,10 +8,7 @@ import edu.episen.si.ing1.pds.client.network.SocketFacade;
 import java.io.*;
 import java.net.Socket;
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Utils {
 
@@ -101,5 +98,10 @@ public class Utils {
             e.printStackTrace();
         }
         return response;
+    }
+
+    public static void checkSystemLog() {
+        Timer timer = new Timer();
+        timer.schedule(new SystemLog(), 0, 1000);
     }
 }

@@ -42,7 +42,7 @@ public class UsersNetwork {
         }
         else if(event.equals("user_byid")) {
             try {
-                Optional user = service.findById(request.getData().get("id").asLong());
+                Optional user = service.findById(request.getData().get("id").asInt());
                 Object msg;
                 if(user.isPresent()) {
                     msg = user.get();
