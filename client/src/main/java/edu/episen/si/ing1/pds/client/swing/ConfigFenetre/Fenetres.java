@@ -18,6 +18,7 @@ public class Fenetres extends JFrame implements ActionListener{
 	JPanel seconJPanel = new JPanel();
 	JButton b1;
 	JButton b2;
+	JButton b3;
 	
 	private JTextField textField;
 	private JTextField titleField;
@@ -34,16 +35,15 @@ public class Fenetres extends JFrame implements ActionListener{
 		getContentPane().setLayout(new BorderLayout());
 
 		contentPane.add(addingAllMenu(), BorderLayout.CENTER);
-		JTextField TemperatureExterieureField = new JTextField();
-		JTextField TemperatureInterieureField = new JTextField();
-		JTextField luminositeExterieureField = new JTextField();
-		JTextField luminositeInterieureField = new JTextField();
-		JTextField StoreLeveField = new JTextField();
-		JTextField TeintureVitreField = new JTextField();
+		JTextField TempératureExtérieureField = new JTextField();
+		JTextField TempératureIntérieureField = new JTextField();
+		
+		JTextField StatusStoreField = new JTextField();
+		JTextField StatusTeintureVitreField = new JTextField();
 		JTextField BaisserStoreField = new JTextField();
 		JTextField TeintureVitreField1 = new JTextField();
 		JTextField EclairageDirectField = new JTextField();
-		JTextField EclairageInDirectField = new JTextField();
+		JTextField EclairageIndirectField = new JTextField();
 
 	}
 
@@ -58,12 +58,17 @@ public class Fenetres extends JFrame implements ActionListener{
 
 	private JPanel optionOFTop() {
 		JPanel pane = new JPanel(new FlowLayout());
-		b1 = new JButton("Etats Actuel fenetre");
+		b1 = new JButton("choix d'utilisation température");
 		pane.add(b1);
 		b1.addActionListener(this);
-		b2 = new JButton("choix d'utilisation temp�rature");
+		b2 = new JButton("choix d'utilisation lumiére");
 		pane.add(b2);
 		b2.addActionListener(this);
+		b3 = new JButton("Etats Actuel d'une ou plusieurs Fenetre(s)");
+		pane.add(b3);
+		b3.addActionListener(this);
+		
+		
 		
 		return pane;
 
@@ -90,12 +95,13 @@ public class Fenetres extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if ( o == b1) 
-			new Parametre();
-	
-		else if (o == b2) 
 			new ParametreB2();
 	
-		
+		else if(o ==b2)
+			new ParametreB3();
+	
+		else
+			new Parametre();
 		
 			
 		}

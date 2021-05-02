@@ -1,8 +1,11 @@
 package edu.episen.si.ing1.pds.client.swing.ConfigFenetre;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -10,28 +13,27 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class Parametre extends JFrame {
-	JTextField TemperatureExterieureField = new JTextField();
-	JTextField TemperatureInterieureField1 = new JTextField();
-	JTextField luminositeExterieureField = new JTextField();
-	JTextField luminositeInterieureField = new JTextField();
-	JTextField StoreLevéField = new JTextField();
-	JTextField TeintureVitreField = new JTextField();
+public class Parametre extends JFrame implements ActionListener{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	JTextField TempératureExtérieureField = new JTextField();
+	JTextField TempératureIntérieureField1 = new JTextField();
+	JTextField EclairageDirectField = new JTextField();
+	JTextField EclairageIndirectField = new JTextField();
+	JTextField StatusstoresField = new JTextField();
+	JTextField StatusTeintureVitreField = new JTextField();
 
-	JLabel TemperatureExterieure = new JLabel("Temp�ratureExt�rieure");
+	JLabel TemperatureExterieure = new JLabel("TempératureExtérieure");
+	JLabel TempératureIntérieure = new JLabel("TempératureIntérieure");
+	JLabel EclairageDirect = new JLabel("EclairageDirect");
+	JLabel EclairageIndirect = new JLabel("EclairageIndirect");
+	JLabel StatusStores = new JLabel("StatusStores");
+	JLabel StatusTeintureVitre = new JLabel("StatusTeintureVitre");
 	
-	JLabel TemperatureInterieure = new JLabel("Temp�ratureInt�rieure");
-	JLabel luminositeExterieure = new JLabel("luminositeExterieure");
-	JLabel luminositeInterieure1 = new JLabel("luminositeInterieure");
-	JLabel StoreLeve = new JLabel("StoreLev�");
-	JLabel TeintureVitre = new JLabel("TeintureVitre");
-	private Component TemperatureExterieure1;
-	private Component TemperatureInterieure1;
-	private Component luminositeInterieure;
-	private Component luminositExterieure;
-	private Component TemperatureInterieureField;
-	private Component StoreLeveField;
-	private Component luminositInterieure;
+	
+
 
 	public Parametre() {
 		this.setVisible(true);
@@ -41,43 +43,42 @@ public class Parametre extends JFrame {
 		this.setLayout(new BorderLayout());
 
 		JPanel contentPane = (JPanel) this.getContentPane();
-		contentPane.add(labelparametre(),BorderLayout.CENTER);
+		contentPane.add(labelparametre(), BorderLayout.CENTER);
 		contentPane.add(fieldparametre(), BorderLayout.EAST);
-		
-	} 
+
+	}
+
 	public JPanel labelparametre() {
-		JPanel lab=new JPanel(new GridLayout(7,1));
+		JPanel lab = new JPanel(new GridLayout(7, 1));
 		lab.add(TemperatureExterieure);
-		lab.add(luminositeExterieure);
-		lab.add(luminositInterieure);
-		
-		
-		lab.add(StoreLeve);
-		lab.add(TeintureVitre);
-		
-		
-		
-		
+		lab.add(EclairageDirect);
+		lab.add(EclairageIndirect);
+		lab.add(TempératureIntérieure);
+		lab.add( StatusStores);
+		lab.add( StatusTeintureVitre);
 		
 		return lab;
 	}
-	public JPanel fieldparametre() {
-		JPanel field=new JPanel(new GridLayout(7,1,20,20));
-		field.setPreferredSize(new Dimension(200,200));
-		
-		
-		
-		field.add(TemperatureInterieureField1);
-		field.add(luminositInterieure);
-		field.add(luminositeExterieure);
-		field.add(StoreLeveField);
-		field.add(TeintureVitreField);
 
-		
+	public JPanel fieldparametre() {
+		JPanel field = new JPanel(new GridLayout(7, 1, 20, 20));
+		field.setPreferredSize(new Dimension(200, 200));
+		field.add(TempératureIntérieureField1);
+		field.add(TempératureExtérieureField);
+		field.add(EclairageDirectField);
+		field.add(EclairageIndirectField);
+		field.add(StatusstoresField);
+		field.add(StatusTeintureVitreField);
+		JButton bouton4 = new JButton( "refresh");
+		field.add(bouton4);
+		bouton4.addActionListener(this);
 		return field;
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
 		
+		
+	}
 
 }
-
-
