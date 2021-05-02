@@ -179,6 +179,7 @@ public class Main implements MouseListener {
     private void setupBloc() {
         bloc = new JPanel();
         bloc.setBorder(new LineBorder(Color.RED));
+        bloc.setVisible(false);
     }
 
     public JPanel getGlobal() {
