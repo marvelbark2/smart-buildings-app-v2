@@ -1,29 +1,29 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.cards.models.relationship;
+package edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.relationship;
 
-public class Floors {
+public class Desks {
     private Integer id;
     private String abbreviation;
     private String designation;
     private Boolean enabled;
-    private Buildings building;
+    private Floors floor;
 
-    public Floors(Integer id, String abbreviation, String designation, Boolean enabled, Buildings building) {
+    public Desks(Integer id, String abbreviation, String designation, Boolean enabled, Floors floor) {
         this.id = id;
         this.abbreviation = abbreviation;
         this.designation = designation;
         this.enabled = enabled;
-        this.building = building;
+        this.floor = floor;
     }
 
-    public Floors(String abbreviation, String designation, Boolean enabled, Buildings building) {
+    public Desks(String abbreviation, String designation, Boolean enabled, Floors floor) {
         this.id = null;
         this.abbreviation = abbreviation;
         this.designation = designation;
         this.enabled = enabled;
-        this.building = building;
+        this.floor = floor;
     }
 
-    public Floors() {
+    public Desks() {
     }
 
     public Integer getId() {
@@ -58,11 +58,11 @@ public class Floors {
         this.enabled = enabled;
     }
 
-    public Buildings getBuilding() {
-        return building;
+    public Floors getFloor() {
+        return floor;
     }
 
-    public void setBuilding(Buildings building) {
-        this.building = building;
+    public void setFloor(Floors floor) {
+        this.floor = floor;
     }
 }

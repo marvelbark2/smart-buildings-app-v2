@@ -1,6 +1,7 @@
 package edu.episen.si.ing1.pds.client.swing.cards;
 
 import edu.episen.si.ing1.pds.client.network.Request;
+import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.swing.cards.models.UserTableModel;
 import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
@@ -13,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 public class UsersView implements Routes {
     private JTable table;
@@ -52,12 +54,40 @@ public class UsersView implements Routes {
         actionPanel.add(delete, FlowLayout.CENTER);
         actionPanel.add(read, FlowLayout.RIGHT);
 
-        JPanel formPanel = new JPanel();
+        JPanel formPanel = new JPanel(new GridLayout(2, 2, 50,50));
+
+        JPanel nameFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JTextField nameField = new JTextField(10);
-        formPanel.add(new JLabel("Nom"));
-        formPanel.add(nameField);
+        nameFieldPanel.add(new JLabel("Nom"));
+        nameFieldPanel.add(nameField);
+
+        JPanel roleFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        Request request = new Request();
+        request.setEvent("role_list");
+        Response response = Utils.sendRequest(request);
+        List<Map> roleList = (List<Map>) response.getMessage();
+        JComboBox comboBox = new JComboBox(new Vector(roleList));
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if(value instanceof Map) {
+                    Map role = (Map) value;
+                    setText(role.get("abbreviation") + " - " + role.get("designation"));
+                }
+                return this;
+            }
+        });
+        roleFieldPanel.add(new JLabel("Role"));
+        roleFieldPanel.add(comboBox);
+
+        formPanel.add(roleFieldPanel);
+        formPanel.add(nameFieldPanel);
 
         JPanel buttonPanel = new JPanel(new BorderLayout());
+
+        buttonPanel.add(button, BorderLayout.PAGE_START);
+        buttonPanel.add(actionPanel, BorderLayout.CENTER);
 
         JButton insert = new JButton("Soumettre");
         insert.addActionListener(new ActionListener() {
@@ -72,15 +102,13 @@ public class UsersView implements Routes {
 
             }
         });
+        insert.setBounds(30,30, 50, 50);
 
-        buttonPanel.add(button, BorderLayout.PAGE_START);
-        buttonPanel.add(actionPanel, BorderLayout.CENTER);
-
-        formPanel.add(insert);
 
         frame.add(jScrollPane, JPanel.CENTER_ALIGNMENT);
         frame.add(buttonPanel);
         frame.add(formPanel);
+        frame.add(insert);
 
         frame.setVisible(true);
     }

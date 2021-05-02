@@ -1,14 +1,13 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.cards.services;
+package edu.episen.si.ing1.pds.backend.server.workspace.cards.card.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.CardRequest;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.Cards;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.CardsResponse;
-import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.models.Users;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardRequest;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.Cards;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardsResponse;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.Users;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersRequest;
 
 import java.sql.*;
 import java.sql.Date;
@@ -269,7 +268,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
     public Map<Map, List> getAccessList(Integer card_id) {
         Map<Map, List> data = new HashMap();
 
-        String query = "SELECT b.name as building, concat('Etage ', f.floor_number) as floor, w.workspace_type, iscardaccessibletodesk(?, w.id_workspace) as desk_access FROM buildings b join floors f on b.id_buildings = f.building_number join workspace w on f.id_floor = w.floor_number;";
+        String query = "SELECT b.name as building, concat('Etage ', f.floor_number) as floor, w.workspace_type, iscardaccessibletodesk(?, w.id_workspace) as desk_access FROM buildings b join floors f on b.id_buildings = f.building_number join workspace w on f.id_floor = w.floor_number";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, card_id);

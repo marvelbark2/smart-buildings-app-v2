@@ -1,7 +1,7 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.cards.models;
+package edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersRequest;
 
 import java.time.LocalDate;
 

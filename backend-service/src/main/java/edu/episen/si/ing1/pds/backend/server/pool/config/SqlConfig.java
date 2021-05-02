@@ -23,11 +23,12 @@ public enum SqlConfig {
             e.printStackTrace();
         }
     }
-    public String getUserSql(String request) {
-        return node.get("users").get(request).asText();
+    public String getUserSql(String field) {
+        return node.get("users").get(field).asText();
     }
-    public String getCardSql(String request) {
-        return node.get("cards").get(request).asText();
+    public String getCardSql(String field) {
+        return node.get("cards").get(field).asText();
     }
+    public String getRoleSql(String field) { return node.get("roles").get(field).asText(); }
 
 }

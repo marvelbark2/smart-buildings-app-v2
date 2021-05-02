@@ -1,10 +1,11 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.users.services;
+package edu.episen.si.ing1.pds.backend.server.workspace.cards.user.services;
 
 import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.models.Role;
 import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.models.Users;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersResponse;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.Users;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersRequest;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersResponse;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -30,10 +31,17 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
             statement.setInt(1, companyId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
+                Role role = new Role();
+                role.setRoleId(rs.getInt("roleid"));
+                role.setAbbrevation(rs.getString("abbreviation"));
+                role.setDesignation(rs.getString("designation"));
+                role.setEnabled(rs.getBoolean("enabled"));
+
                 Users user = new Users();
                 user.setUserId(rs.getInt("userid"));
                 user.setUserUId(rs.getString("user_uid"));
                 user.setName(rs.getString("name"));
+                user.setRole(role);
                 response.add(new UsersResponse(user));
             }
         } catch (Exception e) {
