@@ -79,6 +79,7 @@ public class Main implements MouseListener {
 
         JPanel logo = new JPanel();
         JLabel label = new JLabel(Utils.getCompanyName(), SwingUtilities.CENTER);
+        label.setFont(new Font("ROBOTO LIGHT", Font.PLAIN, 18));
         header.setBackground(new Color(54, 38, 90));
         label.setForeground(Color.white);
         logo.add(label);

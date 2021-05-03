@@ -222,8 +222,6 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
                    int rs = statement.executeUpdate();
                    spaceResponse = spaceResponse && rs > 0;
                }
-
-
            }
 
            boolean equipmentResponse = true;

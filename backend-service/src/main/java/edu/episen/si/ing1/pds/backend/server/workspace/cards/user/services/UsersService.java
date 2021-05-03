@@ -85,13 +85,22 @@ public class UsersService implements IUsersService<UsersRequest, UsersResponse> 
         try {
             String query = sql.getUserSql("insert");
 
-            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             statement.setString(1, request.getUserUId());
             statement.setString(2, request.getName());
             statement.setInt(3, companyId);
 
-            response = statement.executeUpdate();
+            statement.executeUpdate();
+
+            ResultSet rs = statement.getGeneratedKeys();
+            if(rs.next()) {
+                PreparedStatement roleAdding = connection.prepareStatement("INSERT INTO roles_users (roleid, userid) values (?, ?)");
+                roleAdding.setInt(1, request.getRole().getRoleId());
+                roleAdding.setInt(2, rs.getInt(1));
+
+                response = roleAdding.executeUpdate();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

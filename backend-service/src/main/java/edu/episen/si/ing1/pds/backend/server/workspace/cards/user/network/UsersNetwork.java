@@ -61,8 +61,7 @@ public class UsersNetwork {
         else if(event.equals("user_insert")) {
             try {
                 JsonNode data = request.getData();
-                UsersRequest usersRequest = new UsersRequest();
-                usersRequest.setName(data.get("name").asText());
+                UsersRequest usersRequest = mapper.treeToValue(data, UsersRequest.class);
                 usersRequest.setUserUId(Utils.generateStringId(15));
                 Boolean isUserInserted = service.add(usersRequest);
                 String response = mapper.writeValueAsString(Utils.responseFactory(isUserInserted, event));

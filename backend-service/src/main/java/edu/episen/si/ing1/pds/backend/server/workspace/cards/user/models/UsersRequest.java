@@ -30,4 +30,13 @@ public class UsersRequest {
     public void setRole(RoleRequest role) {
         this.role = role;
     }
+
+    @Override
+    public String toString() {
+        return "UsersRequest{" +
+                "userUId='" + userUId + '\'' +
+                ", name='" + name + '\'' +
+                ", role=" + role +
+                '}';
+    }
 }

@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
 
 public class UsersView implements Routes {
@@ -104,7 +105,11 @@ public class UsersView implements Routes {
         insert.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Map data = Map.of("name", nameField.getText());
+                Map data = Map.of(
+                        "name", nameField.getText(),
+                        "role", Objects.requireNonNull(comboBox.getSelectedItem())
+                );
+                logger.info(comboBox.getSelectedItem().toString());
                 Boolean response = model.addData(data);
                 if(response) {
                     toastr.success("Utilisateur est bien enregister");

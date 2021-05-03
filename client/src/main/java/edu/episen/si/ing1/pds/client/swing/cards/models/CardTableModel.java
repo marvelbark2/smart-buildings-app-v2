@@ -36,7 +36,7 @@ public class CardTableModel extends AbstractTableModel {
         if(value instanceof Map)
             value = ( (Map) value).get("name");
         else if(value == null)
-            value = "Infini";
+            value = "-";
         else if(value instanceof Boolean) {
             Boolean bool = (Boolean) value;
             if(bool)
