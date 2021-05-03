@@ -22,7 +22,7 @@ public class MappingNetwork {
         
     	String event = request.getEvent();
         ObjectMapper mapper = new ObjectMapper();
-        if(event.equalsIgnoreCase("building_list")) {
+        if(event.equalsIgnoreCase("mapping_list")) {
             try {
             List<Map> response = new ArrayList<>();
             JsonNode data = request.getData();

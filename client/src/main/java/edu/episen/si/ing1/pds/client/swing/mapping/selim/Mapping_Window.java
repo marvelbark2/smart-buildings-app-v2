@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -41,7 +42,7 @@ import edu.episen.si.ing1.pds.client.utils.Utils;
 public class Mapping_Window implements Navigate {
     Main global;
     private JPanel content = new JPanel();
-    private JButton[] Button = new JButton[16];
+  
 
     public Mapping_Window(Main global) {
         this.global = global;
@@ -146,7 +147,7 @@ public class Mapping_Window implements Navigate {
    
     private JPanel carte(Integer id) {
         Request request=new Request();
-        request.setEvent("building_list");
+        request.setEvent("mapping_list");
         request.setData(Map.of("workspace_id", id));
         Response response = Utils.sendRequest(request);
         List<Map> data=(List<Map>) response.getMessage();
@@ -157,17 +158,20 @@ public class Mapping_Window implements Navigate {
         gcon.weightx = 1;
         gcon.weighty = 1;
 
-        System.out.println(data.size());
+        
 
         gcon.fill = GridBagConstraints.BOTH;
 
         for(Map e:data) {
-            Button[(int) e.get("equipment_id")] = new JButton();
+            
+        	JButton btn = new JButton(e.get("equipment_id").toString());
             gcon.gridx = Integer.valueOf(e.get("gridx").toString());
             gcon.gridy = Integer.valueOf(e.get("gridy").toString());
             gcon.gridheight = Integer.valueOf(e.get("gridheigth").toString());
             gcon.gridwidth = Integer.valueOf(e.get("gridwidth").toString());
-            carte.add(Button[(int) e.get("equipment_id")], gcon);
+            btn.setTransferHandler(new TransferHandler("icon"));
+            carte.add(btn, gcon);
+            
 
         }
 
@@ -241,7 +245,7 @@ public class Mapping_Window implements Navigate {
         menuScroll(arbre);
         bloc_equipement();
 
-        JLabel label = new JLabel("Choisissez un espace");
+        JLabel label = new JLabel("Veuillez sélectionnez un espace à configurer à l'aide de l’arborescence sur votre gauche");
         content.add(label);
 
         contentPane.add(content);
