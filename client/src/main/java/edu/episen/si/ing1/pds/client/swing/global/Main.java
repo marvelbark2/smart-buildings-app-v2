@@ -25,7 +25,7 @@ public class Main implements MouseListener {
 
     private Map<JLabel, Navigate> frames;
     public Main() {
-        frame = new JFrame("Smart building app");
+        frame = new JFrame("Smart Building App");
         global = new JPanel();
         if(Utils.isGuestPage()) {
             loadCompanyWindows();
@@ -85,7 +85,7 @@ public class Main implements MouseListener {
         logo.setOpaque(false);
 
         JPanel leftPanel = new JPanel();
-        JLabel disconnect = new JLabel("Deconnecté", SwingUtilities.CENTER);
+        JLabel disconnect = new JLabel("Se déconnecter", SwingUtilities.CENTER);
         disconnect.setSize(100, 75);
         disconnect.setMinimumSize(disconnect.getSize());
         disconnect.setPreferredSize(disconnect.getSize());
@@ -150,21 +150,21 @@ public class Main implements MouseListener {
         menu.setLayout(new BoxLayout(menu, BoxLayout.Y_AXIS));
         menu.add(Box.createVerticalStrut(100));
 
-        JLabel realize = new MenuItem("Realiser une location");
-        frames.put(realize, new LocationMenu(this));
-        realize.addMouseListener(this);
+        JLabel location = new MenuItem("Louer et configurer un Digital Workplace");
+        frames.put(location, new LocationMenu(this));
+        location.addMouseListener(this);
 
-        JLabel consult = new MenuItem("Consulter une location");
-        frames.put(consult, new Mapping_Window(this));
-        consult.addMouseListener(this);
+        JLabel mapping = new MenuItem("Configurer les équipements et capteurs d'un Digital Workplace");
+        frames.put(mapping, new Mapping_Window(this));
+        mapping.addMouseListener(this);
 
-        JLabel staff = new MenuItem("Configurer les cartes d'acces");
-        staff.addMouseListener(this);
-        frames.put(staff, new ContextFrame(this));
+        JLabel acces = new MenuItem("Configurer une carte d'accès au Digital Workplace");
+        acces.addMouseListener(this);
+        frames.put(acces, new ContextFrame(this));
 
-        menu.add(realize);
-        menu.add(consult);
-        menu.add(staff);
+        menu.add(location);
+        menu.add(mapping);
+        menu.add(acces);
         menu.add(Box.createGlue());
 
         menu.setBackground(new Color(54, 38, 90));
