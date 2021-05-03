@@ -81,6 +81,7 @@ public class CardsResponse implements Serializable {
                 ", cardUId='" + cardUId + '\'' +
                 ", expirable=" + expirable +
                 ", expiredDate=" + expiredDate +
+                ", user=" + user +
                 ", active=" + active +
                 '}';
     }

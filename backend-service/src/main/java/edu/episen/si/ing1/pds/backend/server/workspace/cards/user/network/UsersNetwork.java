@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.backend.server.network.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersResponse;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.services.IUsersService;
 import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersRequest;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.services.UsersService;
@@ -17,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class UsersNetwork {
-    private Services service;
+    private IUsersService<UsersRequest, UsersResponse> service;
     private final PrintWriter writer;
     private final ObjectMapper mapper = new ObjectMapper();
     private final Logger logger = LoggerFactory.getLogger(UsersNetwork.class.getName());
@@ -67,6 +69,17 @@ public class UsersNetwork {
                 writer.println(response);
                 logger.info(response);
 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else if(event.equals("user_find")) {
+            try{
+                JsonNode data = request.getData();
+                UsersRequest usersRequest = mapper.convertValue(data, UsersRequest.class);
+                JsonNode userInfo = service.findUser(usersRequest);
+                String response = mapper.writeValueAsString(Utils.responseFactory(userInfo, event));
+                writer.println(response);
             } catch (Exception e) {
                 e.printStackTrace();
             }

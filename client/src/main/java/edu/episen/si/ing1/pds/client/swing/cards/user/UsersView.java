@@ -1,7 +1,9 @@
-package edu.episen.si.ing1.pds.client.swing.cards;
+package edu.episen.si.ing1.pds.client.swing.cards.user;
 
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
+import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
+import edu.episen.si.ing1.pds.client.swing.cards.Routes;
 import edu.episen.si.ing1.pds.client.swing.cards.models.UserTableModel;
 import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
@@ -19,13 +21,13 @@ import java.util.Vector;
 public class UsersView implements Routes {
     private JTable table;
     private final Logger logger = LoggerFactory.getLogger(UsersView.class.getName());
-    private Toast toast;
+    private Toast toastr;
 
     @Override
     public void launch(ContextFrame context) {
         JPanel frame = context.getApp().getContext();
 
-        toast = new Toast(frame);
+        toastr = new Toast(frame);
         frame.setLayout(new GridLayout(3,1, 100, 100));
 
         UserTableModel model = new UserTableModel();
@@ -48,6 +50,15 @@ public class UsersView implements Routes {
         JButton edit = new JButton("Modifier");
         JButton delete = new JButton("Supprimer");
         JButton read = new JButton("details");
+
+        read.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                int selectedRow = table.getSelectedRow();
+                Map user = model.getUserList().get(selectedRow);
+                new UserDetails(context.frame(), user);
+            }
+        });
 
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         actionPanel.add(edit, FlowLayout.LEFT);
@@ -96,7 +107,7 @@ public class UsersView implements Routes {
                 Map data = Map.of("name", nameField.getText());
                 Boolean response = model.addData(data);
                 if(response) {
-                    toast.success("Utilisateur est bien enregister");
+                    toastr.success("Utilisateur est bien enregister");
                     refresh();
                 }
 
@@ -117,6 +128,6 @@ public class UsersView implements Routes {
         table.invalidate();
         table.validate();
         table.repaint();
-        toast.success("Tableau est bien rafraîchi");
+        toastr.success("Tableau est bien rafraîchi");
     }
 }

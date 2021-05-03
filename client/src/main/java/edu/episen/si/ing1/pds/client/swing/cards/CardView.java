@@ -130,7 +130,8 @@ public class CardView implements Routes {
                             { "Matricule", data.get("cardUId").toString() },
                             { "Provisoire", data.get("expirable").equals(true) ? "Oui" : "Non" },
                             { "Nom d'utilisateur", ( (Map) data.get("user")).get("name").toString() },
-                            { "Expiration", data.get("expiredDate") == null ? "Infini" : data.get("expiredDate").toString()}
+                            { "Expiration", data.get("expiredDate") == null ? "Infini" : data.get("expiredDate").toString()},
+                            { "Utisilateur", ((Map)data.get("user")).get("name").toString() }
                     };
                     JTable showTable = new JTable(rows, new String[]{ " ", " " });
                     showTable.setOpaque(false);

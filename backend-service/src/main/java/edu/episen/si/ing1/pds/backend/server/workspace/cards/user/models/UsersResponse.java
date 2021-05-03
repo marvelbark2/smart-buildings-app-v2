@@ -38,4 +38,13 @@ public class UsersResponse {
     public void setRole(RoleResponse role) {
         this.role = role;
     }
+
+    @Override
+    public String toString() {
+        return "UsersResponse{" +
+                "userUId='" + userUId + '\'' +
+                ", name='" + name + '\'' +
+                ", role=" + role +
+                '}';
+    }
 }

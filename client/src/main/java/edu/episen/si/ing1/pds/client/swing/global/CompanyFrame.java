@@ -10,13 +10,10 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Map;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
 
 public class CompanyFrame extends JPanel {
-    private final Toast toaster;
     private JComboBox comboBox;
     private List<Map> companies;
 
@@ -34,10 +31,11 @@ public class CompanyFrame extends JPanel {
 
         addLoginButton(mainJPanel);
 
+        copyRightText(mainJPanel);
+
         this.add(mainJPanel);
         this.setVisible(true);
 
-        toaster = new Toast(mainJPanel);
     }
 
     private JPanel getMainJPanel() {
@@ -49,27 +47,6 @@ public class CompanyFrame extends JPanel {
         panel1.setBackground(Ui.COLOR_BACKGROUND);
         panel1.setLayout(null);
 
-        MouseAdapter ma = new MouseAdapter() {
-            int lastX, lastY;
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                lastX = e.getXOnScreen();
-                lastY = e.getYOnScreen();
-            }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                int x = e.getXOnScreen();
-                int y = e.getYOnScreen();
-                setLocation(getLocationOnScreen().x + x - lastX, getLocationOnScreen().y + y - lastY);
-                lastX = x;
-                lastY = y;
-            }
-        };
-
-        panel1.addMouseListener(ma);
-        panel1.addMouseMotionListener(ma);
 
         return panel1;
     }
@@ -87,7 +64,7 @@ public class CompanyFrame extends JPanel {
         label1.setFocusable(false);
         Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource("icon/logo.png"));
         label1.setIcon(new ImageIcon(icon));
-        label1.setBounds(55, 146, 200, 110);
+        label1.setBounds(55, 120, 200, 110);
         label1.setVisible(true);
         panel1.add(label1);
     }
@@ -179,10 +156,21 @@ public class CompanyFrame extends JPanel {
         panel1.add(loginButton);
     }
 
+    private void copyRightText(JPanel panel1) {
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        JLabel cr = new JLabel("SmartBuilding © 2020 - " + year);
+        cr.setForeground(Ui.OFFWHITE);
+        cr.setOpaque(false);
+        cr.setFont(Ui.FONT_COPYRIGHT);
+        cr.setBounds(625, 320, 300, 50);
+        panel1.add(cr);
+    }
+
     private void loginEventHandler() {
-        toaster.success("Veuillez Patientez ...");
+        Toast toastr = new Toast(getMainJPanel());
+        toastr.success("Veuillez Patientez ...");
         Map selectedMap = (Map) comboBox.getSelectedItem();
-        Utils.setCompanyId((Integer) selectedMap.get("id_companies"));
+        Utils.setCompanyId((Integer) selectedMap.get("id_companies"), selectedMap.get("name").toString());
         app.loadSystemWindow();
     }
 

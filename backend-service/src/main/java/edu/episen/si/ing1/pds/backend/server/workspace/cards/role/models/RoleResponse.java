@@ -8,7 +8,7 @@ public class RoleResponse {
 
     public RoleResponse(Role role) {
         roleId = role.getRoleId();
-        abbreviation = role.getAbbrevation();
+        abbreviation = role.getAbbreviation();
         designation = role.getDesignation();
         enabled = role.isEnabled();
     }
@@ -43,5 +43,15 @@ public class RoleResponse {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    @Override
+    public String toString() {
+        return "RoleResponse{" +
+                "roleId=" + roleId +
+                ", abbreviation='" + abbreviation + '\'' +
+                ", designation='" + designation + '\'' +
+                ", enabled=" + enabled +
+                '}';
     }
 }

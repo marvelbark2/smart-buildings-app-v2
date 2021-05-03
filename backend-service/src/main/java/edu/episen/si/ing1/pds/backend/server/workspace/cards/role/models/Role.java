@@ -2,7 +2,7 @@ package edu.episen.si.ing1.pds.backend.server.workspace.cards.role.models;
 
 public class Role {
     private int roleId;
-    private String abbrevation;
+    private String abbreviation;
     private String designation;
     private boolean enabled;
 
@@ -14,12 +14,12 @@ public class Role {
         this.roleId = roleId;
     }
 
-    public String getAbbrevation() {
-        return abbrevation;
+    public String getAbbreviation() {
+        return abbreviation;
     }
 
-    public void setAbbrevation(String abbrevation) {
-        this.abbrevation = abbrevation;
+    public void setAbbreviation(String abbrevation) {
+        this.abbreviation = abbrevation;
     }
 
     public String getDesignation() {
@@ -42,7 +42,7 @@ public class Role {
     public String toString() {
         return "Role{" +
                 "roleId=" + roleId +
-                ", abbrevation='" + abbrevation + '\'' +
+                ", abbrevation='" + abbreviation + '\'' +
                 ", designation='" + designation + '\'' +
                 ", enabled=" + enabled +
                 '}';

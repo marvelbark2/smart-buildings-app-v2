@@ -35,7 +35,7 @@ public class RoleService implements IRoleService<RoleRequest, RoleResponse> {
             while (rs.next()) {
                 Role role = new Role();
                 role.setRoleId(rs.getInt("roleid"));
-                role.setAbbrevation(rs.getString("abbreviation"));
+                role.setAbbreviation(rs.getString("abbreviation"));
                 role.setDesignation(rs.getString("designation"));
                 role.setEnabled(rs.getBoolean("enabled"));
                 RoleResponse item = new RoleResponse(role);

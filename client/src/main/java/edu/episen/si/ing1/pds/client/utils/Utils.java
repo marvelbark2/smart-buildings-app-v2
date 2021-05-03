@@ -16,8 +16,9 @@ public class Utils {
     private static boolean guestPage = true;
     private static String companyName;
 
-    public static void setCompanyId(int companyId) {
+    public static void setCompanyId(int companyId, String companyName) {
         Utils.companyId = companyId;
+        Utils.companyName = companyName;
         Utils.guestPage = false;
     }
 
@@ -28,6 +29,10 @@ public class Utils {
 
     public static int getCompanyId() {
         return companyId;
+    }
+
+    public static String getCompanyName() {
+        return companyName;
     }
 
     public static boolean isGuestPage() {
@@ -68,13 +73,10 @@ public class Utils {
         }
         return builder.toString();
     }
-    public static void runCommand(Command command, Object object) {
-        command.execute(object);
-    }
 
     public static Response sendRequest(Request request) {
-        PrintWriter writer = null;
-        BufferedReader reader = null;
+        PrintWriter writer;
+        BufferedReader reader;
         Response response = null;
         try {
             String event = request.getEvent();

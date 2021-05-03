@@ -1,8 +1,14 @@
 package edu.episen.si.ing1.pds.backend.server.workspace.cards.user.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardRequest;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardsResponse;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.services.CardService;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.services.ICardService;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.models.Role;
-import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.Users;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersRequest;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersResponse;
@@ -10,9 +16,10 @@ import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersRe
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-public class UsersService implements Services<UsersRequest, UsersResponse> {
+public class UsersService implements IUsersService<UsersRequest, UsersResponse> {
     private final Connection connection;
     private int companyId;
     private SqlConfig sql = SqlConfig.Instance;
@@ -33,7 +40,7 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
             while (rs.next()) {
                 Role role = new Role();
                 role.setRoleId(rs.getInt("roleid"));
-                role.setAbbrevation(rs.getString("abbreviation"));
+                role.setAbbreviation(rs.getString("abbreviation"));
                 role.setDesignation(rs.getString("designation"));
                 role.setEnabled(rs.getBoolean("enabled"));
 
@@ -104,5 +111,21 @@ public class UsersService implements Services<UsersRequest, UsersResponse> {
     @Override
     public void setCompanyId(int companyId) {
         this.companyId = companyId;
+    }
+
+    @Override
+    public JsonNode findUser(UsersRequest user) {
+        ObjectMapper mapper = new ObjectMapper();
+        ICardService<CardRequest, CardsResponse> cardsService = new CardService(connection);
+        cardsService.setCompanyId(companyId);
+        List<CardsResponse> cards = cardsService.findAll();
+
+        CardsResponse userCard = cards.stream().filter(card -> card.getUser().getUserUId().equals(user.getUserUId())).findAny().get();
+        ObjectNode tree = mapper.createObjectNode();
+        JsonNode userNode = mapper.valueToTree(user);
+        JsonNode cardNode = mapper.valueToTree(userCard);
+        tree.set("user", userNode);
+        tree.set("card", cardNode);
+        return tree;
     }
 }

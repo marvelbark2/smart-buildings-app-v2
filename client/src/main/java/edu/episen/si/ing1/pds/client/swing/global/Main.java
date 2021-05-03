@@ -49,7 +49,7 @@ public class Main implements MouseListener {
     }
 
     public void loadSystemWindow() {
-        frame.setResizable(true);
+        frame.setResizable(false);
         frame.setSize(1800, 1000);
 
         frame.setPreferredSize(frame.getSize());
@@ -78,7 +78,7 @@ public class Main implements MouseListener {
         JPanel header = new JPanel(new BorderLayout());
 
         JPanel logo = new JPanel();
-        JLabel label = new JLabel("Logo", SwingUtilities.CENTER);
+        JLabel label = new JLabel(Utils.getCompanyName(), SwingUtilities.CENTER);
         header.setBackground(new Color(54, 38, 90));
         label.setForeground(Color.white);
         logo.add(label);
