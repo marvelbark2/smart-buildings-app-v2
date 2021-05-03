@@ -86,7 +86,7 @@ public class Main implements MouseListener {
 
         JPanel leftPanel = new JPanel();
         JLabel disconnect = new JLabel("Se déconnecter", SwingUtilities.CENTER);
-        disconnect.setSize(100, 75);
+        disconnect.setSize(130, 75);
         disconnect.setMinimumSize(disconnect.getSize());
         disconnect.setPreferredSize(disconnect.getSize());
         disconnect.setMaximumSize(disconnect.getSize());
@@ -150,15 +150,16 @@ public class Main implements MouseListener {
         menu.setLayout(new BoxLayout(menu, BoxLayout.Y_AXIS));
         menu.add(Box.createVerticalStrut(100));
 
-        JLabel location = new MenuItem("Louer et configurer un Digital Workplace");
+        JLabel location = new MenuItem("Louer un Digital Workplace");
         frames.put(location, new LocationMenu(this));
         location.addMouseListener(this);
+    
 
-        JLabel mapping = new MenuItem("Configurer les équipements et capteurs d'un Digital Workplace");
+        JLabel mapping = new MenuItem("Configurer les équipements");
         frames.put(mapping, new Mapping_Window(this));
         mapping.addMouseListener(this);
 
-        JLabel acces = new MenuItem("Configurer une carte d'accès au Digital Workplace");
+        JLabel acces = new MenuItem("Configurer les cartes d'accès");
         acces.addMouseListener(this);
         frames.put(acces, new ContextFrame(this));
 

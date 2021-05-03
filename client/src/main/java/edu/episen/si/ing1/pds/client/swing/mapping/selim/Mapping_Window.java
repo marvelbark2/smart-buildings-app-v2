@@ -76,7 +76,7 @@ public class Mapping_Window implements Navigate {
 		Response response = Utils.sendRequest(request);
           Map<Map, List<Map>> dataMap = ( Map<Map, List<Map>>) response.getMessage();
 
-		DefaultMutableTreeNode racine = new DefaultMutableTreeNode("racine");
+		DefaultMutableTreeNode racine = new DefaultMutableTreeNode(Utils.getCompanyName());
 
 		for (Object building: dataMap.keySet()) {
 		    Map buildingMap = Utils.toMap(building.toString());
@@ -251,7 +251,7 @@ public class Mapping_Window implements Navigate {
         contentPane.add(content);
 
 
-        contentPane.add(createToolBar(), BorderLayout.SOUTH);
+        contentPane.add(createToolBar(), BorderLayout.NORTH);
         global.getFrame().pack();
 
 
