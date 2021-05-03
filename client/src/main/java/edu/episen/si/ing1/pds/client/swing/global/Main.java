@@ -160,13 +160,19 @@ public class Main implements MouseListener {
         frames.put(mapping, new Mapping_Window(this));
         mapping.addMouseListener(this);
 
-        JLabel acces = new MenuItem("Configurer les cartes d'accès");
-        acces.addMouseListener(this);
-        frames.put(acces, new ContextFrame(this));
+        JLabel access = new MenuItem("Configurer les cartes d'accès");
+        access.addMouseListener(this);
+        frames.put(access, new ContextFrame(this));
+
+        JLabel windows = new MenuItem("Configurer les fenêtres");
+        windows.addMouseListener(this);
+        frames.put(windows, null);
+
 
         menu.add(location);
         menu.add(mapping);
-        menu.add(acces);
+        menu.add(access);
+        menu.add(windows);
         menu.add(Box.createGlue());
 
         menu.setBackground(new Color(54, 38, 90));
