@@ -147,7 +147,7 @@ public class Mapping_Window implements Navigate {
    
     private JPanel carte(Integer id) {
         Request request=new Request();
-        request.setEvent("building_list");
+        request.setEvent("mapping_list");
         request.setData(Map.of("workspace_id", id));
         Response response = Utils.sendRequest(request);
         List<Map> data=(List<Map>) response.getMessage();
@@ -158,7 +158,7 @@ public class Mapping_Window implements Navigate {
         gcon.weightx = 1;
         gcon.weighty = 1;
 
-        System.out.println(data.size());
+        
 
         gcon.fill = GridBagConstraints.BOTH;
 
@@ -245,7 +245,7 @@ public class Mapping_Window implements Navigate {
         menuScroll(arbre);
         bloc_equipement();
 
-        JLabel label = new JLabel("Choisissez un espace");
+        JLabel label = new JLabel("Veuillez sélectionnez un espace à configurer à l'aide de l’arborescence sur votre gauche");
         content.add(label);
 
         contentPane.add(content);
