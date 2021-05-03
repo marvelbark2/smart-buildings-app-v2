@@ -1,12 +1,8 @@
 package edu.episen.si.ing1.pds.backend.server;
 
 import edu.episen.si.ing1.pds.backend.server.network.Server;
-import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 import edu.episen.si.ing1.pds.backend.server.pool.PoolFactory;
 import edu.episen.si.ing1.pds.backend.server.pool.config.DBConfig;
-import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
-import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.services.UsersService;
 import org.apache.commons.cli.*;
 
 import org.slf4j.Logger;

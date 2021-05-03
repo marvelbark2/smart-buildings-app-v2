@@ -1,9 +1,8 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.cards.services;
+package edu.episen.si.ing1.pds.backend.server.workspace.cards.card.services;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 

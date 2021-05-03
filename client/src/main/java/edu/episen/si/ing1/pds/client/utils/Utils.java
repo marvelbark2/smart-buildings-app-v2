@@ -14,6 +14,7 @@ public class Utils {
 
     private static int companyId;
     private static boolean guestPage = true;
+    private static String companyName;
 
     public static void setCompanyId(int companyId) {
         Utils.companyId = companyId;

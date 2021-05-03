@@ -1,20 +1,30 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.cards.models;
+package edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models;
+
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.models.Users;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersResponse;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Cards {
+public class CardsResponse implements Serializable {
     private Long cardId;
     private String cardUId;
     private boolean expirable;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate expiredDate;
+    private UsersResponse user;
     private boolean active;
 
-    private Users user;
+    public CardsResponse(Cards card) {
+        this.cardId = card.getCardId();
+        this.cardUId = card.getCardUId();
+        this.expirable = card.isExpirable();
+        this.expiredDate = card.getExpiredDate();
+        this.user = new UsersResponse(card.getUser());
+        this.active = card.isActive();
+    }
 
     public Long getCardId() {
         return cardId;
@@ -48,11 +58,11 @@ public class Cards {
         this.expiredDate = expiredDate;
     }
 
-    public Users getUser() {
+    public UsersResponse getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(UsersResponse user) {
         this.user = user;
     }
 
@@ -62,5 +72,16 @@ public class Cards {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    @Override
+    public String toString() {
+        return "CardsResponse{" +
+                "cardId=" + cardId +
+                ", cardUId='" + cardUId + '\'' +
+                ", expirable=" + expirable +
+                ", expiredDate=" + expiredDate +
+                ", active=" + active +
+                '}';
     }
 }

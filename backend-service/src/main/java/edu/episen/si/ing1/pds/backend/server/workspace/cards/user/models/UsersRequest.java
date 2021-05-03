@@ -1,8 +1,11 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.users.models;
+package edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models;
+
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.models.RoleRequest;
 
 public class UsersRequest {
     private String userUId;
     private String name;
+    private RoleRequest role;
 
     public String getUserUId() {
         return userUId;
@@ -18,5 +21,13 @@ public class UsersRequest {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public RoleRequest getRole() {
+        return role;
+    }
+
+    public void setRole(RoleRequest role) {
+        this.role = role;
     }
 }

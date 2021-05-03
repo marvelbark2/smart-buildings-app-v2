@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.users.network;
+package edu.episen.si.ing1.pds.backend.server.workspace.cards.user.network;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.backend.server.network.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.services.UsersService;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersRequest;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.services.UsersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

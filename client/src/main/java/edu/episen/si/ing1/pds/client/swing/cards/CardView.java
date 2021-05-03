@@ -24,6 +24,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -168,16 +170,22 @@ public class CardView implements Routes {
                         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
                             Object object = ((DefaultMutableTreeNode) value).getUserObject();
-
                             if(object instanceof Map) {
                                 Map val = (Map) object;
-                                setText(val.get("workspace_type").toString());
-                                String path = (Boolean)val.get("access") ? "icon/granted.png" : "icon/forbidden.png";
+                                boolean bool = (Boolean)val.get("access");
+                                String path = "";
+                                if(bool) {
+                                    path = "icon/granted.png";
+                                    logger.info(val.toString());
+                                } else {
+                                    path = "icon/forbidden.png";
+                                }
+                                setText(val.get("workspace_type").toString() + " - " + bool);
+
                                 Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource(path));
                                 Image resised = icon.getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH);
                                 setIcon(new ImageIcon(resised));
                             }
-
                             return this;
                         }
                     });
@@ -579,11 +587,13 @@ public class CardView implements Routes {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                final Boolean bool = (Boolean) modelTable.getDataSource().get(row).get("active");
-                if(!bool) {
-                    setBackground(Color.RED);
+                if(modelTable.getDataSource().size() > row) {
+                    final Boolean bool = (Boolean) modelTable.getDataSource().get(row).get("active");
+                    if(!bool) {
+                        setBackground(Color.RED);
+                    }
+                    setOpaque(isSelected);
                 }
-                setOpaque(isSelected);
                 return this;
             }
         });

@@ -1,25 +1,21 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.cards.network;
+package edu.episen.si.ing1.pds.backend.server.workspace.cards.card.network;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.jsr310.*;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.CardRequest;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.models.CardsResponse;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.services.CardService;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardRequest;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardsResponse;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.services.CardService;
 import edu.episen.si.ing1.pds.backend.server.network.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.services.ICardService;
-import edu.episen.si.ing1.pds.backend.server.workspace.shared.Services;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.models.UsersRequest;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.services.ICardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
