@@ -58,53 +58,30 @@ public class MappingNetwork {
         	try {
         		JsonNode data = request.getData();
                 int id_workspace_equipment = data.get("id_workspace_equipments").asInt();
-                String sql = "UPDATE workspace_equipments SET etat = src/main/resources/icon/ecran.jpg WHERE id_workspace_equipments = ?";
+                String sql = "UPDATE workspace_equipments SET etat = 'icon/ecran.png' WHERE id_workspace_equipments = ?";
                 PreparedStatement statement = connection.prepareStatement(sql);
                 statement.setInt(1, id_workspace_equipment);
-                ResultSet rs = statement.executeQuery();
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-        }
-        else if(event.equalsIgnoreCase("floors_list")) {
-        	try {
-        		List<Map> response = new ArrayList<>();
-                Statement statement = connection.createStatement();
-                ResultSet rs = statement.executeQuery("SELECT b.id_buildings, f.floor_number FROM workspace\n"
-                		+ "join floors f on f.id_floor = workspace.floor_number\n"
-                		+ "join buildings b on b.id_buildings = f.building_number;");
-                while(rs.next()) {
-                	Map hMap=new HashMap();
-                	//hMap.put("building_number", rs.getInt("building_number"));
-                	hMap.put("floor_number", rs.getInt("floor_number"));
-                	response.add(hMap);
-                }
-                Map responseMsg=Utils.responseFactory(response, event);
-                String serializedMsgString=mapper.writeValueAsString(responseMsg);
-        		writer.println(serializedMsgString);
-        		
-        	} catch (Exception throwables) {
-        		throwables.printStackTrace();
-        	}
-        }
-        else if(event.equalsIgnoreCase("companies_list")) {
-            try {
-                List<Map> response = new ArrayList<>();
-                Statement statement = connection.createStatement();
-                ResultSet rs = statement.executeQuery("SELECT * FROM companies");
-                while (rs.next()) {
-                    Map hMap=new HashMap();
-                    hMap.put("id_companies", rs.getInt("id_companies"));
-                    hMap.put("name", rs.getString("name"));
-                    response.add(hMap);
-                }
-                Map responseMsg=Utils.responseFactory(response, event);
-                String serializedMsgString=mapper.writeValueAsString(responseMsg);
-                writer.println(serializedMsgString);
+                statement.executeUpdate();
 
-            } catch (Exception e ){
-                e.printStackTrace();
-            }
+                String query2 = "SELECT * FROM workspace_equipments WHERE id_workspace_equipments = ?";
+                PreparedStatement stmt = connection.prepareStatement(query2);
+                stmt.setInt(1, id_workspace_equipment);
+                ResultSet rs = stmt.executeQuery();
+                Map hm = new HashMap();
+                if(rs.next()) {
+                    hm.put("id_workspace_equipments", rs.getInt("id_workspace_equipments"));
+                    hm.put("gridx", rs.getInt("gridx"));
+                    hm.put("gridy", rs.getInt("gridy"));
+                    hm.put("gridwidth", rs.getInt("gridwidth"));
+                    hm.put("gridheigth", rs.getInt("gridheight"));
+                    hm.put("equipment_id", rs.getInt("equipment_id"));
+                    hm.put("etat", rs.getString("etat"));
+                }
+                Map formatter = Utils.responseFactory(hm, event);
+                writer.println(mapper.writeValueAsString(formatter));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
         }
         else if(event.equalsIgnoreCase("tree_list")){
         	 String sql = "SELECT b.name,b.id_buildings, f.id_floor, concat('Etage ', f.floor_number) as floor, w.workspace_label, w.id_workspace FROM workspace w join floors f on f.id_floor = w.floor_number join buildings b on f.building_number = b.id_buildings JOIN reservations r on w.id_workspace = r.id_workspace WHERE r.id_companies = ?";
