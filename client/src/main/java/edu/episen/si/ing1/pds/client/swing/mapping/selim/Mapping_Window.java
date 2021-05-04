@@ -5,12 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -28,8 +30,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 
 
-
-
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 
@@ -42,6 +42,7 @@ import edu.episen.si.ing1.pds.client.utils.Utils;
 public class Mapping_Window implements Navigate {
     Main global;
     private JPanel content = new JPanel();
+    private MyGlassPane glass = new MyGlassPane();
   
 
     public Mapping_Window(Main global) {
@@ -59,7 +60,6 @@ public class Mapping_Window implements Navigate {
 
         menuPanel.removeAll();
         menu.setPreferredSize(new Dimension(200,0));
-
         menuPanel.add(menu);
         menuPanel.invalidate();
         menuPanel.validate();
@@ -166,12 +166,34 @@ public class Mapping_Window implements Navigate {
 
         for(Map e:data) {
             
-        	ImageIcon icon = new ImageIcon(String.valueOf(e.get("etat")));
-        	JButton btn = new JButton(e.get("equipment_id").toString(),icon);
+        	Integer idInteger = Integer.valueOf(e.get("id_workspace_equipments").toString());
+        	
+        	JButton btn = new JButton();
+        	if(!e.get("etat").equals(null)) {
+        		ImageIcon icon = Utils.getImageIconFromResource(e.get("etat").toString());
+            	btn.setIcon(icon);
+        	}
+        	
+        	btn.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					//System.out.println(((AbstractButton) e.getSource()).getText());
+					System.out.println(idInteger);
+					add_equipment(idInteger);
+					
+					
+				}
+			});
+				
+			
+        	
             gcon.gridx = Integer.valueOf(e.get("gridx").toString());
             gcon.gridy = Integer.valueOf(e.get("gridy").toString());
             gcon.gridheight = Integer.valueOf(e.get("gridheigth").toString());
             gcon.gridwidth = Integer.valueOf(e.get("gridwidth").toString());
+            btn.addMouseListener(new MouseGlassListener(glass));
+            btn.addMouseMotionListener(new MouseGlassMotionListener(glass));
             btn.setTransferHandler(new TransferHandler("icon"));
             carte.add(btn, gcon);
             
@@ -182,36 +204,56 @@ public class Mapping_Window implements Navigate {
         return carte;
 
     }
+    
+    private void add_equipment(int id_workspace_equipment) {
+    	
+    	Request request=new Request();
+    	request.setEvent("add_ecran");
+    	request.setData(Map.of("id_workspace_equipments", id_workspace_equipment));
+    	Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON 
+    }
 
     private void bloc_equipement() {
 
         JPanel bloc = global.getBloc();
-        bloc.setLayout(new GridLayout(3,1));
+        bloc.setLayout(new GridLayout(5,1));
         
-        ImageIcon icon1 = new ImageIcon("src/main/resources/icon/sensor.png");
-        ImageIcon icon2 = new ImageIcon("src/main/resources/icon/ecran.jpg");
-        ImageIcon icon3 = new ImageIcon("src/main/resources/icon/prise.jpg");
-
+        //ImageIcon icon1 = Utils.getImageIconFromResource("icon/capteur.png");
+        ImageIcon icon1 = new ImageIcon("icon/ecran");
+        ImageIcon icon2 = Utils.getImageIconFromResource("icon/ecran.png");
+        ImageIcon icon3 = Utils.getImageIconFromResource("icon/fenetre.png");
+        ImageIcon icon4 = Utils.getImageIconFromResource("icon/prise.png");
+        
+        String str = "Veuillez déplacer les equipements";
+        JLabel label0 = new JLabel(str,JLabel.CENTER);
+        
         JLabel label1 = new JLabel(icon1, JLabel.CENTER);
         JLabel label2 = new JLabel(icon2, JLabel.CENTER);
         JLabel label3 = new JLabel(icon3, JLabel.CENTER);
+        JLabel label4 = new JLabel(icon4, JLabel.CENTER);
 
-        DragMouseAdapter listener = new DragMouseAdapter();
+       /* DragMouseAdapter listener = new DragMouseAdapter();
         label1.addMouseListener(listener);
         label2.addMouseListener(listener);
         label3.addMouseListener(listener);
+        label4.addMouseListener(listener);
 
+        */
         
-
+        label1.addMouseListener(new MouseGlassListener(glass));
+        label1.addMouseMotionListener(new MouseGlassMotionListener(glass));
+        
         label1.setTransferHandler(new TransferHandler("icon"));
         label2.setTransferHandler(new TransferHandler("icon"));
         label3.setTransferHandler(new TransferHandler("icon"));
+        label4.setTransferHandler(new TransferHandler("icon"));
     
       
-
+        bloc.add(label0);
         bloc.add(label1);
         bloc.add(label2);
         bloc.add(label3);
+        bloc.add(label4);
         bloc.setVisible(true);
         bloc.repaint();
     }
@@ -260,8 +302,10 @@ public class Mapping_Window implements Navigate {
 
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
 
-    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

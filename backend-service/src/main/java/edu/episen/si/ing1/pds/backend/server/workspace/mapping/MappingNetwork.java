@@ -35,6 +35,7 @@ public class MappingNetwork {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 Map hm = new HashMap();
+                hm.put("id_workspace_equipments", rs.getInt("id_workspace_equipments"));
                 hm.put("gridx", rs.getInt("gridx"));
                 hm.put("gridy", rs.getInt("gridy"));
                 hm.put("gridwidth", rs.getInt("gridwidth"));
@@ -52,6 +53,18 @@ public class MappingNetwork {
             throwables.printStackTrace();
         }
 
+        }
+        else if(event.equalsIgnoreCase("add_ecran")) {
+        	try {
+        		JsonNode data = request.getData();
+                int id_workspace_equipment = data.get("id_workspace_equipments").asInt();
+                String sql = "UPDATE workspace_equipments SET etat = src/main/resources/icon/ecran.jpg WHERE id_workspace_equipments = ?";
+                PreparedStatement statement = connection.prepareStatement(sql);
+                statement.setInt(1, id_workspace_equipment);
+                ResultSet rs = statement.executeQuery();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
         }
         else if(event.equalsIgnoreCase("floors_list")) {
         	try {
