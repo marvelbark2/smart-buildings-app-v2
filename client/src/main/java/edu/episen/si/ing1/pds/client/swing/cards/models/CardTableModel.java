@@ -10,7 +10,7 @@ import javax.swing.table.AbstractTableModel;
 import java.util.List;
 import java.util.Map;
 
-public class CardTableModel extends AbstractTableModel {
+public class CardTableModel extends DataTable {
     List<Map> cardList;
 
     public CardTableModel() {
@@ -55,7 +55,9 @@ public class CardTableModel extends AbstractTableModel {
         super.setValueAt(aValue, rowIndex, columnIndex);
     }
 
-    public Boolean addData(Request insertCardReq) {
+    public Boolean addData(Map data) {
+        Request insertCardReq = new Request();
+        insertCardReq.setEvent("card_insert");
         Response response = Utils.sendRequest(insertCardReq);
         return (Boolean) response.getMessage();
     }

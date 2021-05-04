@@ -9,7 +9,7 @@ import javax.swing.table.AbstractTableModel;
 import java.util.List;
 import java.util.Map;
 
-public class UserTableModel extends AbstractTableModel {
+public class UserTableModel extends DataTable {
 
     private List<Map> userList;
 
@@ -53,7 +53,7 @@ public class UserTableModel extends AbstractTableModel {
         return isInserted;
     }
 
-    public List<Map> getUserList() {
+    public List<Map> getDataSource() {
         return userList;
     }
 }

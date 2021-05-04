@@ -2,6 +2,7 @@ package edu.episen.si.ing1.pds.client.swing.cards;
 
 import edu.episen.si.ing1.pds.client.swing.cards.access.CardRoleTest;
 import edu.episen.si.ing1.pds.client.swing.cards.card.CardView;
+import edu.episen.si.ing1.pds.client.swing.cards.roles.RoleList;
 import edu.episen.si.ing1.pds.client.swing.cards.user.UsersView;
 import edu.episen.si.ing1.pds.client.swing.global.Main;
 import edu.episen.si.ing1.pds.client.swing.global.Navigate;
@@ -59,10 +60,12 @@ public class ContextFrame implements Navigate {
         userTest.addActionListener(this);
         cardTest.addActionListener(this);
         permissionTest.addActionListener(this);
+        roleTest.addActionListener(this);
 
         frames.put(cardTest, new CardView());
         frames.put(permissionTest, new CardRoleTest());
         frames.put(userTest, new UsersView());
+        frames.put(roleTest, new RoleList());
 
         buttons.add(cardTest);
         buttons.add(roleTest);

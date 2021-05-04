@@ -36,7 +36,12 @@ public class AccessService implements IAccessService {
     @Override
     public ArrayNode buildingList() {
         ArrayNode list = mapper.createArrayNode();
-        String query = "SELECT DISTINCT b.id_buildings, b.name FROM buildings b join floors f on b.id_buildings = f.building_number join workspace w on f.id_floor = w.floor_number join reservations r on w.id_workspace = r.id_workspace join companies c on r.id_companies = c.id_companies join workspace_equipments we on w.id_workspace = we.id_workspace join equipments e on we.equipment_id = e.id_equipments where c.id_companies = ?";
+        String query = "SELECT distinct b.id_buildings, b.name  FROM buildings b\n" +
+                "    join floors f on b.id_buildings = f.building_number\n" +
+                "    join workspace w on f.id_floor = w.floor_number\n" +
+                "    join reservations r on w.id_workspace = r.id_workspace\n" +
+                "    join companies c on r.id_companies = c.id_companies\n" +
+                "where c.id_companies = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, companyId);
@@ -57,7 +62,12 @@ public class AccessService implements IAccessService {
     @Override
     public ArrayNode floorList(int buildId) {
         ArrayNode list = mapper.createArrayNode();
-        String query = "SELECT DISTINCT f.id_floor, concat('Etage ', f.floor_number) as floor FROM buildings b join floors f on b.id_buildings = f.building_number join workspace w on f.id_floor = w.floor_number join reservations r on w.id_workspace = r.id_workspace join companies c on r.id_companies = c.id_companies join workspace_equipments we on w.id_workspace = we.id_workspace join equipments e on we.equipment_id = e.id_equipments where c.id_companies = ? and b.id_buildings = ?";
+        String query = "SELECT DISTINCT f.id_floor, concat('Etage ', f.floor_number) as floor  FROM buildings b\n" +
+                "    join floors f on b.id_buildings = f.building_number\n" +
+                "    join workspace w on f.id_floor = w.floor_number\n" +
+                "    join reservations r on w.id_workspace = r.id_workspace\n" +
+                "    join companies c on r.id_companies = c.id_companies\n" +
+                "where c.id_companies = ? and b.id_buildings = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, companyId);
@@ -78,16 +88,15 @@ public class AccessService implements IAccessService {
     @Override
     public ArrayNode workspaceList(int floorId) {
         ArrayNode list = mapper.createArrayNode();
-        String query = "SELECT DISTINCT w.id_workspace, w.workspace_label as name FROM buildings b join floors f on b.id_buildings = f.building_number join workspace w on f.id_floor = w.floor_number join reservations r on w.id_workspace = r.id_workspace join companies c on r.id_companies = c.id_companies join workspace_equipments we on w.id_workspace = we.id_workspace join equipments e on we.equipment_id = e.id_equipments where c.id_companies = ? and f.id_floor = ?";
+        String query = "SELECT id_workspace, workspace_label FROM workspace where floor_number = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1, companyId);
-            statement.setInt(2, floorId);
+            statement.setInt(1, floorId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 Map<String, Object> workspace = new HashMap<>();
                 workspace.put("workspace_id", rs.getInt("id_workspace"));
-                workspace.put("name", rs.getString("name"));
+                workspace.put("name", rs.getString("workspace_label"));
                 list.add(mapper.valueToTree(workspace));
             }
         } catch (Exception e) {

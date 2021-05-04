@@ -4,6 +4,7 @@ import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.cards.Routes;
+import edu.episen.si.ing1.pds.client.swing.cards.models.DataTable;
 import edu.episen.si.ing1.pds.client.swing.cards.models.UserTableModel;
 import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
@@ -31,7 +32,7 @@ public class UsersView implements Routes {
         toastr = new Toast(frame);
         frame.setLayout(new GridLayout(3,1, 100, 100));
 
-        UserTableModel model = new UserTableModel();
+        DataTable model = new UserTableModel();
         table = new JTable(model);
 
         table.setVisible(true);
@@ -56,7 +57,7 @@ public class UsersView implements Routes {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 int selectedRow = table.getSelectedRow();
-                Map user = model.getUserList().get(selectedRow);
+                Map user = model.getDataSource().get(selectedRow);
                 new UserDetails(context.frame(), user);
             }
         });
@@ -66,7 +67,7 @@ public class UsersView implements Routes {
             public void actionPerformed(ActionEvent actionEvent) {
                 int selectedRow = table.getSelectedRow();
                 if(table.isRowSelected(selectedRow)) {
-                    Map user = model.getUserList().get(selectedRow);
+                    Map user = model.getDataSource().get(selectedRow);
                     Boolean deleteUser = UserRequests.deleteUser(user);
                     if(deleteUser) {
                         toastr.success("Utilisateur est bien supprimer");

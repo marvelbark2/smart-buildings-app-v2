@@ -2,8 +2,10 @@ package edu.episen.si.ing1.pds.client.swing.cards.card;
 
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
+import edu.episen.si.ing1.pds.client.swing.cards.ComponentRegister;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.cards.Routes;
+import edu.episen.si.ing1.pds.client.swing.cards.card.listeners.CardButtonListener;
 import edu.episen.si.ing1.pds.client.swing.cards.models.CardTableModel;
 import edu.episen.si.ing1.pds.client.swing.cards.models.DualListBox;
 import edu.episen.si.ing1.pds.client.swing.global.MenuItem;
@@ -15,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -29,7 +29,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CardView implements Routes {
     private final Logger logger = LoggerFactory.getLogger(CardView.class.getName());
@@ -40,6 +39,9 @@ public class CardView implements Routes {
     public void launch(ContextFrame context) {
         JPanel frame = context.getApp().getContext();
 
+        ComponentRegister register = ComponentRegister.Instance;
+        register.registerContainer("context", context);
+
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         toast = new Toast(panel);
@@ -47,6 +49,10 @@ public class CardView implements Routes {
         CardTableModel tableModel = new CardTableModel();
         dataTable = tableModel.getDataSource();
         JTable table = new JTable(tableModel);
+
+
+        register.registerTable("card_table", table);
+        register.registerDataTable("card_dataTable", tableModel);
 
         handlecardStatus(table, tableModel);
 
@@ -78,12 +84,19 @@ public class CardView implements Routes {
         JPanel btnPanel = new JPanel(new GridLayout(1, 3, 20, 30));
         btnPanel.setBorder(BorderFactory.createTitledBorder("Operations"));
 
+        ActionListener cardButtonListeners = new CardButtonListener();
+
         JButton edit = new JButton("Modifier");
         edit.setPreferredSize(new Dimension(40, 40));
+        register.registerButton("card_edit", edit);
+
         JButton delete = new JButton("Supprimer");
         delete.setPreferredSize(new Dimension(40, 40));
+        register.registerButton("card_delete", delete);
+
         JButton details = new JButton("details");
         details.setPreferredSize(new Dimension(40, 40));
+        register.registerButton("card_details", details);
 
         details.addActionListener(new ActionListener() {
             @Override
@@ -232,205 +245,206 @@ public class CardView implements Routes {
                 logger.error("Select a row");
             }
         });
-        edit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
-                if (table.isRowSelected(selectedRow)) {
-                    Request request = new Request();
-                    request.setEvent("card_byid");
-                    request.setData(Map.of(
-                            "id",
-                            Integer.parseInt(dataTable.get(selectedRow).get(tableModel.getColumnName(0)).toString()))
-                    );
-                    Response response = Utils.sendRequest(request);
-                    Map<String, Object> responseBody = (Map<String, Object>) response.getMessage();
-                    Map<String, Object> data = (Map<String, Object>) responseBody.get("card");
-                    JDialog dialog = new JDialog(context.frame());
-                    dialog.setSize(700,800);
-
-                    dialog.setPreferredSize(dialog.getSize());
-                    JPanel dialogPanel = new JPanel(new GridLayout(4,2, 25, 25));
-                    dialogPanel.setBorder(BorderFactory.createTitledBorder("Modifer la carte"));
-
-                    Request requestUserList = new Request();
-                    requestUserList.setEvent("user_list");
-                    Response rsponse = Utils.sendRequest(requestUserList);
-                    List userList = (List) rsponse.getMessage();
-                    JComboBox comboBox = new JComboBox(new Vector(userList));
-                    comboBox.setPreferredSize(new Dimension(250, 25));
-
-                    comboBox.setRenderer(new DefaultListCellRenderer() {
-                        @Override
-                        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                            if (value instanceof Map) {
-                                Map<String, String> val = (Map<String, String>) value;
-                                setText(val.get("name"));
-                            }
-                            if(index == -1 && value == null) {
-                                setText(((Map) data.get("user")).get("name").toString());
-                            }
-                            return this;
-                        }
-                    });
-
-                    comboBox.addActionListener(evt -> {
-                        JComboBox self = (JComboBox) evt.getSource();
-                        Map o = (Map) self.getSelectedItem();
-                    });
-
-                    comboBox.setSelectedIndex(-1);
-
-                    JPanel userFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-                    JLabel userFieldFor = new JLabel("Utilisateur");
-                    userFieldPanel.add(userFieldFor);
-                    userFieldPanel.add(comboBox);
-
-                    JPanel serialFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-                    JLabel serialFieldFor = new JLabel("Matricule");
-                    JTextField serialField = new JTextField(20);
-                    serialField.setText(data.get("cardUId").toString());
-                    JButton snGenerator = new JButton("Generer 1");
-                    snGenerator.addActionListener(evt -> serialField.setText(Utils.generateSerialNumber()));
-                    serialFieldPanel.add(serialFieldFor);
-                    serialFieldPanel.add(serialField);
-                    serialFieldPanel.add(snGenerator);
-
-                    JPanel expirableFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-                    JCheckBox expirableField = new JCheckBox();
-                    expirableField.setSelected((Boolean) data.get("expirable"));
-                    JLabel expirableFieldFor = new JLabel("Expirable");
-                    expirableFieldPanel.add(expirableFieldFor);
-                    expirableFieldPanel.add(expirableField);
-
-                    JPanel expiredDate = new JPanel(new FlowLayout(FlowLayout.CENTER));
-                    JTextField expiredDateField = new JTextField(12);
-                    expiredDateField.setText(data.get("expiredDate") == null ? "Infini" : data.get("expiredDate").toString() );
-                    expiredDateField.setEnabled(expirableField.isSelected());
-                    JLabel expiredDateFieldFor = new JLabel("Date d'expiration");
-                    expiredDate.add(expiredDateFieldFor);
-                    expiredDate.add(expiredDateField);
-
-                    expirableField.addChangeListener(new ChangeListener() {
-                        @Override
-                        public void stateChanged(ChangeEvent e) {
-                            expiredDateField.setEnabled(expirableField.isSelected());
-                        }
-                    });
-
-                    JPanel textFields = new JPanel(new GridLayout(2,2, 25,25));
-                    textFields.add(userFieldPanel);
-                    textFields.add(serialFieldPanel);
-                    textFields.add(expirableFieldPanel);
-                    textFields.add(expiredDate);
-
-                    dialogPanel.add(textFields);
-
-                    JPanel active = new JPanel(new FlowLayout(FlowLayout.CENTER));
-                    JCheckBox activeCard = new JCheckBox("Carte Active");
-                    activeCard.setSelected((Boolean) data.get("active"));
-                    active.add(activeCard);
-
-                    dialogPanel.add(active);
-
-                    DualListBox dual = new DualListBox("accessible");
-
-                    Request requestAccessList = new Request();
-                    requestAccessList.setEvent("card_access_list");
-                    requestAccessList.setData(Map.of("serialId", data.get("cardUId")));
-
-                    Response responseAccessList = Utils.sendRequest(requestAccessList);
-
-                    List<Map> dataAccessList = (List<Map>) responseAccessList.getMessage();
-                    dataAccessList.forEach(map ->map.put("edited", false));
-
-                    List<Map> accessible = dataAccessList.stream().filter(map -> (boolean)map.get("accessible")).collect(Collectors.toList());
-                    List<Map> notAccessible = dataAccessList.stream().filter(map -> ! (boolean)map.get("accessible")).collect(Collectors.toList());
-
-
-
-                    dual.addSourceElements(notAccessible.toArray(new Map[0]));
-                    dual.addDestinationElements(accessible.toArray(new Map[0]));
-                    dual.setRenderer(new DefaultListCellRenderer() {
-                        @Override
-                        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                            if (value instanceof Map) {
-                                Map<String, String> val = (Map<String, String>) value;
-                                setText(val.get("title"));
-                            }
-                            return this;
-                        }
-                    });
-                    dual.setBorder(BorderFactory.createTitledBorder("Gérer les accès"));
-                    dialogPanel.add(dual);
-                    JButton submit = new JButton("Soumttre");
-                    submit.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            Map<String, Object> card = new HashMap<>();
-                            card.put("cardUId", serialField.getText());
-                            card.put("expirable", expirableField.isSelected());
-                            if(expiredDateField.getText().equalsIgnoreCase("infini"))
-                                card.put("expiredDate", null);
-                            else
-                                card.put("expiredDate", expiredDateField.getText());
-                            card.put("active", activeCard.isSelected());
-                            Object user = comboBox.getSelectedItem();
-                            if(user == null)
-                                card.put("user", data.get("user"));
-                            else
-                                card.put("user",user);
-
-                            Iterator source = dual.sourceIterator();
-                            Iterator dest = dual.destinationIterator();
-
-                            List not = new ArrayList();
-                            List accessible = new ArrayList();
-
-                            while (source.hasNext())
-                                not.add(source.next());
-
-                            while (dest.hasNext())
-                                accessible.add(dest.next());
-
-                            List items = new ArrayList();
-                            items.addAll(not);
-                            items.addAll(accessible);
-
-                            Map editData = Map.of(
-                                    "card", card,
-                                    "card_id", data.get("cardId"),
-                                    "workspaces", items
-                            );
-                            Request editReq = new Request();
-                            editReq.setEvent("card_update");
-                            editReq.setData(editData);
-                            Response ediRes = Utils.sendRequest(editReq);
-                            if((Boolean) ediRes.getMessage()) {
-                                toast.success("La modification est bien faite");
-                                updateTable(table, tableModel);
-                                dual.clearDestinationListModel();
-                                dual.clearSourceListModel();
-                                dialog.dispose();
-                            } else {
-                                toast.error("Erreur! Il y a un problème");
-                            }
-                        }
-                    });
-
-                    dialogPanel.add(submit);
-
-                    dialog.setContentPane(dialogPanel);
-                    dialog.setVisible(true);
-                    dialog.pack();
-                }
-                else {
-                    toast.warn("Selectionnez une ligne dans le tableau");
-                }
-            }
-        });
+        edit.addActionListener(cardButtonListeners);
+//        edit.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                int selectedRow = table.getSelectedRow();
+//                if (table.isRowSelected(selectedRow)) {
+//                    Request request = new Request();
+//                    request.setEvent("card_byid");
+//                    request.setData(Map.of(
+//                            "id",
+//                            Integer.parseInt(dataTable.get(selectedRow).get(tableModel.getColumnName(0)).toString()))
+//                    );
+//                    Response response = Utils.sendRequest(request);
+//                    Map<String, Object> responseBody = (Map<String, Object>) response.getMessage();
+//                    Map<String, Object> data = (Map<String, Object>) responseBody.get("card");
+//                    JDialog dialog = new JDialog(context.frame());
+//                    dialog.setSize(700,800);
+//
+//                    dialog.setPreferredSize(dialog.getSize());
+//                    JPanel dialogPanel = new JPanel(new GridLayout(4,2, 25, 25));
+//                    dialogPanel.setBorder(BorderFactory.createTitledBorder("Modifer la carte"));
+//
+//                    Request requestUserList = new Request();
+//                    requestUserList.setEvent("user_list");
+//                    Response rsponse = Utils.sendRequest(requestUserList);
+//                    List userList = (List) rsponse.getMessage();
+//                    JComboBox comboBox = new JComboBox(new Vector(userList));
+//                    comboBox.setPreferredSize(new Dimension(250, 25));
+//
+//                    comboBox.setRenderer(new DefaultListCellRenderer() {
+//                        @Override
+//                        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+//                            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+//                            if (value instanceof Map) {
+//                                Map<String, String> val = (Map<String, String>) value;
+//                                setText(val.get("name"));
+//                            }
+//                            if(index == -1 && value == null) {
+//                                setText(((Map) data.get("user")).get("name").toString());
+//                            }
+//                            return this;
+//                        }
+//                    });
+//
+//                    comboBox.addActionListener(evt -> {
+//                        JComboBox self = (JComboBox) evt.getSource();
+//                        Map o = (Map) self.getSelectedItem();
+//                    });
+//
+//                    comboBox.setSelectedIndex(-1);
+//
+//                    JPanel userFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+//                    JLabel userFieldFor = new JLabel("Utilisateur");
+//                    userFieldPanel.add(userFieldFor);
+//                    userFieldPanel.add(comboBox);
+//
+//                    JPanel serialFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+//                    JLabel serialFieldFor = new JLabel("Matricule");
+//                    JTextField serialField = new JTextField(20);
+//                    serialField.setText(data.get("cardUId").toString());
+//                    JButton snGenerator = new JButton("Generer 1");
+//                    snGenerator.addActionListener(evt -> serialField.setText(Utils.generateSerialNumber()));
+//                    serialFieldPanel.add(serialFieldFor);
+//                    serialFieldPanel.add(serialField);
+//                    serialFieldPanel.add(snGenerator);
+//
+//                    JPanel expirableFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+//                    JCheckBox expirableField = new JCheckBox();
+//                    expirableField.setSelected((Boolean) data.get("expirable"));
+//                    JLabel expirableFieldFor = new JLabel("Expirable");
+//                    expirableFieldPanel.add(expirableFieldFor);
+//                    expirableFieldPanel.add(expirableField);
+//
+//                    JPanel expiredDate = new JPanel(new FlowLayout(FlowLayout.CENTER));
+//                    JTextField expiredDateField = new JTextField(12);
+//                    expiredDateField.setText(data.get("expiredDate") == null ? "Infini" : data.get("expiredDate").toString() );
+//                    expiredDateField.setEnabled(expirableField.isSelected());
+//                    JLabel expiredDateFieldFor = new JLabel("Date d'expiration");
+//                    expiredDate.add(expiredDateFieldFor);
+//                    expiredDate.add(expiredDateField);
+//
+//                    expirableField.addChangeListener(new ChangeListener() {
+//                        @Override
+//                        public void stateChanged(ChangeEvent e) {
+//                            expiredDateField.setEnabled(expirableField.isSelected());
+//                        }
+//                    });
+//
+//                    JPanel textFields = new JPanel(new GridLayout(2,2, 25,25));
+//                    textFields.add(userFieldPanel);
+//                    textFields.add(serialFieldPanel);
+//                    textFields.add(expirableFieldPanel);
+//                    textFields.add(expiredDate);
+//
+//                    dialogPanel.add(textFields);
+//
+//                    JPanel active = new JPanel(new FlowLayout(FlowLayout.CENTER));
+//                    JCheckBox activeCard = new JCheckBox("Carte Active");
+//                    activeCard.setSelected((Boolean) data.get("active"));
+//                    active.add(activeCard);
+//
+//                    dialogPanel.add(active);
+//
+//                    DualListBox dual = new DualListBox("accessible");
+//
+//                    Request requestAccessList = new Request();
+//                    requestAccessList.setEvent("card_access_list");
+//                    requestAccessList.setData(Map.of("serialId", data.get("cardUId")));
+//
+//                    Response responseAccessList = Utils.sendRequest(requestAccessList);
+//
+//                    List<Map> dataAccessList = (List<Map>) responseAccessList.getMessage();
+//                    dataAccessList.forEach(map ->map.put("edited", false));
+//
+//                    List<Map> accessible = dataAccessList.stream().filter(map -> (boolean)map.get("accessible")).collect(Collectors.toList());
+//                    List<Map> notAccessible = dataAccessList.stream().filter(map -> ! (boolean)map.get("accessible")).collect(Collectors.toList());
+//
+//
+//
+//                    dual.addSourceElements(notAccessible.toArray(new Map[0]));
+//                    dual.addDestinationElements(accessible.toArray(new Map[0]));
+//                    dual.setRenderer(new DefaultListCellRenderer() {
+//                        @Override
+//                        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+//                            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+//                            if (value instanceof Map) {
+//                                Map<String, String> val = (Map<String, String>) value;
+//                                setText(val.get("title"));
+//                            }
+//                            return this;
+//                        }
+//                    });
+//                    dual.setBorder(BorderFactory.createTitledBorder("Gérer les accès"));
+//                    dialogPanel.add(dual);
+//                    JButton submit = new JButton("Soumttre");
+//                    submit.addActionListener(new ActionListener() {
+//                        @Override
+//                        public void actionPerformed(ActionEvent e) {
+//                            Map<String, Object> card = new HashMap<>();
+//                            card.put("cardUId", serialField.getText());
+//                            card.put("expirable", expirableField.isSelected());
+//                            if(expiredDateField.getText().equalsIgnoreCase("infini"))
+//                                card.put("expiredDate", null);
+//                            else
+//                                card.put("expiredDate", expiredDateField.getText());
+//                            card.put("active", activeCard.isSelected());
+//                            Object user = comboBox.getSelectedItem();
+//                            if(user == null)
+//                                card.put("user", data.get("user"));
+//                            else
+//                                card.put("user",user);
+//
+//                            Iterator source = dual.sourceIterator();
+//                            Iterator dest = dual.destinationIterator();
+//
+//                            List not = new ArrayList();
+//                            List accessible = new ArrayList();
+//
+//                            while (source.hasNext())
+//                                not.add(source.next());
+//
+//                            while (dest.hasNext())
+//                                accessible.add(dest.next());
+//
+//                            List items = new ArrayList();
+//                            items.addAll(not);
+//                            items.addAll(accessible);
+//
+//                            Map editData = Map.of(
+//                                    "card", card,
+//                                    "card_id", data.get("cardId"),
+//                                    "workspaces", items
+//                            );
+//                            Request editReq = new Request();
+//                            editReq.setEvent("card_update");
+//                            editReq.setData(editData);
+//                            Response ediRes = Utils.sendRequest(editReq);
+//                            if((Boolean) ediRes.getMessage()) {
+//                                toast.success("La modification est bien faite");
+//                                updateTable(table, tableModel);
+//                                dual.clearDestinationListModel();
+//                                dual.clearSourceListModel();
+//                                dialog.dispose();
+//                            } else {
+//                                toast.error("Erreur! Il y a un problème");
+//                            }
+//                        }
+//                    });
+//
+//                    dialogPanel.add(submit);
+//
+//                    dialog.setContentPane(dialogPanel);
+//                    dialog.setVisible(true);
+//                    dialog.pack();
+//                }
+//                else {
+//                    toast.warn("Selectionnez une ligne dans le tableau");
+//                }
+//            }
+//        });
 
         btnPanel.add(edit, BorderLayout.CENTER);
         btnPanel.add(delete, BorderLayout.CENTER);
@@ -449,6 +463,8 @@ public class CardView implements Routes {
         Response response = Utils.sendRequest(requestUserList);
         List userList = (List) response.getMessage();
         JComboBox comboBox = new JComboBox(new Vector(userList));
+
+        register.registerComboBox("user_list", comboBox);
         comboBox.setPreferredSize(new Dimension(250, 25));
         comboBox.setSelectedIndex(-1);
         comboBox.setRenderer(new DefaultListCellRenderer() {
@@ -528,13 +544,11 @@ public class CardView implements Routes {
         submitButton.setSize(100, 100);
         submitButton.addActionListener((e) -> {
             if ((snFieldText.getText() != null && snFieldText.getText().length() >= 20) && (comboBox.getSelectedItem() != null || comboBox.getSelectedIndex() != -1)) {
-                Request insertCardReq = new Request();
-                insertCardReq.setEvent("card_insert");
                 String expireDateValue = "";
                 if (expirable.isSelected())
                     expireDateValue = expirableDate.getText();
 
-                insertCardReq.setData(Map.of("cardUId", snFieldText.getText(), "expirable", expirable.isSelected(), "expiredDate", expireDateValue, "user", comboBox.getSelectedItem()));
+                Map insertCardReq =  Map.of("cardUId", snFieldText.getText(), "expirable", expirable.isSelected(), "expiredDate", expireDateValue, "user", comboBox.getSelectedItem());
                 Boolean inserted = tableModel.addData(insertCardReq);
                 if(inserted)
                     updateTable(table, tableModel);
