@@ -61,6 +61,23 @@ public class UsersView implements Routes {
             }
         });
 
+        delete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                int selectedRow = table.getSelectedRow();
+                if(table.isRowSelected(selectedRow)) {
+                    Map user = model.getUserList().get(selectedRow);
+                    Boolean deleteUser = UserRequests.deleteUser(user);
+                    if(deleteUser) {
+                        toastr.success("Utilisateur est bien supprimer");
+                        refresh();
+                    } else
+                        toastr.error("Il y a un erreur");
+                } else
+                    toastr.warn("Selectionnez un utilisateur");
+            }
+        });
+
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         actionPanel.add(edit, FlowLayout.LEFT);
         actionPanel.add(delete, FlowLayout.CENTER);

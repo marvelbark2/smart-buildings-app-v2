@@ -23,9 +23,9 @@ public class UserDetails extends JDialog {
         JPanel body = new JPanel(new GridLayout(2, 1));
 
         String[][] userRow = {
-                { "ID", userInfo.get("user").get("userUId").asText() },
-                { "Nom", userInfo.get("user").get("name").asText() },
-                { "Role", userInfo.get("user").get("role").get("designation").asText() }
+                {"ID", userInfo.get("user").get("userUId").asText()},
+                {"Nom", userInfo.get("user").get("name").asText()},
+                {"Role", userInfo.get("user").get("role").get("designation").asText()}
         };
         JPanel userInfoPanel = new JPanel(new BorderLayout());
         userInfoPanel.setBorder(BorderFactory.createTitledBorder("Info d'utilisateur"));
@@ -33,49 +33,55 @@ public class UserDetails extends JDialog {
         userInfoPanel.add(table);
         body.add(userInfoPanel);
 
-        JPanel cardInfoPanel = new JPanel(new BorderLayout());
-        cardInfoPanel.setBorder(BorderFactory.createTitledBorder("Carte d'utilisateur"));
+        if (userInfo.has("card")) {
+            JPanel cardInfoPanel = new JPanel(new BorderLayout());
+            cardInfoPanel.setBorder(BorderFactory.createTitledBorder("Carte d'utilisateur"));
 
-        String[][] cardRow = {
-                {
-                    userInfo.get("card").get("cardId").asText() ,
-                    userInfo.get("card").get("cardUId").asText() ,
-                    userInfo.get("card").get("expirable").asBoolean() ? "Oui" : "Non" ,
-                        userInfo.get("card").get("expiredDate").asText() != null ? "Infini" : userInfo.get("card").get("expiredDate").asText(),
+            String[][] cardRow = {
+                    {
+                            userInfo.get("card").get("cardId").asText(),
+                            userInfo.get("card").get("cardUId").asText(),
+                            userInfo.get("card").get("expirable").asBoolean() ? "Oui" : "Non",
+                            userInfo.get("card").get("expiredDate").asText() != null ? "Infini" : userInfo.get("card").get("expiredDate").asText(),
+                    }
+            };
+            String[] cardCol = {"ID", "Matricule", "Provisoire", "Date d'expiration"};
+            JTable cardTable = new JTable(cardRow, cardCol) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
                 }
-        };
-        String[] cardCol = { "ID", "Matricule", "Provisoire", "Date d'expiration" };
-        JTable cardTable = new JTable(cardRow, cardCol) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+            };
 
-        JScrollPane scrollPane = new JScrollPane(cardTable);
-        Boolean active = userInfo.get("card").get("active").asBoolean();
-        cardTable.setBackground(active ? null : Color.red);
-        cardTable.setForeground(active ? Color.BLACK: Color.white);
-        scrollPane.setOpaque(false);
-        cardInfoPanel.add(scrollPane, BorderLayout.CENTER);
+            JScrollPane scrollPane = new JScrollPane(cardTable);
+            Boolean active = userInfo.get("card").get("active").asBoolean();
+            cardTable.setBackground(active ? null : Color.red);
+            cardTable.setForeground(active ? Color.BLACK : Color.white);
+            scrollPane.setOpaque(false);
+            cardInfoPanel.add(scrollPane, BorderLayout.CENTER);
 
-        JPanel toolsCard = new JPanel(new GridLayout(2,2));
-        toolsCard.add(new JButton("Active"));toolsCard.add(new JButton("Desactive"));
-        toolsCard.add(new JButton("Modifier"));toolsCard.add(new JButton("Supprimer"));toolsCard.add(new JButton("Voir"));
-        toolsCard.setBorder(BorderFactory.createTitledBorder("Outils"));
-        cardInfoPanel.add(toolsCard, BorderLayout.LINE_END);
+            JPanel toolsCard = new JPanel(new GridLayout(2, 2));
+            toolsCard.add(new JButton("Active"));
+            toolsCard.add(new JButton("Desactive"));
+            toolsCard.add(new JButton("Modifier"));
+            toolsCard.add(new JButton("Supprimer"));
+            toolsCard.add(new JButton("Voir"));
+            toolsCard.add(new JButton("Perdue"));
+            toolsCard.setBorder(BorderFactory.createTitledBorder("Outils"));
+            cardInfoPanel.add(toolsCard, BorderLayout.LINE_END);
 
-        body.add(cardInfoPanel);
+            body.add(cardInfoPanel);
+        }
+
 
         pane.add(header, BorderLayout.PAGE_START);
         pane.add(body, BorderLayout.CENTER);
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        setVisible(true);
         setContentPane(pane);
         pack();
-        setLocation(screenSize.width / 2 - frame.getWidth() / 2, screenSize.height / 2 - frame.getHeight() / 2);
 
+        setLocationRelativeTo(frame);
+        setVisible(true);
     }
 }

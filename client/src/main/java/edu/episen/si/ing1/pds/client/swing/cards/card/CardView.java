@@ -1,10 +1,9 @@
-package edu.episen.si.ing1.pds.client.swing.cards;
+package edu.episen.si.ing1.pds.client.swing.cards.card;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
+import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
+import edu.episen.si.ing1.pds.client.swing.cards.Routes;
 import edu.episen.si.ing1.pds.client.swing.cards.models.CardTableModel;
 import edu.episen.si.ing1.pds.client.swing.cards.models.DualListBox;
 import edu.episen.si.ing1.pds.client.swing.global.MenuItem;
@@ -24,6 +23,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.font.TextAttribute;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -286,8 +286,6 @@ public class CardView implements Routes {
                     JLabel userFieldFor = new JLabel("Utilisateur");
                     userFieldPanel.add(userFieldFor);
                     userFieldPanel.add(comboBox);
-
-                    System.out.println(data);
 
                     JPanel serialFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
                     JLabel serialFieldFor = new JLabel("Matricule");
@@ -588,6 +586,23 @@ public class CardView implements Routes {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if(modelTable.getDataSource().size() > row) {
                     final Boolean bool = (Boolean) modelTable.getDataSource().get(row).get("active");
+                    Object expired = modelTable.getDataSource().get(row).get("expiredDate");
+                    if(expired != null) {
+                        try {
+                            String expire = expired.toString();
+                            Date today = new Date();
+                            Date expiredDate = new SimpleDateFormat("dd/MM/yyyy").parse(expire);
+                            if(today.after(expiredDate)){
+                                Font font = Ui.FONT_GENERAL_UI;
+                                Map  attributes = font.getAttributes();
+                                attributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+                                setFont(new Font(attributes));
+                            }
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     if(!bool) {
                         setBackground(Color.RED);
                     }

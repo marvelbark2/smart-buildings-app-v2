@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.backend.server.network.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.Network;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.models.RoleResponse;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.services.RoleService;
 import org.slf4j.Logger;
@@ -14,7 +15,7 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
-public class RoleNetwork {
+public class RoleNetwork implements Network {
     private final Logger logger = LoggerFactory.getLogger(RoleNetwork.class.getName());
     private final PrintWriter writer;
     private final ObjectMapper mapper = new ObjectMapper();

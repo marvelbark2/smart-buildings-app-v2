@@ -24,4 +24,11 @@ public class UserRequests {
         LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) response.getMessage();
         return new ObjectMapper().valueToTree(data);
     }
+    public static Boolean deleteUser(Map user) {
+        Request request = new Request();
+        request.setEvent("user_delete");
+        request.setData(user);
+        Response response = Utils.sendRequest(request);
+        return (Boolean) response.getMessage();
+    }
 }

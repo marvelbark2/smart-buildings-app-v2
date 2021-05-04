@@ -266,7 +266,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
     public Map<Map, List> getAccessList(Integer card_id) {
         Map<Map, List> data = new HashMap();
 
-        String query = "SELECT b.name as building, concat('Etage ', f.floor_number) as floor, w.workspace_type, iscardaccessibletodesk(?, w.id_workspace) as desk_access FROM buildings b join floors f on b.id_buildings = f.building_number join workspace w on f.id_floor = w.floor_number";
+        String query = "SELECT b.name as building, concat('Etage ', f.floor_number) as floor, w.workspace_label, iscardaccessibletodesk(?, w.id_workspace) as desk_access FROM buildings b join floors f on b.id_buildings = f.building_number join workspace w on f.id_floor = w.floor_number";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, card_id);
@@ -283,7 +283,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
                 floor.put("root", false);
 
                 Map workspace = new HashMap();
-                workspace.put("workspace_type", rs.getString("workspace_type"));
+                workspace.put("workspace_type", rs.getString("workspace_label"));
                 workspace.put("access", rs.getBoolean("desk_access"));
 
                 if(!floorContainer.containsKey(floor)) {

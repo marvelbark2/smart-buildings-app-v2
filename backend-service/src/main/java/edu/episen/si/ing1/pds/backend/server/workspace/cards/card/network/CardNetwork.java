@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.jsr310.*;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.Network;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardRequest;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardsResponse;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.services.CardService;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class CardNetwork {
+public class CardNetwork implements Network {
     private final ICardService<CardRequest, CardsResponse> service;
     private final PrintWriter writer;
     private final Connection connection;
