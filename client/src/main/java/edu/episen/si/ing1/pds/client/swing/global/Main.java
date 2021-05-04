@@ -25,7 +25,7 @@ public class Main implements MouseListener {
 
     private Map<JLabel, Navigate> frames;
     public Main() {
-        frame = new JFrame("Smart building app");
+        frame = new JFrame("Smart Building App");
         global = new JPanel();
         if(Utils.isGuestPage()) {
             loadCompanyWindows();
@@ -49,7 +49,7 @@ public class Main implements MouseListener {
     }
 
     public void loadSystemWindow() {
-        frame.setResizable(true);
+        frame.setResizable(false);
         frame.setSize(1800, 1000);
 
         frame.setPreferredSize(frame.getSize());
@@ -78,15 +78,16 @@ public class Main implements MouseListener {
         JPanel header = new JPanel(new BorderLayout());
 
         JPanel logo = new JPanel();
-        JLabel label = new JLabel("Logo", SwingUtilities.CENTER);
+        JLabel label = new JLabel(Utils.getCompanyName(), SwingUtilities.CENTER);
+        label.setFont(new Font("ROBOTO LIGHT", Font.PLAIN, 18));
         header.setBackground(new Color(54, 38, 90));
         label.setForeground(Color.white);
         logo.add(label);
         logo.setOpaque(false);
 
         JPanel leftPanel = new JPanel();
-        JLabel disconnect = new JLabel("Deconnecté", SwingUtilities.CENTER);
-        disconnect.setSize(100, 75);
+        JLabel disconnect = new JLabel("Se déconnecter", SwingUtilities.CENTER);
+        disconnect.setSize(130, 75);
         disconnect.setMinimumSize(disconnect.getSize());
         disconnect.setPreferredSize(disconnect.getSize());
         disconnect.setMaximumSize(disconnect.getSize());
@@ -150,21 +151,28 @@ public class Main implements MouseListener {
         menu.setLayout(new BoxLayout(menu, BoxLayout.Y_AXIS));
         menu.add(Box.createVerticalStrut(100));
 
-        JLabel realize = new MenuItem("Realiser une location");
-        frames.put(realize, new LocationMenu(this));
-        realize.addMouseListener(this);
+        JLabel location = new MenuItem("Louer un Digital Workplace");
+        frames.put(location, new LocationMenu(this));
+        location.addMouseListener(this);
+    
 
-        JLabel consult = new MenuItem("Consulter une location");
-        frames.put(consult, new Mapping_Window(this));
-        consult.addMouseListener(this);
+        JLabel mapping = new MenuItem("Configurer les équipements");
+        frames.put(mapping, new Mapping_Window(this));
+        mapping.addMouseListener(this);
 
-        JLabel staff = new MenuItem("Configurer les cartes d'acces");
-        staff.addMouseListener(this);
-        frames.put(staff, new ContextFrame(this));
+        JLabel access = new MenuItem("Configurer les cartes d'accès");
+        access.addMouseListener(this);
+        frames.put(access, new ContextFrame(this));
 
-        menu.add(realize);
-        menu.add(consult);
-        menu.add(staff);
+        JLabel windows = new MenuItem("Configurer les fenêtres");
+        windows.addMouseListener(this);
+        frames.put(windows, null);
+
+
+        menu.add(location);
+        menu.add(mapping);
+        menu.add(access);
+        menu.add(windows);
         menu.add(Box.createGlue());
 
         menu.setBackground(new Color(54, 38, 90));
@@ -179,6 +187,7 @@ public class Main implements MouseListener {
     private void setupBloc() {
         bloc = new JPanel();
         bloc.setBorder(new LineBorder(Color.RED));
+        bloc.setVisible(false);
     }
 
     public JPanel getGlobal() {

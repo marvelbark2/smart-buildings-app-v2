@@ -2,16 +2,12 @@ package edu.episen.si.ing1.pds.client;
 
 import edu.episen.si.ing1.pds.client.network.SocketConfig;
 import edu.episen.si.ing1.pds.client.swing.global.Main;
-import edu.episen.si.ing1.pds.client.utils.Utils;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class Client {
     private final static Logger logger = LoggerFactory.getLogger(Client.class.getName());
@@ -19,7 +15,6 @@ public class Client {
     private static void createAndShowGUI() {
         Main app = new Main();
         JFrame frame = app.getFrame();
-       // Utils.checkSystemLog();
         frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource("icon/logo.png")));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);

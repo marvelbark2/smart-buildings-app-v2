@@ -3,11 +3,13 @@ package edu.episen.si.ing1.pds.backend.server.network;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.network.CardNetwork;
+import edu.episen.si.ing1.pds.backend.server.workspace.Bootstrap;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.network.CardNetwork;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.network.RoleNetwork;
 import edu.episen.si.ing1.pds.backend.server.workspace.location.LocationNetwork;
 import edu.episen.si.ing1.pds.backend.server.workspace.mapping.MappingNetwork;
 import edu.episen.si.ing1.pds.backend.server.workspace.shared.SystemLog;
-import edu.episen.si.ing1.pds.backend.server.workspace.users.network.UsersNetwork;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.network.UsersNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,17 +70,7 @@ public class Conversation implements Runnable {
                 logger.info(requestObj.toString());
                 logger.info("Request ID: {}",requestObj.getRequestId());
 
-                CardNetwork cardNetwork = new CardNetwork(connection, writer);
-                cardNetwork.execute(requestObj);
-
-                UsersNetwork usersNetwork = new UsersNetwork(connection, writer);
-                usersNetwork.execute(requestObj);
-
-                new MappingNetwork(requestObj, connection, writer);
-
-                new LocationNetwork(requestObj, connection, writer);
-
-                new SystemLog(requestObj, connection, socket, writer);
+                new Bootstrap(requestObj, connection, writer);
 
                 Map<String, Object> endResponse = Utils.responseFactory("end", "end");
                 String createMessage = mapper.writeValueAsString(endResponse);

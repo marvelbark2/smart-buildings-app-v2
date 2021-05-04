@@ -2,6 +2,7 @@ package edu.episen.si.ing1.pds.client.swing.cards.models;
 
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
+import edu.episen.si.ing1.pds.client.swing.cards.card.CardRequests;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 
 import javax.swing.table.AbstractTableModel;
@@ -14,10 +15,7 @@ public class CardTableModel extends AbstractTableModel {
 
     public CardTableModel() {
         super();
-        Request req = new Request();
-        req.setEvent("card_list");
-        Response response = Utils.sendRequest(req);
-        cardList = (List<Map>) response.getMessage();
+        cardList = CardRequests.fetchCarcardList();
     }
 
     @Override
@@ -36,7 +34,7 @@ public class CardTableModel extends AbstractTableModel {
         if(value instanceof Map)
             value = ( (Map) value).get("name");
         else if(value == null)
-            value = "Infini";
+            value = "-";
         else if(value instanceof Boolean) {
             Boolean bool = (Boolean) value;
             if(bool)

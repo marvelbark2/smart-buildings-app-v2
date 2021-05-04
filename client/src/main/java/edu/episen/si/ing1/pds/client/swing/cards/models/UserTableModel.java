@@ -2,6 +2,7 @@ package edu.episen.si.ing1.pds.client.swing.cards.models;
 
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
+import edu.episen.si.ing1.pds.client.swing.cards.user.UserRequests;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 
 import javax.swing.table.AbstractTableModel;
@@ -13,9 +14,7 @@ public class UserTableModel extends AbstractTableModel {
     private List<Map> userList;
 
     public UserTableModel() {
-        Request request = new Request();
-        request.setEvent("user_list");
-        userList = (List<Map>) Utils.sendRequest(request).getMessage();
+        userList = UserRequests.all();
     }
 
     @Override
@@ -30,7 +29,13 @@ public class UserTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return userList.get(rowIndex).get(getColumnName(columnIndex));
+        Object element =  userList.get(rowIndex).get(getColumnName(columnIndex));
+        if(element instanceof Map) {
+            Map role = (Map) element;
+            return role.get("designation");
+        } else {
+            return element;
+        }
     }
 
     @Override
@@ -46,5 +51,9 @@ public class UserTableModel extends AbstractTableModel {
         Response response = Utils.sendRequest(request);
         Boolean isInserted = (Boolean) response.getMessage();
         return isInserted;
+    }
+
+    public List<Map> getUserList() {
+        return userList;
     }
 }
