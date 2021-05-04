@@ -5,10 +5,14 @@ import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.network.SocketFacade;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.Timer;
 
 public class Utils {
 
@@ -74,6 +78,10 @@ public class Utils {
         return builder.toString();
     }
 
+    public static ImageIcon getImageIconFromResource(String path) {
+        Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource(path));
+        return new ImageIcon(icon);
+    }
     public static Response sendRequest(Request request) {
         PrintWriter writer;
         BufferedReader reader;
