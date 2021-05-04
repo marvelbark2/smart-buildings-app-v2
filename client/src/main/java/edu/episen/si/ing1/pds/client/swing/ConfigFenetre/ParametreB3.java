@@ -7,7 +7,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -76,13 +75,36 @@ public class ParametreB3 extends JFrame implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println(Teinture_VitreField.getText());
+	/*	System.out.println(Teinture_VitreField.getText());
 		System.out.println(Eclairage_DirectField.getText());
 		System.out.println(Eclairage_IndirectField.getText());
-			
+	*/		
+		InsertLight(Integer.parseInt(Eclairage_IndirectField.getText()) ,  Boolean.parseBoolean(Eclairage_DirectField.getText()),Integer.parseInt(Teinture_VitreField.getText()) ) ;
+		
 	}
+	
+	public int InsertLight(int Eclairage_Indirect , boolean Eclairage_Direct, int Teinture_Vitre ) {
+        String SQL = "INSERT INTO LIGHT ( Eclairage_Indirect , Eclairage_Direct, Teinture_Vitre)"
+                + "VALUES( ? , ? , ? )" ;
 
-	}
+        int affectedrows = 0;
+        ConnectionDB c = new ConnectionDB() ;
+        
+        try (Connection conn1 = c.connect();
+                PreparedStatement pstmt = conn1.prepareStatement(SQL)) {
+        	System.out.println("testttt okkkkkkkkkkkk ");
+            pstmt.setInt(1, Eclairage_Indirect);
+            pstmt.setBoolean(2, Eclairage_Direct);
+            pstmt.setInt(3, Teinture_Vitre);
+            
+            affectedrows = pstmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return affectedrows;
+    }
+}
 
 
 

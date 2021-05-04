@@ -1,17 +1,15 @@
 package edu.episen.si.ing1.pds.client.swing.ConfigFenetre;
-
 import java.awt.BorderLayout;
-import java.awt.Component;
+
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,6 +31,8 @@ public class ParametreB2 extends JFrame implements ActionListener {
 	JLabel Température_Intérieure = new JLabel("Température_Intérieure");
 
 	JLabel Baisser_Store = new JLabel("Baisser_Store");
+
+	private Object s1;
 
 	public ParametreB2() {
 		this.setVisible(true);
@@ -67,16 +67,51 @@ public class ParametreB2 extends JFrame implements ActionListener {
 		JButton bouton = new JButton("Valider");
 		field1.add(bouton);
 		bouton.addActionListener(this);
+		JButton s1 = new JButton("suivant");
+		field1.add(s1);
+		s1.addActionListener(this);
 		return field1;
+	
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		
-		System.out.println(Température_ExtérieureField.getText());
+	/*	System.out.println(Température_ExtérieureField.getText());
 		System.out.println(Température_IntérieureField.getText());
 		System.out.println(Baisser_StoreField.getText());
+	*/	
+		//ConfigFenetreNetwork cf = new ConfigFenetreNetwork();
+		InsertTemp(Integer.parseInt(Baisser_StoreField.getText()), Integer.parseInt(Température_IntérieureField.getText()) , Integer.parseInt(Température_ExtérieureField.getText()) ) ;
 
-		 
+		
+	}
 	
-    }
+	public void actionPerformed2(ActionEvent e) {
+	    Object source = e.getSource();
+	    if(source == s1 ){
+	        this.dispose();
+	        Parametre rs = new Parametre();
+	        rs.setVisible(true);
+	    }}
+	
+	public int InsertTemp(int store, int temp_int, int temp_ext ) {
+		String SQL = "INSERT INTO TEMPERATURE( baisserstore , temperature_interieure, temperature_exterieure)"
+				+ "VALUES( ? , ? , ? )" ;
+	
+		int affectedrows = 0;
+		ConnectionDB c = new ConnectionDB();
+		try (Connection conn = c.connect();
+		        PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+			System.out.println("testttt okkkkkkkkkkkk ");
+		    pstmt.setInt(1, store);
+		    pstmt.setInt(2, temp_int);
+		    pstmt.setInt(3, temp_ext);
+		    
+		    affectedrows = pstmt.executeUpdate();
+
+		} catch (SQLException ex) {
+		    System.out.println(ex.getMessage());
+		}
+		return affectedrows;
+	}
 }

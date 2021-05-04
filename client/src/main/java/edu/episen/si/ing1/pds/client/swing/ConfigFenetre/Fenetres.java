@@ -20,6 +20,7 @@ public class Fenetres extends JFrame implements ActionListener{
 	JButton b2;
 	JButton b3;
 	
+	
 	private JTextField textField;
 	private JTextField titleField;
 	private JButton submit;
@@ -96,7 +97,7 @@ public class Fenetres extends JFrame implements ActionListener{
 		Object o = e.getSource();
 		if ( o == b1) 
 			new ParametreB2();
-	
+		
 		else if(o ==b2)
 			new ParametreB3();
 	
