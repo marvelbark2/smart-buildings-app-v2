@@ -161,10 +161,13 @@ public class Mapping_Window implements Navigate {
         
 
         gcon.fill = GridBagConstraints.BOTH;
+        
+       
 
         for(Map e:data) {
             
-        	JButton btn = new JButton(e.get("equipment_id").toString());
+        	ImageIcon icon = new ImageIcon(String.valueOf(e.get("etat")));
+        	JButton btn = new JButton(e.get("equipment_id").toString(),icon);
             gcon.gridx = Integer.valueOf(e.get("gridx").toString());
             gcon.gridy = Integer.valueOf(e.get("gridy").toString());
             gcon.gridheight = Integer.valueOf(e.get("gridheigth").toString());

@@ -40,6 +40,7 @@ public class MappingNetwork {
                 hm.put("gridwidth", rs.getInt("gridwidth"));
                 hm.put("gridheigth", rs.getInt("gridheight"));
                 hm.put("equipment_id", rs.getInt("equipment_id"));
+                hm.put("etat", rs.getString("etat"));
 
                 response.add(hm);
             }
@@ -93,7 +94,7 @@ public class MappingNetwork {
             }
         }
         else if(event.equalsIgnoreCase("tree_list")){
-        	 String sql = "SELECT b.name,b.id_buildings, f.id_floor, concat('Etage ', f.floor_number) as floor, w.workspace_type, w.id_workspace FROM workspace w join floors f on f.id_floor = w.floor_number join buildings b on f.building_number = b.id_buildings JOIN reservations r on w.id_workspace = r.id_workspace WHERE r.id_companies = ?";
+        	 String sql = "SELECT b.name,b.id_buildings, f.id_floor, concat('Etage ', f.floor_number) as floor, w.workspace_label, w.id_workspace FROM workspace w join floors f on f.id_floor = w.floor_number join buildings b on f.building_number = b.id_buildings JOIN reservations r on w.id_workspace = r.id_workspace WHERE r.id_companies = ?";
              PreparedStatement statement = connection.prepareStatement(sql);
              statement.setInt(1, request.getCompanyId());
              ResultSet rs = statement.executeQuery();
@@ -113,7 +114,7 @@ public class MappingNetwork {
 
                  Map workspace = new HashMap();
                  workspace.put("id_workspace", rs.getInt("id_workspace"));
-                 workspace.put("workspace_type", rs.getString("workspace_type"));
+                 workspace.put("workspace_type", rs.getString("workspace_label"));
 
 
                  if(!floorContainer.containsKey(floor)) {
