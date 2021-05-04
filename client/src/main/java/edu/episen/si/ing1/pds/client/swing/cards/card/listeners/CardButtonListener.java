@@ -148,6 +148,7 @@ public class CardButtonListener implements ActionListener {
                     });
                     dual.setBorder(BorderFactory.createTitledBorder("Gérer les accès"));
                     dialogPanel.add(dual);
+
                     JButton submit = new JButton("Soumttre");
                     submit.addActionListener(new ActionListener() {
                         @Override
