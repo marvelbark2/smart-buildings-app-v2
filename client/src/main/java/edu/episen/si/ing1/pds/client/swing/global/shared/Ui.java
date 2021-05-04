@@ -11,7 +11,7 @@ public class Ui {
     public static final Color COLOR_INTERACTIVE = new Color(54, 38, 90);
     public static final Color COLOR_INTERACTIVE_DARKER = new Color(72, 64, 92);
     public static final Color OFFWHITE = new Color(229, 229, 229);
-    public static final String BUTTON_TEXT_LOGIN = "Accèder au Systéme";
+    public static final String BUTTON_TEXT_LOGIN = "Accéder au système";
     public static final int ROUNDNESS = 8;
 
     public static Graphics2D get2dGraphics(Graphics g) {
