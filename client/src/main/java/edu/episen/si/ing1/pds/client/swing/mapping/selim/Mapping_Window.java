@@ -42,7 +42,7 @@ import edu.episen.si.ing1.pds.client.utils.Utils;
 public class Mapping_Window implements Navigate {
     Main global;
     private JPanel content = new JPanel();
-    private MyGlassPane glass = new MyGlassPane();
+   // private MyGlassPane glass = new MyGlassPane();
   
 
     public Mapping_Window(Main global) {
@@ -192,8 +192,8 @@ public class Mapping_Window implements Navigate {
             gcon.gridy = Integer.valueOf(e.get("gridy").toString());
             gcon.gridheight = Integer.valueOf(e.get("gridheigth").toString());
             gcon.gridwidth = Integer.valueOf(e.get("gridwidth").toString());
-            btn.addMouseListener(new MouseGlassListener(glass));
-            btn.addMouseMotionListener(new MouseGlassMotionListener(glass));
+           // btn.addMouseListener(new MouseGlassListener(glass));
+           // btn.addMouseMotionListener(new MouseGlassMotionListener(glass));
             btn.setTransferHandler(new TransferHandler("icon"));
             carte.add(btn, gcon);
             
@@ -240,8 +240,8 @@ public class Mapping_Window implements Navigate {
 
         */
         
-        label1.addMouseListener(new MouseGlassListener(glass));
-        label1.addMouseMotionListener(new MouseGlassMotionListener(glass));
+       // label1.addMouseListener(new MouseGlassListener(glass));
+       // label1.addMouseMotionListener(new MouseGlassMotionListener(glass));
         
         label1.setTransferHandler(new TransferHandler("icon"));
         label2.setTransferHandler(new TransferHandler("icon"));
