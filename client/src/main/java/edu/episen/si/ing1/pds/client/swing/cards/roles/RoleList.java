@@ -7,6 +7,7 @@ import edu.episen.si.ing1.pds.client.swing.cards.models.DualListBox;
 import edu.episen.si.ing1.pds.client.swing.cards.models.RoleTableModel;
 import edu.episen.si.ing1.pds.client.swing.cards.user.UserRequests;
 import edu.episen.si.ing1.pds.client.swing.global.MenuItem;
+import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -19,9 +20,12 @@ import java.awt.*;
 import java.util.List;
 
 public class RoleList implements Routes {
+
     @Override
     public void launch(ContextFrame context) {
         JPanel body = context.getApp().getContext();
+
+        Toast toastr = new Toast(body);
 
         JPanel panel = new JPanel(new GridLayout(3,1, 50, 50));
 
@@ -142,7 +146,12 @@ public class RoleList implements Routes {
 
                                 Map data = Map.of("role", formData, "accessList", accessData);
                                 Boolean response = RoleRequests.updateRole(data);
-                                System.out.println(response);
+                                if(response) {
+                                    toastr.success("Role est bien modifié !");
+                                } else
+                                    toastr.error("Il y a un erreur !");
+                            } else {
+                                toastr.error("Il y a un erreur dans formulaire !");
                             }
                         }
                     });
@@ -155,6 +164,8 @@ public class RoleList implements Routes {
                     dialog.setLocationRelativeTo(panel);
                     dialog.setVisible(true);
                     dialog.pack();
+                } else {
+                    toastr.warn("Selectionner un role dans tableau");
                 }
             }
         });
