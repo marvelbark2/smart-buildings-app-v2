@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.RootPaneContainer;
 import javax.swing.TransferHandler;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -35,13 +36,17 @@ import edu.episen.si.ing1.pds.client.network.Response;
 
 import edu.episen.si.ing1.pds.client.swing.global.Main;
 import edu.episen.si.ing1.pds.client.swing.global.Navigate;
+import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
+
 
 
 
 public class Mapping_Window implements Navigate {
     Main global;
     private JPanel content = new JPanel();
+    private Toast toaster;
+    
 
     public Mapping_Window(Main global) {
         this.global = global;
@@ -75,14 +80,18 @@ public class Mapping_Window implements Navigate {
           Map<Map, List<Map>> dataMap = ( Map<Map, List<Map>>) response.getMessage();
 
 		DefaultMutableTreeNode racine = new DefaultMutableTreeNode(Utils.getCompanyName());
-
+	
 		for (Object building: dataMap.keySet()) {
 		    Map buildingMap = Utils.toMap(building.toString());
+		    
 			DefaultMutableTreeNode buildNode = new DefaultMutableTreeNode(buildingMap.get("name"));
+			
             for (Object floor: dataMap.get(building)) {
                 Map<Map, List> floorN = (Map) floor;
+                
                 for (Object works: floorN.keySet()) {
                     Map floorMap = Utils.toMap(works.toString());
+                    
                     DefaultMutableTreeNode floorNode = new DefaultMutableTreeNode(floorMap.get("floor"));
                     buildNode.add(floorNode);
                     for (List<Map> dataN: floorN.values()) {
@@ -164,28 +173,47 @@ public class Mapping_Window implements Navigate {
 
         for(Map e:data) {
             
-        	Integer idInteger = Integer.valueOf(String.valueOf(e.get("id_workspace_equipments")));
-        	
+        	Integer id_workspace_equipments = Integer.valueOf(e.get("id_workspace_equipments").toString());
+        	Integer id_equipments = Integer.valueOf(e.get("equipment_id").toString());
         	JButton btn = new JButton();
         	if(!e.get("etat").equals("")) {
         		ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(e.get("etat")));
             	btn.setIcon(icon);
+            	btn.setTransferHandler(new TransferHandler("text"));
+            	
         	}
+        	
         	
         	btn.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					//System.out.println(((AbstractButton) e.getSource()).getText());
-					System.out.println(idInteger);
-					Map update = add_equipment(idInteger);
-                    JButton bt = (JButton) e.getSource();
-                    if(!(update.get("etat").equals("") || update.get("etat") == null)) {
-                        System.out.println(update.get("etat").toString());
-                        ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
-                        bt.setIcon(icon);
-                        bt.repaint();
+					
+					//System.out.println(id_workspace_equipments);
+					//System.out.println(id_equipments);
+					String verif= ((AbstractButton) e.getSource()).getText();
+					System.out.println(verif);
+					if(Integer.valueOf(verif) == id_equipments) {
+						Map update = add_equipment(id_workspace_equipments, id_equipments);
+	                    JButton bt = (JButton) e.getSource();
+	                    if(!(update.get("etat").equals("") || update.get("etat") == null)) {
+	                       
+	                        ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
+	                        bt.setIcon(icon);
+	                        bt.repaint();
+	                        System.out.println("Equipement mapper");
+	                       // toaster.success("Equipement mapper");
+	                        
+	                    } 
+ 
+					} 
+					else {
+                    	System.out.println("Erreur de mapping");
+                    	btn.removeAll();
+                    	btn.repaint();
+                    	btn.setTransferHandler(new TransferHandler("text"));
                     }
+					
 				}
 			});
 				
@@ -195,7 +223,7 @@ public class Mapping_Window implements Navigate {
             gcon.gridy = Integer.valueOf(e.get("gridy").toString());
             gcon.gridheight = Integer.valueOf(e.get("gridheigth").toString());
             gcon.gridwidth = Integer.valueOf(e.get("gridwidth").toString());
-            btn.setTransferHandler(new TransferHandler("icon"));
+            btn.setTransferHandler(new TransferHandler("text"));
             carte.add(btn, gcon);
             
 
@@ -206,35 +234,37 @@ public class Mapping_Window implements Navigate {
 
     }
     
-    private Map add_equipment(int id_workspace_equipment) {
+    private Map add_equipment(int id_workspace_equipment,int equipment_id) {
     	
     	Request request=new Request();
-    	request.setEvent("add_ecran");
-    	request.setData(Map.of("id_workspace_equipments", id_workspace_equipment));
+    	request.setEvent("add_equipment");
+    	request.setData(Map.of("id_workspace_equipments", id_workspace_equipment, "equipment_id", equipment_id));
     	Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON
-        System.out.println(response);
+       // System.out.println(response);
         return (Map) response.getMessage();
     }
 
     private void bloc_equipement() {
 
+    	
         JPanel bloc = global.getBloc();
         bloc.setLayout(new GridLayout(5,1));
         
-        ImageIcon icon1 = Utils.getImageIconFromResource("icon/capteur.png");
-        
-        ImageIcon icon2 = Utils.getImageIconFromResource("icon/ecran.png");
-        ImageIcon icon3 = Utils.getImageIconFromResource("icon/fenetre.png");
-        ImageIcon icon4 = Utils.getImageIconFromResource("icon/prise.png");
+        ImageIcon icon1 = Utils.getImageIconFromResource("icon/ecran.png");
+        ImageIcon icon2 = Utils.getImageIconFromResource("icon/capteur.png");
+        ImageIcon icon3 = Utils.getImageIconFromResource("icon/prise.png");
+        ImageIcon icon4 = Utils.getImageIconFromResource("icon/fenetre.png");
         
         String str = "Veuillez déplacer les equipements";
         JLabel label0 = new JLabel(str,JLabel.CENTER);
         
-        JLabel label1 = new JLabel(icon1, JLabel.CENTER);
-        JLabel label2 = new JLabel(icon2, JLabel.CENTER);
-        JLabel label3 = new JLabel(icon3, JLabel.CENTER);
-        JLabel label4 = new JLabel(icon4, JLabel.CENTER);
+       
+        JLabel label1 = new JLabel("1" ,icon1, JLabel.CENTER);
+        JLabel label2 = new JLabel("2",icon2, JLabel.CENTER);
+        JLabel label3 = new JLabel("3",icon3, JLabel.CENTER);
+        JLabel label4 = new JLabel("4",icon4, JLabel.CENTER);
 
+        
         DragMouseAdapter listener = new DragMouseAdapter();
         label1.addMouseListener(listener);
         label2.addMouseListener(listener);
@@ -242,10 +272,12 @@ public class Mapping_Window implements Navigate {
         label4.addMouseListener(listener);
 
 
-        label1.setTransferHandler(new TransferHandler("icon"));
-        label2.setTransferHandler(new TransferHandler("icon"));
-        label3.setTransferHandler(new TransferHandler("icon"));
-        label4.setTransferHandler(new TransferHandler("icon"));
+       
+  	    label1.setTransferHandler(new TransferHandler("text"));
+  	    //label11.setTransferHandler(new TransferHandler("icon"));
+        label2.setTransferHandler(new TransferHandler("text"));
+        label3.setTransferHandler(new TransferHandler("text"));
+        label4.setTransferHandler(new TransferHandler("text"));
     
       
         bloc.add(label0);
@@ -255,10 +287,13 @@ public class Mapping_Window implements Navigate {
         bloc.add(label4);
         bloc.setVisible(true);
         bloc.repaint();
+      
+      
     }
-    
+   
 
-    private class DragMouseAdapter extends MouseAdapter {
+
+	private class DragMouseAdapter extends MouseAdapter {
 
         public void mousePressed(MouseEvent e) {
 
