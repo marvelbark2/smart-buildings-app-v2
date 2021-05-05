@@ -58,13 +58,6 @@ public class MappingNetwork {
         	try {
         		JsonNode data = request.getData();
                 int id_workspace_equipment = data.get("id_workspace_equipments").asInt();
-<<<<<<< HEAD
-                String sql = "UPDATE workspace_equipments SET etat = 'icon/ecran.png' WHERE id_workspace_equipments = ?";
-                PreparedStatement statement = connection.prepareStatement(sql);
-                statement.setInt(1, id_workspace_equipment);
-                statement.executeUpdate();
-
-=======
                 int equipment_id = data.get("equipment_id").asInt();
                 String etat;
                 String sql = "UPDATE workspace_equipments SET etat = ? WHERE id_workspace_equipments = ?";
@@ -100,7 +93,6 @@ public class MappingNetwork {
 					break;
 				}
                
->>>>>>> 7af11a86dd45208ceca7382d7fc7a63b0e786f37
                 String query2 = "SELECT * FROM workspace_equipments WHERE id_workspace_equipments = ?";
                 PreparedStatement stmt = connection.prepareStatement(query2);
                 stmt.setInt(1, id_workspace_equipment);
@@ -121,8 +113,6 @@ public class MappingNetwork {
 				e.printStackTrace();
 			}
         }
-<<<<<<< HEAD
-=======
      
         else if(event.equalsIgnoreCase("companies_list")) {
             try {
@@ -143,7 +133,6 @@ public class MappingNetwork {
                 e.printStackTrace();
             }
         }
->>>>>>> 7af11a86dd45208ceca7382d7fc7a63b0e786f37
         else if(event.equalsIgnoreCase("tree_list")){
         	 String sql = "SELECT b.name,b.id_buildings, f.id_floor, concat('Etage ', f.floor_number) as floor, w.workspace_label, w.id_workspace FROM workspace w join floors f on f.id_floor = w.floor_number join buildings b on f.building_number = b.id_buildings JOIN reservations r on w.id_workspace = r.id_workspace WHERE r.id_companies = ?";
              PreparedStatement statement = connection.prepareStatement(sql);
