@@ -189,8 +189,8 @@ public class Mapping_Window implements Navigate {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					
-					//System.out.println(id_workspace_equipments);
-					//System.out.println(id_equipments);
+					System.out.println(id_workspace_equipments);
+					System.out.println(id_equipments);
 					String verif= ((AbstractButton) e.getSource()).getText();
 					System.out.println(verif);
 					if(Integer.valueOf(verif) == id_equipments) {
