@@ -45,23 +45,20 @@ import edu.episen.si.ing1.pds.client.utils.Utils;
 public class Mapping_Window implements Navigate {
     Main global;
     private JPanel content = new JPanel();
-<<<<<<< HEAD
-=======
     private Toast toaster;
-    
->>>>>>> 7af11a86dd45208ceca7382d7fc7a63b0e786f37
+
 
     public Mapping_Window(Main global) {
         this.global = global;
 
 
     }
-   
+
 
     private void menuScroll(JTree arbre2) {
         JPanel menuPanel = global.getMenu();
-        
-      
+
+
         JScrollPane menu = new JScrollPane(arbre2);
 
         menuPanel.removeAll();
@@ -73,68 +70,68 @@ public class Mapping_Window implements Navigate {
 
 
     }
-    
-   private JTree buildTree() {
-        JTree tree = null;
-	  try {
-		Request request = new Request();
-		request.setEvent("tree_list");
-		Response response = Utils.sendRequest(request);
-          Map<Map, List<Map>> dataMap = ( Map<Map, List<Map>>) response.getMessage();
 
-		DefaultMutableTreeNode racine = new DefaultMutableTreeNode(Utils.getCompanyName());
-	
-		for (Object building: dataMap.keySet()) {
-		    Map buildingMap = Utils.toMap(building.toString());
-		    
-			DefaultMutableTreeNode buildNode = new DefaultMutableTreeNode(buildingMap.get("name"));
-			
-            for (Object floor: dataMap.get(building)) {
-                Map<Map, List> floorN = (Map) floor;
-                
-                for (Object works: floorN.keySet()) {
-                    Map floorMap = Utils.toMap(works.toString());
-                    
-                    DefaultMutableTreeNode floorNode = new DefaultMutableTreeNode(floorMap.get("floor"));
-                    buildNode.add(floorNode);
-                    for (List<Map> dataN: floorN.values()) {
-                        for (Map workspace: dataN) {
-                            DefaultMutableTreeNode workNode = new DefaultMutableTreeNode(workspace);
-                            floorNode.add(workNode);
+    private JTree buildTree() {
+        JTree tree = null;
+        try {
+            Request request = new Request();
+            request.setEvent("tree_list");
+            Response response = Utils.sendRequest(request);
+            Map<Map, List<Map>> dataMap = ( Map<Map, List<Map>>) response.getMessage();
+
+            DefaultMutableTreeNode racine = new DefaultMutableTreeNode(Utils.getCompanyName());
+
+            for (Object building: dataMap.keySet()) {
+                Map buildingMap = Utils.toMap(building.toString());
+
+                DefaultMutableTreeNode buildNode = new DefaultMutableTreeNode(buildingMap.get("name"));
+
+                for (Object floor: dataMap.get(building)) {
+                    Map<Map, List> floorN = (Map) floor;
+
+                    for (Object works: floorN.keySet()) {
+                        Map floorMap = Utils.toMap(works.toString());
+
+                        DefaultMutableTreeNode floorNode = new DefaultMutableTreeNode(floorMap.get("floor"));
+                        buildNode.add(floorNode);
+                        for (List<Map> dataN: floorN.values()) {
+                            for (Map workspace: dataN) {
+                                DefaultMutableTreeNode workNode = new DefaultMutableTreeNode(workspace);
+                                floorNode.add(workNode);
+                            }
                         }
                     }
                 }
+                racine.add(buildNode);
             }
-            racine.add(buildNode);
-		}
-		tree = new JTree(racine);
+            tree = new JTree(racine);
 
-		tree.setCellRenderer(new DefaultTreeCellRenderer() {
-            @Override
-            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                Object selected = ( (DefaultMutableTreeNode) value).getUserObject();
-                if(selected instanceof Map) {
-                    setText(((Map)  selected).get("workspace_type").toString());
-                }
+            tree.setCellRenderer(new DefaultTreeCellRenderer() {
+                @Override
+                public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                    super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                    Object selected = ( (DefaultMutableTreeNode) value).getUserObject();
+                    if(selected instanceof Map) {
+                        setText(((Map)  selected).get("workspace_type").toString());
+                    }
 
-                if(leaf && sel && hasFocus) {
-                    content.removeAll();
-                   
-                    content.setLayout(new BorderLayout());
-                    content.add(carte((Integer) ((Map)  selected).get("id_workspace")));
-                    content.invalidate();
-                    content.validate();
-                    content.repaint();
+                    if(leaf && sel && hasFocus) {
+                        content.removeAll();
+
+                        content.setLayout(new BorderLayout());
+                        content.add(carte((Integer) ((Map)  selected).get("id_workspace")));
+                        content.invalidate();
+                        content.validate();
+                        content.repaint();
+                    }
+                    return this;
                 }
-                return this;
-            }
-        });
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-	   return tree;
- }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tree;
+    }
 
     private JToolBar createToolBar() {
 
@@ -145,7 +142,7 @@ public class Mapping_Window implements Navigate {
             @Override
             public void actionPerformed(ActionEvent e) {
                 global.getBloc().removeAll();
-            	global.setupFrame();
+                global.setupFrame();
                 global.getFrame().pack();
             }
         });
@@ -153,8 +150,8 @@ public class Mapping_Window implements Navigate {
 
         return toolBar;
     }
-    
-   
+
+
     private JPanel carte(Integer id) {
         Request request=new Request();
         request.setEvent("mapping_list");
@@ -168,89 +165,67 @@ public class Mapping_Window implements Navigate {
         gcon.weightx = 1;
         gcon.weighty = 1;
 
-        
+
 
         gcon.fill = GridBagConstraints.BOTH;
-        
-       
+
+
 
         for(Map e:data) {
-            
-<<<<<<< HEAD
-        	Integer idInteger = Integer.valueOf(String.valueOf(e.get("id_workspace_equipments")));
-        	
-=======
-        	Integer id_workspace_equipments = Integer.valueOf(e.get("id_workspace_equipments").toString());
-        	Integer id_equipments = Integer.valueOf(e.get("equipment_id").toString());
->>>>>>> 7af11a86dd45208ceca7382d7fc7a63b0e786f37
-        	JButton btn = new JButton();
-        	if(!e.get("etat").equals("")) {
-        		ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(e.get("etat")));
-            	btn.setIcon(icon);
-            	btn.setTransferHandler(new TransferHandler("text"));
-            	
-        	}
-        	
-        	
-        	btn.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-<<<<<<< HEAD
-					//System.out.println(((AbstractButton) e.getSource()).getText());
-					System.out.println(idInteger);
-					Map update = add_equipment(idInteger);
-                    JButton bt = (JButton) e.getSource();
-                    if(!(update.get("etat").equals("") || update.get("etat") == null)) {
-                        System.out.println(update.get("etat").toString());
-                        ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
-                        bt.setIcon(icon);
-                        bt.repaint();
+
+            Integer id_workspace_equipments = Integer.valueOf(e.get("id_workspace_equipments").toString());
+            Integer id_equipments = Integer.valueOf(e.get("equipment_id").toString());
+            JButton btn = new JButton();
+            if(!e.get("etat").equals("")) {
+                ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(e.get("etat")));
+                btn.setIcon(icon);
+                btn.setTransferHandler(new TransferHandler("text"));
+
+            }
+
+
+            btn.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    System.out.println(id_workspace_equipments);
+                    System.out.println(id_equipments);
+                    String verif= ((AbstractButton) e.getSource()).getText();
+                    System.out.println(verif);
+                    if(Integer.valueOf(verif) == id_equipments) {
+                        Map update = add_equipment(id_workspace_equipments, id_equipments);
+                        JButton bt = (JButton) e.getSource();
+                        if(!(update.get("etat").equals("") || update.get("etat") == null)) {
+
+                            ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
+                            bt.setIcon(icon);
+                            bt.repaint();
+                            System.out.println("Equipement mapper");
+                            // toaster.success("Equipement mapper");
+
+                        }
+
                     }
-=======
-					
-					System.out.println(id_workspace_equipments);
-					System.out.println(id_equipments);
-					String verif= ((AbstractButton) e.getSource()).getText();
-					System.out.println(verif);
-					if(Integer.valueOf(verif) == id_equipments) {
-						Map update = add_equipment(id_workspace_equipments, id_equipments);
-	                    JButton bt = (JButton) e.getSource();
-	                    if(!(update.get("etat").equals("") || update.get("etat") == null)) {
-	                       
-	                        ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
-	                        bt.setIcon(icon);
-	                        bt.repaint();
-	                        System.out.println("Equipement mapper");
-	                       // toaster.success("Equipement mapper");
-	                        
-	                    } 
- 
-					} 
-					else {
-                    	System.out.println("Erreur de mapping");
-                    	btn.removeAll();
-                    	btn.repaint();
-                    	btn.setTransferHandler(new TransferHandler("text"));
+                    else {
+                        System.out.println("Erreur de mapping");
+                        btn.removeAll();
+                        btn.repaint();
+                        btn.setTransferHandler(new TransferHandler("text"));
                     }
-					
->>>>>>> 7af11a86dd45208ceca7382d7fc7a63b0e786f37
-				}
-			});
-				
-			
-        	
+
+                }
+            });
+
+
+
             gcon.gridx = Integer.valueOf(e.get("gridx").toString());
             gcon.gridy = Integer.valueOf(e.get("gridy").toString());
             gcon.gridheight = Integer.valueOf(e.get("gridheigth").toString());
             gcon.gridwidth = Integer.valueOf(e.get("gridwidth").toString());
-<<<<<<< HEAD
-            btn.setTransferHandler(new TransferHandler("icon"));
-=======
             btn.setTransferHandler(new TransferHandler("text"));
->>>>>>> 7af11a86dd45208ceca7382d7fc7a63b0e786f37
             carte.add(btn, gcon);
-            
+
 
         }
 
@@ -258,59 +233,38 @@ public class Mapping_Window implements Navigate {
         return carte;
 
     }
-    
-<<<<<<< HEAD
-    private Map add_equipment(int id_workspace_equipment) {
-    	
-    	Request request=new Request();
-    	request.setEvent("add_ecran");
-    	request.setData(Map.of("id_workspace_equipments", id_workspace_equipment));
-    	Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON
-        System.out.println(response);
-=======
+
     private Map add_equipment(int id_workspace_equipment,int equipment_id) {
-    	
-    	Request request=new Request();
-    	request.setEvent("add_equipment");
-    	request.setData(Map.of("id_workspace_equipments", id_workspace_equipment, "equipment_id", equipment_id));
-    	Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON
-       // System.out.println(response);
->>>>>>> 7af11a86dd45208ceca7382d7fc7a63b0e786f37
+
+        Request request=new Request();
+        request.setEvent("add_equipment");
+        request.setData(Map.of("id_workspace_equipments", id_workspace_equipment, "equipment_id", equipment_id));
+        Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON
+        // System.out.println(response);
         return (Map) response.getMessage();
     }
 
     private void bloc_equipement() {
 
-    	
+
         JPanel bloc = global.getBloc();
         bloc.setLayout(new GridLayout(5,1));
-        
-<<<<<<< HEAD
-        ImageIcon icon1 = Utils.getImageIconFromResource("icon/capteur.png");
-        
-        ImageIcon icon2 = Utils.getImageIconFromResource("icon/ecran.png");
-        ImageIcon icon3 = Utils.getImageIconFromResource("icon/fenetre.png");
-        ImageIcon icon4 = Utils.getImageIconFromResource("icon/prise.png");
-=======
+
         ImageIcon icon1 = Utils.getImageIconFromResource("icon/ecran.png");
         ImageIcon icon2 = Utils.getImageIconFromResource("icon/capteur.png");
         ImageIcon icon3 = Utils.getImageIconFromResource("icon/prise.png");
         ImageIcon icon4 = Utils.getImageIconFromResource("icon/fenetre.png");
->>>>>>> 7af11a86dd45208ceca7382d7fc7a63b0e786f37
-        
+
         String str = "Veuillez déplacer les equipements";
         JLabel label0 = new JLabel(str,JLabel.CENTER);
-        
-       
+
+
         JLabel label1 = new JLabel("1" ,icon1, JLabel.CENTER);
         JLabel label2 = new JLabel("2",icon2, JLabel.CENTER);
         JLabel label3 = new JLabel("3",icon3, JLabel.CENTER);
         JLabel label4 = new JLabel("4",icon4, JLabel.CENTER);
 
-<<<<<<< HEAD
-=======
-        
->>>>>>> 7af11a86dd45208ceca7382d7fc7a63b0e786f37
+
         DragMouseAdapter listener = new DragMouseAdapter();
         label1.addMouseListener(listener);
         label2.addMouseListener(listener);
@@ -318,21 +272,14 @@ public class Mapping_Window implements Navigate {
         label4.addMouseListener(listener);
 
 
-<<<<<<< HEAD
-        label1.setTransferHandler(new TransferHandler("icon"));
-        label2.setTransferHandler(new TransferHandler("icon"));
-        label3.setTransferHandler(new TransferHandler("icon"));
-        label4.setTransferHandler(new TransferHandler("icon"));
-=======
-       
-  	    label1.setTransferHandler(new TransferHandler("text"));
-  	    //label11.setTransferHandler(new TransferHandler("icon"));
+
+        label1.setTransferHandler(new TransferHandler("text"));
+        //label11.setTransferHandler(new TransferHandler("icon"));
         label2.setTransferHandler(new TransferHandler("text"));
         label3.setTransferHandler(new TransferHandler("text"));
         label4.setTransferHandler(new TransferHandler("text"));
->>>>>>> 7af11a86dd45208ceca7382d7fc7a63b0e786f37
-    
-      
+
+
         bloc.add(label0);
         bloc.add(label1);
         bloc.add(label2);
@@ -340,13 +287,13 @@ public class Mapping_Window implements Navigate {
         bloc.add(label4);
         bloc.setVisible(true);
         bloc.repaint();
-      
-      
+
+
     }
-   
 
 
-	private class DragMouseAdapter extends MouseAdapter {
+
+    private class DragMouseAdapter extends MouseAdapter {
 
         public void mousePressed(MouseEvent e) {
 
@@ -356,7 +303,7 @@ public class Mapping_Window implements Navigate {
         }
     }
 
-    
+
 
     @Override
     public void start() {
@@ -382,9 +329,9 @@ public class Mapping_Window implements Navigate {
     }
 
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        // TODO Auto-generated method stub
+
+    }
 }
