@@ -47,7 +47,6 @@ public class UserTableModel extends DataTable {
         Request request = new Request();
         request.setEvent("user_insert");
         request.setData(data);
-
         Response response = Utils.sendRequest(request);
         Boolean isInserted = (Boolean) response.getMessage();
         return isInserted;

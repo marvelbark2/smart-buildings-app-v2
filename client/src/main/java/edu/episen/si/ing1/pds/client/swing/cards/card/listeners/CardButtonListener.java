@@ -3,6 +3,7 @@ package edu.episen.si.ing1.pds.client.swing.cards.card.listeners;
 import edu.episen.si.ing1.pds.client.swing.cards.ComponentRegister;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.cards.card.CardRequests;
+import edu.episen.si.ing1.pds.client.swing.cards.models.CardTableModel;
 import edu.episen.si.ing1.pds.client.swing.cards.models.DataTable;
 import edu.episen.si.ing1.pds.client.swing.cards.models.DualListBox;
 import edu.episen.si.ing1.pds.client.swing.cards.user.UserRequests;
@@ -191,7 +192,9 @@ public class CardButtonListener implements ActionListener {
                             Boolean editRes = CardRequests.updateCard(editData);
                             if(editRes) {
                                 toast.success("La modification est bien faite");
-
+                                DataTable cardTableModel = new CardTableModel();
+                                register.registerDataTable("card_table", cardTableModel);
+                                table.setModel(cardTableModel);
                                 dual.clearDestinationListModel();
                                 dual.clearSourceListModel();
                                 dialog.dispose();

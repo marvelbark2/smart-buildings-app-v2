@@ -5,6 +5,7 @@ public class Role {
     private String abbreviation;
     private String designation;
     private boolean enabled;
+    private Integer usersNumber;
 
     public int getRoleId() {
         return roleId;
@@ -36,6 +37,14 @@ public class Role {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Integer getUsersNumber() {
+        return usersNumber;
+    }
+
+    public void setUsersNumber(Integer usersNumber) {
+        this.usersNumber = usersNumber;
     }
 
     @Override

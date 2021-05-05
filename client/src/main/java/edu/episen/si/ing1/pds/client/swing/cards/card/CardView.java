@@ -114,7 +114,16 @@ public class CardView implements Routes {
                     Response response = Utils.sendRequest(request);
                     Map<String, Object> responseBody = (Map<String, Object>) response.getMessage();
                     Map<String, Object> data = (Map<String, Object>) responseBody.get("card");
-                    Map<String, List<Map<String, List>>> accessList = (Map<String, List<Map<String, List>>>) responseBody.get("access_list");
+                    //Map<String, List<Map<String, List>>> accessList = (Map<String, List<Map<String, List>>>) responseBody.get("access_list");
+
+                    Request request1 = new Request();
+                    request1.setEvent("card_treeview");
+                    data.remove("cardId");
+                    request1.setData(data);
+
+                    Response response1 = Utils.sendRequest(request1);
+                    List<Map> treeview = (List<Map>) response1.getMessage();
+
 
                     JDialog dialog = new JDialog(context.frame());
                     dialog.setSize(1000, 1000);
@@ -124,11 +133,8 @@ public class CardView implements Routes {
 
                     JPanel contentPane = new JPanel(new BorderLayout(20, 20));
 
-                    JPanel header = new JPanel(new FlowLayout(FlowLayout.CENTER));
-
                     MenuItem title = new MenuItem("Voir détails d'une carte");
-                    header.add(title);
-                    contentPane.add(header, BorderLayout.PAGE_START);
+                    contentPane.add(title, BorderLayout.PAGE_START);
 
                     JTabbedPane dialogPanel = new JTabbedPane();
                     dialogPanel.setOpaque(true);
@@ -157,20 +163,25 @@ public class CardView implements Routes {
                     infoPanel.add(showTable);
 
                     DefaultMutableTreeNode root = new DefaultMutableTreeNode("r");
-                    for (String building: accessList.keySet()) {
-                        Map buildingMap = Utils.toMap(building);
-                        DefaultMutableTreeNode buildNode = new DefaultMutableTreeNode(buildingMap.get("name"));
-                        for (Object floor: accessList.get(building)) {
-                            Map<Map, List> floorN = (Map) floor;
-                            for (Object works: floorN.keySet()) {
-                                Map floorMap = Utils.toMap(works.toString());
-                                DefaultMutableTreeNode floorNode = new DefaultMutableTreeNode(floorMap.get("floor"));
-                                buildNode.add(floorNode);
-                                for (List<Map> dataN: floorN.values()) {
-                                    for (Map workspaces: dataN) {
-                                        DefaultMutableTreeNode workNode = new DefaultMutableTreeNode(new HashMap<>(workspaces));
-                                        floorNode.add(workNode);
+
+                    for (Map building: treeview) {
+                        DefaultMutableTreeNode buildNode = new DefaultMutableTreeNode(building);
+                        List<Map> floors = (List<Map>) building.get("floors");
+                        for (Map floor: floors) {
+                            DefaultMutableTreeNode floorNode = new DefaultMutableTreeNode(floor);
+                            buildNode.add(floorNode);
+                            List<Map> wokspaces = (List<Map>) floor.get("workspaces");
+                            if(wokspaces != null) {
+                                for(Map wokspace: wokspaces) {
+                                    DefaultMutableTreeNode workspace = new DefaultMutableTreeNode(wokspace);
+                                    List<Map> equipments = (List<Map>) wokspace.get("equipments");
+                                    if(equipments != null) {
+                                        for (Map equipment: equipments) {
+                                            DefaultMutableTreeNode equipNode = new DefaultMutableTreeNode(equipment);
+                                            workspace.add(equipNode);
+                                        }
                                     }
+                                    floorNode.add(workspace);
                                 }
                             }
                         }
@@ -184,19 +195,20 @@ public class CardView implements Routes {
                             Object object = ((DefaultMutableTreeNode) value).getUserObject();
                             if(object instanceof Map) {
                                 Map val = (Map) object;
-                                boolean bool = (Boolean)val.get("access");
-                                String path = "";
-                                if(bool) {
-                                    path = "icon/granted.png";
-                                    logger.info(val.toString());
-                                } else {
-                                    path = "icon/forbidden.png";
+                                if(val.containsKey("accessible")) {
+                                    boolean bool = (Boolean)val.get("accessible");
+                                    String path = "";
+                                    if(bool) {
+                                        path = "icon/granted.png";
+                                        logger.info(val.toString());
+                                    } else {
+                                        path = "icon/forbidden.png";
+                                    }
+                                    Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource(path));
+                                    Image resised = icon.getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH);
+                                    setIcon(new ImageIcon(resised));
                                 }
-                                setText(val.get("workspace_type").toString() + " - " + bool);
-
-                                Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource(path));
-                                Image resised = icon.getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH);
-                                setIcon(new ImageIcon(resised));
+                                setText(val.get("name").toString());
                             }
                             return this;
                         }
@@ -216,8 +228,8 @@ public class CardView implements Routes {
                     contentPane.add(dialogPanel, BorderLayout.CENTER);
 
                     dialog.setContentPane(contentPane);
+                    dialog.setLocationRelativeTo(context.frame());
                     dialog.setVisible(true);
-                    dialog.pack();
                 } else {
                     toast.warn("Selectionnez une ligne dans tableau");
                 }

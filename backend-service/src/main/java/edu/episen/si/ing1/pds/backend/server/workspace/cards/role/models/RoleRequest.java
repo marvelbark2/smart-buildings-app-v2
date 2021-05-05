@@ -5,6 +5,7 @@ public class RoleRequest {
     private String abbreviation;
     private String designation;
     private boolean enabled;
+    private Integer usersNumber;
 
     public int getRoleId() {
         return roleId;
@@ -36,5 +37,13 @@ public class RoleRequest {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Integer getUsersNumber() {
+        return usersNumber;
+    }
+
+    public void setUsersNumber(Integer usersNumber) {
+        this.usersNumber = usersNumber;
     }
 }

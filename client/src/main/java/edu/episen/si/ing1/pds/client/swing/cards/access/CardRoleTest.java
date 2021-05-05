@@ -175,6 +175,7 @@ public class CardRoleTest implements Routes {
                     comboBox.setPreferredSize(comboBox.getSize());
                     comboBox.setSelectedIndex(-1);
                     comboBox2.setEnabled(false);
+                    jButton.setEnabled(false);
                 }
             }
         });
@@ -222,14 +223,14 @@ public class CardRoleTest implements Routes {
         JPanel rejected = new JPanel(new BorderLayout());
         JLabel rejectLabel = new JLabel("Cet utilisateur n'a pas l'accès", SwingConstants.CENTER);
         rejectLabel.setForeground(Color.WHITE);
-        rejected.setBackground(Color.red);
+        rejected.setBackground(new Color(90, 38, 54));
         rejected.add(rejectLabel, BorderLayout.CENTER);
         responsePanel.add(rejected, "rejected");
 
         JPanel granted = new JPanel(new BorderLayout());
         JLabel grantedLabel = new JLabel("Cet utilisateur peut acceder", SwingConstants.CENTER);
-        grantedLabel.setForeground(Color.WHITE);
-        granted.setBackground(Color.GREEN);
+        granted.setBackground(new Color(3, 146, 26));
+        grantedLabel.setForeground(Color.white);
         granted.add(grantedLabel, BorderLayout.CENTER);
         responsePanel.add(granted, "granted");
 

@@ -5,12 +5,14 @@ public class RoleResponse {
     private String abbreviation;
     private String designation;
     private boolean enabled;
+    private Integer usersNumber;
 
     public RoleResponse(Role role) {
         roleId = role.getRoleId();
         abbreviation = role.getAbbreviation();
         designation = role.getDesignation();
         enabled = role.isEnabled();
+        usersNumber = role.getUsersNumber();
     }
 
     public int getRoleId() {
@@ -43,6 +45,14 @@ public class RoleResponse {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Integer getUsersNumber() {
+        return usersNumber;
+    }
+
+    public void setUsersNumber(Integer usersNumber) {
+        this.usersNumber = usersNumber;
     }
 
     @Override

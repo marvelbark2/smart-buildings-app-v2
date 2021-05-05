@@ -42,8 +42,6 @@ import edu.episen.si.ing1.pds.client.utils.Utils;
 public class Mapping_Window implements Navigate {
     Main global;
     private JPanel content = new JPanel();
-   // private MyGlassPane glass = new MyGlassPane();
-  
 
     public Mapping_Window(Main global) {
         this.global = global;
@@ -166,11 +164,11 @@ public class Mapping_Window implements Navigate {
 
         for(Map e:data) {
             
-        	Integer idInteger = Integer.valueOf(e.get("id_workspace_equipments").toString());
+        	Integer idInteger = Integer.valueOf(String.valueOf(e.get("id_workspace_equipments")));
         	
         	JButton btn = new JButton();
-        	if(!e.get("etat").equals(null)) {
-        		ImageIcon icon = Utils.getImageIconFromResource(e.get("etat").toString());
+        	if(!e.get("etat").equals("")) {
+        		ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(e.get("etat")));
             	btn.setIcon(icon);
         	}
         	
@@ -180,9 +178,14 @@ public class Mapping_Window implements Navigate {
 				public void actionPerformed(ActionEvent e) {
 					//System.out.println(((AbstractButton) e.getSource()).getText());
 					System.out.println(idInteger);
-					add_equipment(idInteger);
-					
-					
+					Map update = add_equipment(idInteger);
+                    JButton bt = (JButton) e.getSource();
+                    if(!(update.get("etat").equals("") || update.get("etat") == null)) {
+                        System.out.println(update.get("etat").toString());
+                        ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
+                        bt.setIcon(icon);
+                        bt.repaint();
+                    }
 				}
 			});
 				
@@ -192,8 +195,6 @@ public class Mapping_Window implements Navigate {
             gcon.gridy = Integer.valueOf(e.get("gridy").toString());
             gcon.gridheight = Integer.valueOf(e.get("gridheigth").toString());
             gcon.gridwidth = Integer.valueOf(e.get("gridwidth").toString());
-           // btn.addMouseListener(new MouseGlassListener(glass));
-           // btn.addMouseMotionListener(new MouseGlassMotionListener(glass));
             btn.setTransferHandler(new TransferHandler("icon"));
             carte.add(btn, gcon);
             
@@ -205,12 +206,14 @@ public class Mapping_Window implements Navigate {
 
     }
     
-    private void add_equipment(int id_workspace_equipment) {
+    private Map add_equipment(int id_workspace_equipment) {
     	
     	Request request=new Request();
     	request.setEvent("add_ecran");
     	request.setData(Map.of("id_workspace_equipments", id_workspace_equipment));
-    	Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON 
+    	Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON
+        System.out.println(response);
+        return (Map) response.getMessage();
     }
 
     private void bloc_equipement() {
@@ -218,8 +221,8 @@ public class Mapping_Window implements Navigate {
         JPanel bloc = global.getBloc();
         bloc.setLayout(new GridLayout(5,1));
         
-        //ImageIcon icon1 = Utils.getImageIconFromResource("icon/capteur.png");
-        ImageIcon icon1 = new ImageIcon("icon/ecran");
+        ImageIcon icon1 = Utils.getImageIconFromResource("icon/capteur.png");
+        
         ImageIcon icon2 = Utils.getImageIconFromResource("icon/ecran.png");
         ImageIcon icon3 = Utils.getImageIconFromResource("icon/fenetre.png");
         ImageIcon icon4 = Utils.getImageIconFromResource("icon/prise.png");
@@ -232,17 +235,13 @@ public class Mapping_Window implements Navigate {
         JLabel label3 = new JLabel(icon3, JLabel.CENTER);
         JLabel label4 = new JLabel(icon4, JLabel.CENTER);
 
-       /* DragMouseAdapter listener = new DragMouseAdapter();
+        DragMouseAdapter listener = new DragMouseAdapter();
         label1.addMouseListener(listener);
         label2.addMouseListener(listener);
         label3.addMouseListener(listener);
         label4.addMouseListener(listener);
 
-        */
-        
-       // label1.addMouseListener(new MouseGlassListener(glass));
-       // label1.addMouseMotionListener(new MouseGlassMotionListener(glass));
-        
+
         label1.setTransferHandler(new TransferHandler("icon"));
         label2.setTransferHandler(new TransferHandler("icon"));
         label3.setTransferHandler(new TransferHandler("icon"));
@@ -269,15 +268,7 @@ public class Mapping_Window implements Navigate {
         }
     }
 
-    private String getUriOfFile(String file) {
-        String uri = null;
-        try {
-            uri = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(file)).getPath();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return uri;
-    }
+    
 
     @Override
     public void start() {

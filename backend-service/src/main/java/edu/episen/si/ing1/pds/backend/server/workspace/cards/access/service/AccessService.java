@@ -108,7 +108,7 @@ public class AccessService implements IAccessService {
     @Override
     public ArrayNode equipmentList(int workspaceId) {
         ArrayNode list = mapper.createArrayNode();
-        String query = "SELECT DISTINCT e.id_equipments, e.name  FROM buildings b join floors f on b.id_buildings = f.building_number join workspace w on f.id_floor = w.floor_number join reservations r on w.id_workspace = r.id_workspace join companies c on r.id_companies = c.id_companies join workspace_equipments we on w.id_workspace = we.id_workspace join equipments e on we.equipment_id = e.id_equipments where c.id_companies = ? and w.id_workspace = ?";
+        String query = "SELECT we.id_workspace_equipments as id_equipments, concat(e.name, '-', we.gridheight, we.gridwidth, we.gridx, we.gridy) as name  FROM buildings b join floors f on b.id_buildings = f.building_number join workspace w on f.id_floor = w.floor_number join reservations r on w.id_workspace = r.id_workspace join companies c on r.id_companies = c.id_companies join workspace_equipments we on w.id_workspace = we.id_workspace join equipments e on we.equipment_id = e.id_equipments where c.id_companies = ? and w.id_workspace = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, companyId);

@@ -58,6 +58,7 @@ public class CardTableModel extends DataTable {
     public Boolean addData(Map data) {
         Request insertCardReq = new Request();
         insertCardReq.setEvent("card_insert");
+        insertCardReq.setData(data);
         Response response = Utils.sendRequest(insertCardReq);
         return (Boolean) response.getMessage();
     }

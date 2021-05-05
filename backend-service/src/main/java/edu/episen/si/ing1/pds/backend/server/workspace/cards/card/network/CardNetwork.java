@@ -58,8 +58,7 @@ public class CardNetwork implements Network {
                 } else {
                     msg = "No record found";
                 }
-                Map<Map, List> accessList = service.getAccessList(card_id);
-                Map responseBody = Map.of("card", msg,"access_list", accessList);
+                Map responseBody = Map.of("card", msg);
 
                 logger.info(responseBody.toString());
 
@@ -86,6 +85,17 @@ public class CardNetwork implements Network {
                 CardRequest cardRequest = mapper.treeToValue(data, CardRequest.class);
                 Boolean response = service.delete(cardRequest);
                 writer.println(mapper.writeValueAsString(Utils.responseFactory(response, "card_delete")));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else if(event.equals("card_treeview")) {
+            try {
+                JsonNode data = request.getData();
+                CardRequest cardRequest = mapper.treeToValue(data, CardRequest.class);
+                logger.info(cardRequest.toString());
+                ArrayNode response = service.treeView(cardRequest);
+                writer.println(mapper.writeValueAsString(Utils.responseFactory(response, event)));
             } catch (Exception e) {
                 e.printStackTrace();
             }

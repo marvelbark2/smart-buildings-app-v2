@@ -1,8 +1,12 @@
 package edu.episen.si.ing1.pds.backend.server.workspace.cards.card.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.access.service.AccessService;
+import edu.episen.si.ing1.pds.backend.server.workspace.cards.access.service.IAccessService;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardRequest;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.Cards;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardsResponse;
@@ -156,10 +160,11 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
 
     public List<Map> getItemAccessList(String serialId) {
         List<Map> list = new ArrayList<>();
-        String sql = "SELECT * from getCardAccessibiliy(?)";
+        String sql = "SELECT * from getcardaccessibility(?,?)";
         try {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, serialId);
+            statement.setInt(2, companyId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 list.add(
@@ -330,6 +335,42 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
             user_id = rs.getInt(1);
         return user_id;
     }
+
+    public ArrayNode treeView(CardRequest request) {
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode response = mapper.createArrayNode();
+        IAccessService service = new AccessService(connection);
+        service.setCompanyId(companyId);
+
+        ArrayNode buidings = service.buildingList();
+        for (JsonNode building : buidings) {
+            ArrayNode floors = service.floorList(building.get("building_id").asInt());
+            for (JsonNode floor: floors) {
+                ArrayNode workspaces = service.workspaceList(floor.get("floor_id").asInt());
+                int i = 0;
+                for (JsonNode workspace: workspaces) {
+                    Boolean accessible = service.hasAccessToWorkspace(request, workspace.get("workspace_id").asInt());
+                    ArrayNode equipments = service.equipmentList(workspace.get("workspace_id").asInt());
+                    if(equipments.size() > 0) {
+                        for (JsonNode equipment: equipments) {
+                            Boolean accessibleEqui = service.hasAccessToEquipment(request, equipment.get("equipment_id").asInt());
+                            ((ObjectNode) equipment).put("accessible", accessibleEqui);
+                        }
+                    }
+                    ((ObjectNode) workspace).put("accessible", accessible);
+                    ((ObjectNode) workspace).put("equipments", equipments);
+                    workspaces.remove(i);
+                    workspaces.add(workspace);
+                    ++i;
+                }
+
+                ((ObjectNode) floor).put("workspaces", workspaces);
+            }
+            ((ObjectNode) building).put("floors", floors);
+        }
+        return buidings;
+    }
+
     private int findCardId(CardRequest request) throws SQLException {
         int card_id = 0;
         String query = "SELECT * FROM cards WHERE carduid = ?";
