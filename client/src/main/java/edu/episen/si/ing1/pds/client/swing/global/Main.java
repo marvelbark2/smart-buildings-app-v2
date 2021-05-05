@@ -142,6 +142,11 @@ public class Main implements MouseListener {
         setupBloc();
         global.add(bloc, BorderLayout.EAST);
 
+        ImageIcon icon = Utils.getImageIconFromResource("icon/wallpaper.jpg");
+        JLabel background = new JLabel();
+        background.setIcon(icon);
+        context.setLayout(new GridLayout(1, 1));
+        context.add(background);
         global.setBackground(Color.white);
     }
 
