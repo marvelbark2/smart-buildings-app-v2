@@ -158,13 +158,9 @@ public class Mapping_Window implements Navigate {
 
         JPanel carte = new JPanel(new GridBagLayout());
         Toast toaster = new Toast(carte);
-       // carte.setBorder(new LineBorder(Color.black));
         GridBagConstraints gcon = new GridBagConstraints();
         gcon.weightx = 1;
         gcon.weighty = 1;
-
-
-
         gcon.fill = GridBagConstraints.BOTH;
 
 
@@ -185,10 +181,10 @@ public class Mapping_Window implements Navigate {
             btn.addActionListener(new ActionListener() {
 
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    JButton bt = (JButton) e.getSource();
+                public void actionPerformed(ActionEvent evt) {
+                    JButton bt = (JButton) evt.getSource();
                     if(bt.getIcon() == null) {
-                    	if((Integer.valueOf(((AbstractButton) e.getSource()).getText()) == id_equipments)&& (verif_etat == "")) {
+                    	if((Integer.valueOf(((AbstractButton) evt.getSource()).getText()) == id_equipments)&& (verif_etat == "")) {
                             Map update = add_equipment(id_workspace_equipments, id_equipments);
                             
                             if(!(update.get("etat").equals("") || update.get("etat") == null)) {
@@ -202,6 +198,7 @@ public class Mapping_Window implements Navigate {
                             }
 
                         } else if(verif_etat != "") {
+                        	System.out.println(e);
                         	toaster.warn("Equipement déjà mappé !");
                         } 
                         
@@ -210,7 +207,7 @@ public class Mapping_Window implements Navigate {
                             
                         }
                     } else {
-                    	toaster.warn("Equipement déjà mappé");
+                    	//toaster.warn("Equipement déjà mappé");
                     	clicked.put("button", bt);
                     	clicked.put("equip", equips.get(bt));
                     }
@@ -255,11 +252,13 @@ public class Mapping_Window implements Navigate {
         ImageIcon icon3 = Utils.getImageIconFromResource("icon/prise.png");
         ImageIcon icon4 = Utils.getImageIconFromResource("icon/fenetre.png");
 
-        JLabel label0 = new JLabel("<html><p>Pour activer un équipement <br>"
-        		+ "merci de le déplacer vers<br>"
-        		+ "son emplacement<br>"
-        		+ "l'icone sera de couleur vert"
-        		+ ""
+        JLabel label0 = new JLabel("<html><p><br>Pour activer un équipement <br>"
+        		+ "  merci de le déplacer vers <br>son emplacement respectif<br>"
+        		+ "<br>"
+        		+ "Une icone de couleur verte :<br>"
+        		+ "l'équipement est actif<br>"
+        		+ "Une icône de couleur rouge :<br>"
+        		+ "l'équipement est hors service"
         		+ "</p></html>",JLabel.CENTER);
 
 
@@ -301,11 +300,13 @@ public class Mapping_Window implements Navigate {
 					Map delete = delete_equipement(id_workspace_equipment);
 					
 					clicked.clear();
+					toaster.success("Suppression réussite !");
 					if(delete.get("etat").equals("")) {
 						ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(delete.get("etat")));
 	                    cButton.setIcon(icon);
 	                    cButton.repaint();
 	                    cButton.getIcon();
+	                    cButton.repaint();
 	                    toaster.success("Suppression réussite !");
 					}
 					
@@ -352,11 +353,8 @@ public class Mapping_Window implements Navigate {
         menuScroll(arbre);
         bloc_equipement();
 
-        JLabel label = new JLabel("<html><p>Pour activer un équipement <br>"
-        		+ "merci de le déplacer vers"
-        		+ "son emplacement"
-        		+ ""
-        		+ ""
+        JLabel label = new JLabel("<html><p>Bienvenu sur l'interface de configuration des équipements<br>"
+        		+ "Veuillez sélectionnez un espace à l'aide du menu"
         		+ "</p></html>");
         content.add(label);
 
