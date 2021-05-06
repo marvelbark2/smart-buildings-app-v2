@@ -67,6 +67,7 @@ public class Locat implements Way {
 		    
 		    valid.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					//getting the text from the different criteria we ask in the first interface
 					String Numbdesk = nbBureau.getText();
 					String NumbOp = nbOpenspace.getText();
 					int tmin = Integer.valueOf(tailleMin.getText()); 
@@ -74,6 +75,8 @@ public class Locat implements Way {
 					int persmax = Integer.valueOf(persMax.getText());
 					int prixmax = Integer.valueOf(prixMax.getText());
 					
+					
+					//initialing some variable which will receive the sums of workspace
 					String listesp = "";
 					//int totnbdesk = 0;
 					//int totnbopensp = 0;
@@ -83,10 +86,12 @@ public class Locat implements Way {
 					
 					p.removeAll();
 					
-					for (int i = 0; i<3;i++) {
+					for (int i = 0; i<3;i++) {// this loop is made three time, each time is a different offer
 						proposition[i]=new JLabel("");
 						
 						
+						
+						//as long as the criteria are respected, the workspace are selected one by one  
 				while(totsize<tmax && totpers<persmax &&totprice<prixmax ){
 					if(bureau_ferme.isSelected() && openspace.isSelected()) {
 						
@@ -100,7 +105,7 @@ public class Locat implements Way {
 						totpers = totpers + Integer.valueOf(data.get("employee").toString());;
 						totprice = totprice + Integer.valueOf(data.get("price").toString());;
 						System.out.println(totsize);
-						listesp = listesp + data.get("id").toString();
+						listesp = listesp +" , "+String.valueOf(data.get("id").toString());
 						
 					} else if(bureau_ferme.isSelected() && !openspace.isSelected()) {
 						Request request=new Request();
@@ -113,7 +118,7 @@ public class Locat implements Way {
 						totpers = totpers + Integer.valueOf(data.get("employee").toString());;
 						totprice = totprice + Integer.valueOf(data.get("price").toString());;
 						
-						listesp = listesp + data.get("id").toString();
+						listesp = listesp +" , "+String.valueOf(data.get("id").toString());
 					} else {
 						Request request=new Request();
 						request.setEvent("random_offer_openspace");
@@ -127,13 +132,12 @@ public class Locat implements Way {
 					totpers = totpers + Integer.valueOf(data.get("employee").toString());;
 					totprice = totprice + Integer.valueOf(data.get("price").toString());;
 					
-					listesp = listesp +" , "+ data.get("id").toString();
+					listesp = listesp +" , "+String.valueOf(data.get("id").toString());
 					}
 				}
 					
 					
-					// va chercher les données d'un espace et les mets dans un tableau dans l'ordre id,size,maxpers,price,type
-					//si je deviens chaud je récupère le nom de la salle, so étage et son bâtiment pour en faire une liste
+					
 					
 					
 					
@@ -142,7 +146,7 @@ public class Locat implements Way {
 					
 				
 					
-						// le texte change en fonction du bâtiment
+						// the text is changing about according to the different workspace that are selected
 					    	  proposition[i].setText("cette offre contient les salles: "+ listesp+ " dont  x bureau fermé et y"
 					    	  		+ " openspace pour une taille de "+
 							totsize+" metres carrés et un prix de "+totprice +" euros, il peut contenir "+totpers+" employés ");
@@ -157,6 +161,7 @@ public class Locat implements Way {
 								totpers = 0;
 								totprice = 0;
     
+								//adding the button in order to do the reservation
 					          reserv[i].addActionListener(new ActionListener(){
 					        	  public void actionPerformed(ActionEvent e) {
 					        		  nbreserv++;
@@ -164,20 +169,20 @@ public class Locat implements Way {
 					        		  Request request = new Request();
 					        			request.setEvent("done_reservation");
 					        			Map<String, Object> hm = new HashMap<>();
-					        			//hm.put("list_workspace", listesp);--erreur
+					        			//hm.put("list_workspace", listesp);--error
 					        			hm.put("reserv_numb",nbreserv);
-					        			//hm.put("id_compa",id_compa);--erreur
-					        			//hm.put("id_worksp",listesp);--erreur
+					        			//hm.put("id_compa",id_compa);--error
+					        			//hm.put("id_worksp",listesp);--error
 					        			request.setData(hm);
 					        			
 
 					        			Response response = Utils.sendRequest(request);
 
 					        			Map<String, Object>  data = (Map<String, Object>) response.getMessage();
-					        		  //reserv[i].setText("réservation acceptée !");--erreur
+					        		  //reserv[i].setText("réservation acceptée !");--error
 					        		  
 					 
-					        		// change l'etat de disponible à indispible dans la table workspace
+					  
 					        		  
 					        	  }
 					          });
@@ -189,8 +194,6 @@ public class Locat implements Way {
 						p.repaint();
 						
 					
-					
-					//ajouter la fonction sql qui va chercher toutes les données de la table en fonction de la demnde et qui en fait une liste*/
 				}
 			});
 		    
@@ -198,7 +201,7 @@ public class Locat implements Way {
 		    
 		    retButton.addActionListener(new ActionListener() {
 				
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e) {// initialing again the first interface
 					p.removeAll();
 					
 					p.add(bureau_ferme);
@@ -226,8 +229,7 @@ public class Locat implements Way {
 			});
 		    
 		 
-		    
-		           
+		    //initialing the first interface     
 		        
 		    p.add(bureau_ferme);
 		   	p.add(openspace);

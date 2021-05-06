@@ -26,6 +26,7 @@ public class Gere implements Way {
 		JPanel pangere = men.getApp().getContext();
 		JPanel pg = new JPanel( );
 		
+		//asking for the number of reservation made by a company
 		Request request = new Request();
 		request.setEvent("nb_reservation_list");
 		Map<String, Integer> hm = new HashMap<>();
@@ -35,24 +36,26 @@ public class Gere implements Way {
 		Map<String, Object>  data = (Map<String, Object>) response.getMessage();
 		
 		
+		//asking for the list of the reservation
 		Request request2 = new Request();
 		request.setEvent("reservation_list");
 		Map<String, Integer> hm2 = new HashMap<>();
-		//hm.put("company_id", ?);--erreur
+		//hm.put("company_id", ?);--error
 		request.setData(hm);
-		//Response response = Utils.sendRequest(request);--erreur
-		//Map<String, Object> data = (Map<String, Object>) response.getMessage();--erreur
+		//Response response = Utils.sendRequest(request);--error
+		//Map<String, Object> data = (Map<String, Object>) response.getMessage();--error
 		/*SocketConfig.Instance.setEnv(true);
 		Request request=new Request();
 		request.setEvent("random_offer");
-		// va chercher le nombre de reservation d'une entreprise
 		Response response = Utils.sendRequest(request);
 		int data_reserv = response.getMessage();*/
 		
-		int data_reserv = 16;
+		
+		
+		int data_reserv = 16;//number of rseervation
 	      for (int r = 0; r < data_reserv; r++) {  		
-	    	  lab[r]=new JLabel("pos");// le texte change en fonction du bâtiment
-	    	 // lab[r].setText("l'espace "+esp_reserv+"a été réservé");--erreur
+	    	  lab[r]=new JLabel("pos");
+	    	 // lab[r].setText("l'espace "+esp_reserv+"a été réservé");--error
 			  pg.add(lab[r]);
 	          bouton[r]= new JButton("annuler reservation"); 
 	          pg.add(bouton[r]);
@@ -60,7 +63,7 @@ public class Gere implements Way {
 	          bouton[r].addActionListener(new ActionListener(){
 	        	  public void actionPerformed(ActionEvent e) {
 	        		 
-	        		// change l'etat de indisponible à dispible dans la table workspace
+	        		// here should be the request for changing the state to available to available and remove from the table reservation(kill_reservation)
 	        		  
 	        	  }
 	          });
