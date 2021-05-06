@@ -193,17 +193,17 @@ public class Mapping_Window implements Navigate {
                                 bt.setIcon(icon);
                                 bt.repaint();
                                 bt.getIcon();
-                                toaster.success("Equipement mapper !");
+                                toaster.success("Mapping de l'équipement réussi !");
 
                             }
 
                         } else if(verif_etat != "") {
                         	System.out.println(e);
-                        	toaster.warn("Equipement déjà mappé !");
+                        	toaster.warn("L'équipement est déjà mappé !");
                         } 
                         
                         else {
-                            toaster.error("Erreur de mapping");
+                            toaster.error("Emplacement non réservé pour cet équipement");
                             
                         }
                     } else {
@@ -307,14 +307,11 @@ public class Mapping_Window implements Navigate {
 	                    cButton.repaint();
 	                    cButton.getIcon();
 	                    cButton.repaint();
-	                    toaster.success("Suppression réussite !");
+	                    toaster.success("Suppression de l'équipement réussite !");
 					}
-					
-					
-					
-				}
-				//toaster.success("Suppression réussite !");
 	
+				}
+
 			}
 		});
         JButton update = new JButton("Changer l'état");
