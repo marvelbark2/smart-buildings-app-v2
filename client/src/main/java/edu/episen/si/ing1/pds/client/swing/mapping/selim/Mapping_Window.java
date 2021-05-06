@@ -255,8 +255,12 @@ public class Mapping_Window implements Navigate {
         ImageIcon icon3 = Utils.getImageIconFromResource("icon/prise.png");
         ImageIcon icon4 = Utils.getImageIconFromResource("icon/fenetre.png");
 
-        String str = "Veuillez déplacer les equipements";
-        JLabel label0 = new JLabel(str,JLabel.CENTER);
+        JLabel label0 = new JLabel("<html><p>Pour activer un équipement <br>"
+        		+ "merci de le déplacer vers<br>"
+        		+ "son emplacement<br>"
+        		+ "l'icone sera de couleur vert"
+        		+ ""
+        		+ "</p></html>",JLabel.CENTER);
 
 
         JLabel label1 = new JLabel("1" ,icon1, JLabel.CENTER);
@@ -348,7 +352,12 @@ public class Mapping_Window implements Navigate {
         menuScroll(arbre);
         bloc_equipement();
 
-        JLabel label = new JLabel("Veuillez sélectionnez un espace à configurer à l'aide de l’arborescence sur votre gauche");
+        JLabel label = new JLabel("<html><p>Pour activer un équipement <br>"
+        		+ "merci de le déplacer vers"
+        		+ "son emplacement"
+        		+ ""
+        		+ ""
+        		+ "</p></html>");
         content.add(label);
 
         contentPane.add(content);
