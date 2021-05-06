@@ -26,7 +26,7 @@ public class LocationMenu implements Navigate {
 
 
 
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e) {//we change the empty pannel by a pannel with the three button of navigation
 		if(e.getSource() instanceof JButton) {
 			JButton chosenButton = (JButton) e.getSource();
 			Way way = frames.get(chosenButton);
@@ -43,7 +43,7 @@ public class LocationMenu implements Navigate {
 
 	}
 
-	public void start() {
+	public void start() {//adding the Button in order to navigate between the different page of the usecase:
 		JPanel panMenuLocat=app.getContext();
 		JPanel MenuLocat = new JPanel(new FlowLayout(FlowLayout.CENTER));
 

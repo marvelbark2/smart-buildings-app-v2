@@ -90,26 +90,26 @@ public class MappingNetwork {
                 statement.setInt(2, id_workspace_equipment);
                 switch (equipment_id) {
                     case 1:
-                        etat = "icon/ecran.png";
+                        etat = "icon/ecranOK.png";
                         statement.setString(1, etat);
                         statement.setInt(2, id_workspace_equipment);
                         statement.executeUpdate();
                         break;
                     case 2:
-                        etat = "icon/capteur.png";
+                        etat = "icon/capteurOK.png";
                         statement.setString(1, etat);
                         statement.setInt(2, id_workspace_equipment);
                         statement.executeUpdate();
                         break;
                     case 3:
-                        etat = "icon/prise.png";
+                        etat = "icon/priseOK.png";
                         statement.setString(1, etat);
                         statement.setInt(2, id_workspace_equipment);
                         statement.executeUpdate();
                         break;
 
                     case 4:
-                        etat = "icon/fenetre.png";
+                        etat = "icon/fenetreOK.png";
                         statement.setString(1, etat);
                         statement.setInt(2, id_workspace_equipment);
                         statement.executeUpdate();

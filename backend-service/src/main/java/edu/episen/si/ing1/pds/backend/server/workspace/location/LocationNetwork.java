@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//file where we can find every request I can use in the client. 
+
 public class LocationNetwork {
 
     public LocationNetwork(Request request, Connection connection, PrintWriter writer) throws Exception {
@@ -19,12 +21,13 @@ public class LocationNetwork {
         final ObjectMapper mapper = new ObjectMapper();
 
         switch (event) {
+        //request made in order to get a random openspace from the table workspace
             case "random_offer_openspace":
             	List<Map<String,Object>> offeropenspace = new ArrayList<>();
             	String query3 = "SELECT * FROM workspace where workspace_state='disponible' and workspace_type='Espace Ouvert' order by random() limit 1";
             	PreparedStatement statement1 = connection.prepareStatement(query3);
             	 ResultSet rs3 = statement1.executeQuery();
-            	 while(rs3.next()) {
+            	 if(rs3.next()) {
             		 Map<String, Object> mapOP = new HashMap<>();
             		 mapOP.put("id",rs3.getInt("id_workspace"));
             		 mapOP.put("size",rs3.getInt("size"));
@@ -37,12 +40,13 @@ public class LocationNetwork {
                  writer.println(msg3);
                  break;
                  
+                 //request made in order to get a ransom desk from the table workspace
             case "random_offer_desk":
             	List<Map<String,Object>> offerdesk = new ArrayList<>();
             	String query4 = "SELECT * FROM workspace where workspace_state='disponible' and workspace_type='Bureau' order by random() limit 1";
             	PreparedStatement statement2 = connection.prepareStatement(query4);
             	 ResultSet rs4 = statement2.executeQuery();
-            	 while(rs4.next()) {
+            	 if(rs4.next()) {
             		 Map<String, Object> mapD = new HashMap<>();
             		 mapD.put("id",rs4.getInt("id_workspace"));
             		 mapD.put("size",rs4.getInt("size"));
@@ -55,13 +59,18 @@ public class LocationNetwork {
                  writer.println(msg4);
                  break;
                  
+            
+            	                            
+               
+                
+                  //request to get a random workspace from the table workspace
                  
             case "random_offer":
             	List<Map<String,Object>> offer = new ArrayList<>();
             	String query5 = "SELECT * FROM workspace where workspace_state='disponible' order by random() limit 1";
             	PreparedStatement statement3 = connection.prepareStatement(query5);
             	 ResultSet rs5 = statement3.executeQuery();
-            	 while(rs5.next()) {
+            	 if(rs5.next()) {
             		 Map<String, Object> mapOF = new HashMap<>();
             		 mapOF.put("id",rs5.getInt("id_workspace"));
             		 mapOF.put("size",rs5.getInt("size"));
@@ -74,6 +83,8 @@ public class LocationNetwork {
                  writer.println(msg5);
                  break;
                  
+                 
+                 //request to put the state unavailable on each workspace which are in the offer selected by the user
             case "done_reservtion":
                 Map<String, Object> reservat = new HashMap<>();
                 Integer list_worksp = request.getData().get("list_workspace").asInt();
@@ -97,7 +108,9 @@ public class LocationNetwork {
                 String msg6 = mapper.writeValueAsString(response6);
                 writer.println(msg6);
                 break;
-                 
+                
+                
+                //request made in order to get a full list of the workspace that have been booked by a company 
             case "reservation_list":
                 Map<String, Object> list_reserv = new HashMap<>();
                 Integer company = request.getData().get("company_id").asInt();
@@ -113,6 +126,8 @@ public class LocationNetwork {
                 writer.println(msg7);
                 break;
                 
+                
+                // request made to get the number of reservation made by a company
             case "nb_reservation_list":
                 Map<String, Object> nb_reserva = new HashMap<>();
                 Integer company1 = request.getData().get("company_id").asInt();
@@ -128,8 +143,10 @@ public class LocationNetwork {
                 writer.println(msg8);
                 break;
                 
+                
+                //request made in order to overwrite the state available on the status available. It also remove the workspace from the table reservation
             case "kill_reservation":
-//                Map<String, Object> ask_destroy = new HashMap<>();
+              Map<String, Object> ask_destroy = new HashMap<>();
                 int reservationId = request.getData().get("reservation_id").asInt();
                 int idW = request.getData().get("workspace_id").asInt();
 
@@ -139,9 +156,10 @@ public class LocationNetwork {
                 statement7.setInt(1, idW);
                 statement7.executeUpdate();
                 writer.println(Utils.responseFactory(true ,event));
-
                 break;
                 
+                
+                //request made to get the list of the Buildings especially the name
             case "buildings_list":
             	List<Map> response = new ArrayList<>();                            
                 Statement statement8 = connection.createStatement();
@@ -156,19 +174,39 @@ public class LocationNetwork {
                 writer.println(msg10);
                 break;
                 
+                
+                
+                //request made to get the list of the floors in a buildings
             case "floors_list":
             	List<Map<Map,Object>> response10 = new ArrayList<>();                            
                 Statement statement9 = connection.createStatement();
-                Integer building_id1 = request.getData().get("building_id").asInt();
-                ResultSet rs10 = statement9.executeQuery("SELECT * FROM floors WHERE building_number=" + building_id1);
+                String building_id1 = request.getData().get("building_id").toString();
+                ResultSet rs10 = statement9.executeQuery("SELECT * FROM floors INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE buildings.name =" + building_id1);
                 while (rs10.next()) {
                     Map fMap=new HashMap();
-                    fMap.put("number", rs10.getString("floor_number"));
+                    fMap.put("number", rs10.getInt("floor_number"));
                     response10.add(fMap);
                 }
                 Map rsp11=Utils.responseFactory(response10, event);
                 String msg11=mapper.writeValueAsString(rsp11);
                 writer.println(msg11);
+                break;
+                
+                //request made in order to get the number of workspace in a floor
+            case "numb_workspace":
+            	List<Map<Map,Object>> response11 = new ArrayList<>();                            
+                Statement statement10 = connection.createStatement();
+                String building_id2 = request.getData().get("building_id").toString();
+                Integer floor_id = request.getData().get("floor_id").asInt(); ;
+                ResultSet rs11 = statement10.executeQuery("SELECT COUNT(*) FROM workspace INNER JOIN floors ON workspace.floor_number = floors.floor_number INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE floors.floor_number = "+ floor_id +" AND  buildings.name =" + building_id2);
+                while (rs11.next()) {
+                    Map wMap=new HashMap();
+                    wMap.put("wnumber", rs11.getInt("count"));
+                    response11.add(wMap);
+                }
+                Map rsp12=Utils.responseFactory(response11, event);
+                String msg12=mapper.writeValueAsString(rsp12);
+                writer.println(msg12);
                 break;
     }
 }

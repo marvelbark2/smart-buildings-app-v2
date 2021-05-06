@@ -158,13 +158,9 @@ public class Mapping_Window implements Navigate {
 
         JPanel carte = new JPanel(new GridBagLayout());
         Toast toaster = new Toast(carte);
-       // carte.setBorder(new LineBorder(Color.black));
         GridBagConstraints gcon = new GridBagConstraints();
         gcon.weightx = 1;
         gcon.weighty = 1;
-
-
-
         gcon.fill = GridBagConstraints.BOTH;
 
 
@@ -185,10 +181,10 @@ public class Mapping_Window implements Navigate {
             btn.addActionListener(new ActionListener() {
 
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    JButton bt = (JButton) e.getSource();
+                public void actionPerformed(ActionEvent evt) {
+                    JButton bt = (JButton) evt.getSource();
                     if(bt.getIcon() == null) {
-                    	if((Integer.valueOf(((AbstractButton) e.getSource()).getText()) == id_equipments)&& (verif_etat == "")) {
+                    	if((Integer.valueOf(((AbstractButton) evt.getSource()).getText()) == id_equipments)&& (verif_etat == "")) {
                             Map update = add_equipment(id_workspace_equipments, id_equipments);
                             
                             if(!(update.get("etat").equals("") || update.get("etat") == null)) {
@@ -197,20 +193,21 @@ public class Mapping_Window implements Navigate {
                                 bt.setIcon(icon);
                                 bt.repaint();
                                 bt.getIcon();
-                                toaster.success("Equipement mapper !");
+                                toaster.success("Mapping de l'équipement réussi !");
 
                             }
 
                         } else if(verif_etat != "") {
-                        	toaster.warn("Equipement déjà mappé !");
+                        	System.out.println(e);
+                        	toaster.warn("L'équipement est déjà mappé !");
                         } 
                         
                         else {
-                            toaster.error("Erreur de mapping");
+                            toaster.error("Emplacement non réservé pour cet équipement");
                             
                         }
                     } else {
-                    	toaster.warn("Equipement déjà mappé");
+                    	//toaster.warn("Equipement déjà mappé");
                     	clicked.put("button", bt);
                     	clicked.put("equip", equips.get(bt));
                     }
@@ -255,8 +252,14 @@ public class Mapping_Window implements Navigate {
         ImageIcon icon3 = Utils.getImageIconFromResource("icon/prise.png");
         ImageIcon icon4 = Utils.getImageIconFromResource("icon/fenetre.png");
 
-        String str = "Veuillez déplacer les equipements";
-        JLabel label0 = new JLabel(str,JLabel.CENTER);
+        JLabel label0 = new JLabel("<html><p><br>Pour activer un équipement <br>"
+        		+ "  merci de le déplacer vers <br>son emplacement respectif<br>"
+        		+ "<br>"
+        		+ "Une icone de couleur verte :<br>"
+        		+ "l'équipement est actif<br>"
+        		+ "Une icône de couleur rouge :<br>"
+        		+ "l'équipement est hors service"
+        		+ "</p></html>",JLabel.CENTER);
 
 
         JLabel label1 = new JLabel("1" ,icon1, JLabel.CENTER);
@@ -297,19 +300,18 @@ public class Mapping_Window implements Navigate {
 					Map delete = delete_equipement(id_workspace_equipment);
 					
 					clicked.clear();
+					toaster.success("Suppression réussite !");
 					if(delete.get("etat").equals("")) {
 						ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(delete.get("etat")));
 	                    cButton.setIcon(icon);
 	                    cButton.repaint();
 	                    cButton.getIcon();
-	                    toaster.success("Suppression réussite !");
+	                    cButton.repaint();
+	                    toaster.success("Suppression de l'équipement réussite !");
 					}
-					
-					
-					
-				}
-				//toaster.success("Suppression réussite !");
 	
+				}
+
 			}
 		});
         JButton update = new JButton("Changer l'état");
@@ -348,7 +350,9 @@ public class Mapping_Window implements Navigate {
         menuScroll(arbre);
         bloc_equipement();
 
-        JLabel label = new JLabel("Veuillez sélectionnez un espace à configurer à l'aide de l’arborescence sur votre gauche");
+        JLabel label = new JLabel("<html><p>Bienvenu sur l'interface de configuration des équipements<br>"
+        		+ "Veuillez sélectionnez un espace à l'aide du menu"
+        		+ "</p></html>");
         content.add(label);
 
         contentPane.add(content);

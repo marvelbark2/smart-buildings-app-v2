@@ -22,27 +22,24 @@ import java.util.Vector;
 public class MapCity implements Way {
 	private List<Map> buildings;
 	private List<Map> floors;
+	private List<Map> numbw;
 	
 	public void begin(LocationMenu men) {
 		JPanel panelmap = men.getApp().getContext();
 		JPanel panm = new JPanel(new BorderLayout());
 		JPanel panm_north = new JPanel();
 		
-		// il me faut une requetes qui vont prendre la liste
-		//des bâtiments et la mettre dans un JComboBox et uen qui fait la même avec les étage
+		
+	
 		
 		
-		 
 		
-		String labelsbat[] = {/*liste des batiments*/};
-		String labelsfloors[] = {/*liste des étages*/};
 		
-		//JComboBox<String> comboBoxbat = new JComboBox<>(labelsbat);
-		//JComboBox<String> comboBoxfloors = new JComboBox<>(labelsfloors);
+		
 		JButton validplace = new JButton("valider");
 		
 		
-		
+		//using the method getBuildingList and then put the answer in the JCombobox
 			buildings = getBuildingList();
 			JComboBox comboBuild= new JComboBox(new Vector(buildings));
 
@@ -58,7 +55,18 @@ public class MapCity implements Way {
 	        });
 	        
 	        
-	        floors = getFloorList();
+	        
+	       //sending the request in orderto get the List of the floors of the building we have already selected
+	        Request request = new Request();
+	        request.setEvent("floors_list");
+	        Map<String, Object> hm = new HashMap<>();
+			hm.put("building_id", comboBuild.getSelectedItem());
+			request.setData(hm);
+	        Response response = Utils.sendRequest(request);
+	          
+	    
+	        //putting the floor in a JComboBox
+	        floors = (List<Map>) response.getMessage();
 	        JComboBox comboFloor= new JComboBox(new Vector(floors));
 	        comboFloor.setRenderer(new DefaultListCellRenderer() {
 	            @Override
@@ -71,20 +79,34 @@ public class MapCity implements Way {
 	            }
 	        });
 	        
+	        
+	        	//asking the request for the number of workspace depending the floor and the buillding
+		        Request request1 = new Request();
+		        request1.setEvent("numb_workspace");
+		        Map<String, Object> hm1 = new HashMap<>();
+				hm1.put("building_id", comboBuild.getSelectedItem());
+				hm1.put("floor_id",comboFloor.getSelectedItem());
+				request1.setData(hm1);
+		        Response response1 = Utils.sendRequest(request1);
+		        numbw= (List<Map>) response1.getMessage();
+	        
+	        String x= numbw.get(0).toString();
+	        int k = Integer.parseInt(x);//putting the answer in this variable
+	        
+	        JPanel panm_center = new JPanel(new GridLayout(k,2,20,20));
 
 	        panm_north.add(comboBuild);
 	        panm_north.add(comboFloor);
 		
-		//panm_north.add(comboBoxbat);
-		//panm_north.add(comboBoxfloors);
+		
 		panm_north.add(validplace);
 		
 		panm.add(panm_north,BorderLayout.NORTH);
 		
-		//il me fait une requete qui récupère tous les workspace et les états de cette selection
-		//il me faut une requete qui recupere le nombre d'espace
-		int k =4;//nb de salle
+		//here should be the request for the different state of each workspace
 		
+		
+		//putting the color on the different workspace depending their state
 		validplace.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					for (int i = 0; i<2;i++) {
@@ -100,14 +122,16 @@ public class MapCity implements Way {
 							}
 							box.add(new JLabel("salle "+ x));
 							x++;
+							panm_center.add(box);
 						}
 					}
 				}
 		});
-		
+		panm.add(panm_center);
 		panelmap.add(panm);
 		};
 		
+		//method to get send the request for the list of building
 		private List<Map> getBuildingList() {
 		        Request req = new Request();
 		        req.setEvent("buildings_list");
@@ -115,32 +139,10 @@ public class MapCity implements Way {
 		        return  (List<Map>) response.getMessage();
 		    }
 		
-		private List<Map> getFloorList() {
-	        Request request = new Request();
-	        request.setEvent("floors_list");
-	        Map<String, Integer> hm = new HashMap<>();
-			hm.put("building_id", 2);
-			request.setData(hm);
-	        Response response = Utils.sendRequest(request);
-	        return  (List<Map>) response.getMessage();
+		
+		
 	    }
-		/*Request request = new Request();
-		request.setEvent("location_building_byid");
-
-
-		Map<String, Integer> hm = new HashMap<>();
-		hm.put("building_id", 2);
-		request.setData(hm);
-
-		Response response = Utils.sendRequest(request);
-
-		Map<String, Object>  data = (Map<String, Object>) response.getMessage();
-
-		JLabel name = new JLabel(data.get("name").toString());
-		JButton id = new JButton(data.get("id").toString());
-
-		panel.add(name);
-		panel.add(id);*/
-	}
+		
+	
 
 
