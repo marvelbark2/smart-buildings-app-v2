@@ -53,6 +53,31 @@ public class MappingNetwork {
                 throwables.printStackTrace();
             }
 
+        }else if(event.equalsIgnoreCase("delete_equipment")) {
+        	JsonNode data = request.getData();
+            int id_workspace_equipment = data.get("id_workspace_equipments").asInt();
+            String sql = "UPDATE workspace_equipments SET etat = '' WHERE id_workspace_equipments = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, id_workspace_equipment);
+            statement.executeUpdate();
+            
+            String query2 = "SELECT * FROM workspace_equipments WHERE id_workspace_equipments = ?";
+            PreparedStatement stmt = connection.prepareStatement(query2);
+            stmt.setInt(1, id_workspace_equipment);
+            ResultSet rs = stmt.executeQuery();
+            Map hm = new HashMap();
+            if(rs.next()) {
+                hm.put("id_workspace_equipments", rs.getInt("id_workspace_equipments"));
+                hm.put("gridx", rs.getInt("gridx"));
+                hm.put("gridy", rs.getInt("gridy"));
+                hm.put("gridwidth", rs.getInt("gridwidth"));
+                hm.put("gridheigth", rs.getInt("gridheight"));
+                hm.put("equipment_id", rs.getInt("equipment_id"));
+                hm.put("etat", rs.getString("etat"));
+            }
+            Map delete = Utils.responseFactory(hm, event);
+            writer.println(mapper.writeValueAsString(delete));
+            
         }
         else if(event.equalsIgnoreCase("add_equipment")) {
             try {
@@ -107,8 +132,8 @@ public class MappingNetwork {
                     hm.put("equipment_id", rs.getInt("equipment_id"));
                     hm.put("etat", rs.getString("etat"));
                 }
-                Map formatter = Utils.responseFactory(hm, event);
-                writer.println(mapper.writeValueAsString(formatter));
+                Map update = Utils.responseFactory(hm, event);
+                writer.println(mapper.writeValueAsString(update));
             } catch (Exception e) {
                 e.printStackTrace();
             }

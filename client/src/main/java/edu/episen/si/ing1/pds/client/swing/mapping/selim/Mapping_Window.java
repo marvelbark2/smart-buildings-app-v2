@@ -197,7 +197,7 @@ public class Mapping_Window implements Navigate {
                                 bt.setIcon(icon);
                                 bt.repaint();
                                 bt.getIcon();
-                                toaster.success("Equipement mapper");
+                                toaster.success("Equipement mapper !");
 
                             }
 
@@ -206,7 +206,7 @@ public class Mapping_Window implements Navigate {
                         } 
                         
                         else {
-                            toaster.success("Erreur de mapping");
+                            toaster.error("Erreur de mapping");
                             
                         }
                     } else {
@@ -233,6 +233,14 @@ public class Mapping_Window implements Navigate {
         request.setEvent("add_equipment");
         request.setData(Map.of("id_workspace_equipments", id_workspace_equipment, "equipment_id", equipment_id));
         Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON
+        return (Map) response.getMessage();
+    }
+    
+    private Map delete_equipement(int id_workspace_equipment) {
+    	Request request=new Request();
+        request.setEvent("delete_equipment");
+        request.setData(Map.of("id_workspace_equipments", id_workspace_equipment));
+        Response response = Utils.sendRequest(request); 
         return (Map) response.getMessage();
     }
 
@@ -271,6 +279,7 @@ public class Mapping_Window implements Navigate {
         label4.setTransferHandler(new TransferHandler("text"));
 
         JPanel button = new JPanel(new FlowLayout());
+        Toast toaster = new Toast(button);
         
         JButton delete = new JButton("Supprimer");
         delete.addActionListener(new ActionListener() {
@@ -282,14 +291,24 @@ public class Mapping_Window implements Navigate {
 					JButton cButton = (JButton) clicked.get("button");
 					cButton.setIcon(null);
 					Map equipdata = (Map) clicked.get("equip");
-					System.out.println(equipdata.get("id_workspace_equipments"));
-					
+					//System.out.println(equipdata.get("id_workspace_equipments"));
+					Integer id_workspace_equipment = (Integer) equipdata.get("id_workspace_equipments");
 					//need to call method to delete
+					Map delete = delete_equipement(id_workspace_equipment);
 					
 					clicked.clear();
-					// toast 
+					if(delete.get("etat").equals("")) {
+						ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(delete.get("etat")));
+	                    cButton.setIcon(icon);
+	                    cButton.repaint();
+	                    cButton.getIcon();
+	                    toaster.success("Suppression réussite !");
+					}
+					
+					
 					
 				}
+				//toaster.success("Suppression réussite !");
 	
 			}
 		});
