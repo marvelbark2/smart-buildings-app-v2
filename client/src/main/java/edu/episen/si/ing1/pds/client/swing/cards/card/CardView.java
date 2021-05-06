@@ -214,7 +214,8 @@ public class CardView implements Routes {
                         }
                     });
                     tree.setRootVisible(false);
-                    infoPanel.add(tree);
+                    JScrollPane span = new JScrollPane(tree);
+                    infoPanel.add(span);
 
                     JPanel history = new JPanel(new GridLayout(1,1));
 
