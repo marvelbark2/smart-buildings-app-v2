@@ -42,10 +42,13 @@ import edu.episen.si.ing1.pds.client.utils.Utils;
 
 
 
+
+
 public class Mapping_Window implements Navigate {
     Main global;
     private JPanel content = new JPanel();
     private Toast toaster;
+    private Map clicked = new HashMap<>(); 
 
 
     public Mapping_Window(Main global) {
@@ -54,11 +57,8 @@ public class Mapping_Window implements Navigate {
 
     }
 
-
     private void menuScroll(JTree arbre2) {
         JPanel menuPanel = global.getMenu();
-
-
         JScrollPane menu = new JScrollPane(arbre2);
 
         menuPanel.removeAll();
@@ -67,8 +67,6 @@ public class Mapping_Window implements Navigate {
         menuPanel.invalidate();
         menuPanel.validate();
         menuPanel.repaint();
-
-
     }
 
     private JTree buildTree() {
@@ -87,7 +85,7 @@ public class Mapping_Window implements Navigate {
                 DefaultMutableTreeNode buildNode = new DefaultMutableTreeNode(buildingMap.get("name"));
 
                 for (Object floor: dataMap.get(building)) {
-                    Map<Map, List> floorN = (Map) floor;
+                    Map<Map,List> floorN = (Map) floor;
 
                     for (Object works: floorN.keySet()) {
                         Map floorMap = Utils.toMap(works.toString());
@@ -119,7 +117,7 @@ public class Mapping_Window implements Navigate {
                         content.removeAll();
 
                         content.setLayout(new BorderLayout());
-                        content.add(carte((Integer) ((Map)  selected).get("id_workspace")));
+                        content.add(carte((Integer)((Map)selected).get("id_workspace")));
                         content.invalidate();
                         content.validate();
                         content.repaint();
@@ -151,7 +149,6 @@ public class Mapping_Window implements Navigate {
         return toolBar;
     }
 
-
     private JPanel carte(Integer id) {
         Request request=new Request();
         request.setEvent("mapping_list");
@@ -160,7 +157,8 @@ public class Mapping_Window implements Navigate {
         List<Map> data=(List<Map>) response.getMessage();
 
         JPanel carte = new JPanel(new GridBagLayout());
-        carte.setBorder(new LineBorder(Color.black));
+        Toast toaster = new Toast(carte);
+       // carte.setBorder(new LineBorder(Color.black));
         GridBagConstraints gcon = new GridBagConstraints();
         gcon.weightx = 1;
         gcon.weighty = 1;
@@ -170,68 +168,63 @@ public class Mapping_Window implements Navigate {
         gcon.fill = GridBagConstraints.BOTH;
 
 
-
+        Map<JButton, Map> equips = new HashMap<>();
+    
         for(Map e:data) {
 
             Integer id_workspace_equipments = Integer.valueOf(e.get("id_workspace_equipments").toString());
             Integer id_equipments = Integer.valueOf(e.get("equipment_id").toString());
+            String verif_etat = e.get("etat").toString();
             JButton btn = new JButton();
+            equips.put(btn, e);
             if(!e.get("etat").equals("")) {
                 ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(e.get("etat")));
                 btn.setIcon(icon);
                 btn.setTransferHandler(new TransferHandler("text"));
-
-            }
-
-
+            }   
             btn.addActionListener(new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    JButton bt = (JButton) e.getSource();
+                    if(bt.getIcon() == null) {
+                    	if((Integer.valueOf(((AbstractButton) e.getSource()).getText()) == id_equipments)&& (verif_etat == "")) {
+                            Map update = add_equipment(id_workspace_equipments, id_equipments);
+                            
+                            if(!(update.get("etat").equals("") || update.get("etat") == null)) {
 
-                    System.out.println(id_workspace_equipments);
-                    System.out.println(id_equipments);
-                    String verif= ((AbstractButton) e.getSource()).getText();
-                    System.out.println(verif);
-                    if(Integer.valueOf(verif) == id_equipments) {
-                        Map update = add_equipment(id_workspace_equipments, id_equipments);
-                        JButton bt = (JButton) e.getSource();
-                        if(!(update.get("etat").equals("") || update.get("etat") == null)) {
+                                ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
+                                bt.setIcon(icon);
+                                bt.repaint();
+                                bt.getIcon();
+                                toaster.success("Equipement mapper");
 
-                            ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
-                            bt.setIcon(icon);
-                            bt.repaint();
-                            System.out.println("Equipement mapper");
-                            // toaster.success("Equipement mapper");
+                            }
 
+                        } else if(verif_etat != "") {
+                        	toaster.warn("Equipement déjà mappé !");
+                        } 
+                        
+                        else {
+                            toaster.success("Erreur de mapping");
+                            
                         }
-
-                    }
-                    else {
-                        System.out.println("Erreur de mapping");
-                        btn.removeAll();
-                        btn.repaint();
-                        btn.setTransferHandler(new TransferHandler("text"));
+                    } else {
+                    	toaster.warn("Equipement déjà mappé");
+                    	clicked.put("button", bt);
+                    	clicked.put("equip", equips.get(bt));
                     }
 
                 }
             });
-
-
-
             gcon.gridx = Integer.valueOf(e.get("gridx").toString());
             gcon.gridy = Integer.valueOf(e.get("gridy").toString());
             gcon.gridheight = Integer.valueOf(e.get("gridheigth").toString());
             gcon.gridwidth = Integer.valueOf(e.get("gridwidth").toString());
             btn.setTransferHandler(new TransferHandler("text"));
             carte.add(btn, gcon);
-
-
         }
-
-
         return carte;
-
     }
 
     private Map add_equipment(int id_workspace_equipment,int equipment_id) {
@@ -240,7 +233,6 @@ public class Mapping_Window implements Navigate {
         request.setEvent("add_equipment");
         request.setData(Map.of("id_workspace_equipments", id_workspace_equipment, "equipment_id", equipment_id));
         Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON
-        // System.out.println(response);
         return (Map) response.getMessage();
     }
 
@@ -248,7 +240,7 @@ public class Mapping_Window implements Navigate {
 
 
         JPanel bloc = global.getBloc();
-        bloc.setLayout(new GridLayout(5,1));
+        bloc.setLayout(new GridLayout(6,1));
 
         ImageIcon icon1 = Utils.getImageIconFromResource("icon/ecran.png");
         ImageIcon icon2 = Utils.getImageIconFromResource("icon/capteur.png");
@@ -274,25 +266,48 @@ public class Mapping_Window implements Navigate {
 
 
         label1.setTransferHandler(new TransferHandler("text"));
-        //label11.setTransferHandler(new TransferHandler("icon"));
         label2.setTransferHandler(new TransferHandler("text"));
         label3.setTransferHandler(new TransferHandler("text"));
         label4.setTransferHandler(new TransferHandler("text"));
 
-
+        JPanel button = new JPanel(new FlowLayout());
+        
+        JButton delete = new JButton("Supprimer");
+        delete.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(clicked.size() > 0) {
+ 					System.out.println(clicked.get("equip"));
+					JButton cButton = (JButton) clicked.get("button");
+					cButton.setIcon(null);
+					Map equipdata = (Map) clicked.get("equip");
+					System.out.println(equipdata.get("id_workspace_equipments"));
+					
+					//need to call method to delete
+					
+					clicked.clear();
+					// toast 
+					
+				}
+	
+			}
+		});
+        JButton update = new JButton("Changer l'état");
+        button.add(update);
+        button.add(delete);
+        
+        
         bloc.add(label0);
         bloc.add(label1);
         bloc.add(label2);
         bloc.add(label3);
         bloc.add(label4);
+        bloc.add(button);
         bloc.setVisible(true);
         bloc.repaint();
 
-
     }
-
-
-
     private class DragMouseAdapter extends MouseAdapter {
 
         public void mousePressed(MouseEvent e) {
@@ -302,8 +317,6 @@ public class Mapping_Window implements Navigate {
             handler.exportAsDrag(c, e, TransferHandler.COPY);
         }
     }
-
-
 
     @Override
     public void start() {
@@ -327,7 +340,6 @@ public class Mapping_Window implements Navigate {
 
 
     }
-
 
     @Override
     public void actionPerformed(ActionEvent e) {
