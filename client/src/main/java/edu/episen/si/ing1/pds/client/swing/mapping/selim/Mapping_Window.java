@@ -53,8 +53,6 @@ public class Mapping_Window implements Navigate {
 
     public Mapping_Window(Main global) {
         this.global = global;
-
-
     }
 
     private void menuScroll(JTree arbre2) {
@@ -134,7 +132,6 @@ public class Mapping_Window implements Navigate {
     private JToolBar createToolBar() {
 
         JToolBar toolBar = new JToolBar();
-
         JButton retour = new JButton("Retour");
         retour.addActionListener(new ActionListener() {
             @Override
@@ -145,7 +142,6 @@ public class Mapping_Window implements Navigate {
             }
         });
         toolBar.add(retour);
-
         return toolBar;
     }
 
@@ -154,7 +150,7 @@ public class Mapping_Window implements Navigate {
         request.setEvent("mapping_list");
         request.setData(Map.of("workspace_id", id));
         Response response = Utils.sendRequest(request);
-        List<Map> data=(List<Map>) response.getMessage();
+        List<Map> data=(List<Map>) response.getMessage();  
 
         JPanel carte = new JPanel(new GridBagLayout());
         Toast toaster = new Toast(carte);
@@ -163,7 +159,6 @@ public class Mapping_Window implements Navigate {
         gcon.weighty = 1;
         gcon.fill = GridBagConstraints.BOTH;
 
-
         Map<JButton, Map> equips = new HashMap<>();
     
         for(Map e:data) {
@@ -171,6 +166,7 @@ public class Mapping_Window implements Navigate {
             Integer id_workspace_equipments = Integer.valueOf(e.get("id_workspace_equipments").toString());
             Integer id_equipments = Integer.valueOf(e.get("equipment_id").toString());
             String verif_etat = e.get("etat").toString();
+            System.out.println(verif_etat + "sys de verif_etat");
             JButton btn = new JButton();
             equips.put(btn, e);
             if(!e.get("etat").equals("")) {
@@ -183,22 +179,27 @@ public class Mapping_Window implements Navigate {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
                     JButton bt = (JButton) evt.getSource();
+                    
+                    System.out.println("clic sur un emplacement"); // SYSTEM OUT 
+                    
                     if(bt.getIcon() == null) {
                     	if((Integer.valueOf(((AbstractButton) evt.getSource()).getText()) == id_equipments)&& (verif_etat == "")) {
                             Map update = add_equipment(id_workspace_equipments, id_equipments);
+                            
+                            System.out.println(update + "sys de update"); // SYSTEM OUT 
                             
                             if(!(update.get("etat").equals("") || update.get("etat") == null)) {
 
                                 ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
                                 bt.setIcon(icon);
-                                bt.repaint();
-                                bt.getIcon();
+                                bt.repaint();                               
                                 toaster.success("Mapping de l'équipement réussi !");
-
                             }
 
                         } else if(verif_etat != "") {
-                        	System.out.println(e);
+                        	
+                        	System.out.println(e + "sys de la map e"); // SYSTEM OUT 
+                        	
                         	toaster.warn("L'équipement est déjà mappé !");
                         } 
                         
@@ -207,6 +208,7 @@ public class Mapping_Window implements Navigate {
                             
                         }
                     } else {
+                    	System.out.println("On entre ici quand ? ");
                     	//toaster.warn("Equipement déjà mappé");
                     	clicked.put("button", bt);
                     	clicked.put("equip", equips.get(bt));
@@ -237,6 +239,14 @@ public class Mapping_Window implements Navigate {
     	Request request=new Request();
         request.setEvent("delete_equipment");
         request.setData(Map.of("id_workspace_equipments", id_workspace_equipment));
+        Response response = Utils.sendRequest(request); 
+        return (Map) response.getMessage();
+    }
+    
+    private Map update_equipement(int id_workspace_equipment,int equipment_id) {
+    	Request request=new Request();
+        request.setEvent("update_equipment");
+        request.setData(Map.of("id_workspace_equipments", id_workspace_equipment, "equipment_id", equipment_id));
         Response response = Utils.sendRequest(request); 
         return (Map) response.getMessage();
     }
@@ -290,16 +300,21 @@ public class Mapping_Window implements Navigate {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(clicked.size() > 0) {
- 					System.out.println(clicked.get("equip"));
+					
+ 					System.out.println(clicked.get("equip") + "syys de clicled dans bouton delete");// SYSTEM OUT 
+ 					
 					JButton cButton = (JButton) clicked.get("button");
 					cButton.setIcon(null);
 					Map equipdata = (Map) clicked.get("equip");
-					//System.out.println(equipdata.get("id_workspace_equipments"));
+					
 					Integer id_workspace_equipment = (Integer) equipdata.get("id_workspace_equipments");
 					//need to call method to delete
 					Map delete = delete_equipement(id_workspace_equipment);
 					
 					clicked.clear();
+					
+					System.out.println(delete + "syys de la map delete");// SYSTEM OUT 
+					
 					toaster.success("Suppression réussite !");
 					if(delete.get("etat").equals("")) {
 						ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(delete.get("etat")));
@@ -315,10 +330,40 @@ public class Mapping_Window implements Navigate {
 			}
 		});
         JButton update = new JButton("Changer l'état");
+        update.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(clicked.size() > 0) {
+					
+ 					System.out.println(clicked.get("equip")+ "syys de clicled dans bouton update"); // SYSTEM OUT 
+ 					
+					JButton cButton = (JButton) clicked.get("button");
+					
+					Map equipdata = (Map) clicked.get("equip");
+				
+					Integer id_workspace_equipment = (Integer) equipdata.get("id_workspace_equipments");
+					Integer id_equipment = (Integer) equipdata.get("equipment_id");
+					Map update = update_equipement(id_workspace_equipment, id_equipment);
+					
+					System.out.println(update + "syys de la map update"); // SYSTEM OUT 
+					
+				
+					if(!(update.get("etat").equals("") || update.get("etat") == null)) {
+						ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
+	                    cButton.setIcon(icon);
+	                    cButton.repaint();
+	                    toaster.error("Equipement hors service ! ");
+  
+					}
+	
+				}
+				
+			}
+		});
+        
         button.add(update);
         button.add(delete);
-        
-        
         bloc.add(label0);
         bloc.add(label1);
         bloc.add(label2);
@@ -350,18 +395,13 @@ public class Mapping_Window implements Navigate {
         menuScroll(arbre);
         bloc_equipement();
 
-        JLabel label = new JLabel("<html><p>Bienvenu sur l'interface de configuration des équipements<br>"
+        JLabel label = new JLabel("<html><p>Bienvenue sur l'interface de configuration des équipements<br>"
         		+ "Veuillez sélectionnez un espace à l'aide du menu"
         		+ "</p></html>");
         content.add(label);
-
         contentPane.add(content);
-
-
         contentPane.add(createToolBar(), BorderLayout.NORTH);
         global.getFrame().pack();
-
-
     }
 
     @Override
