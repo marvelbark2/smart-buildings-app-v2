@@ -6,6 +6,7 @@ import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.cards.Routes;
 import edu.episen.si.ing1.pds.client.swing.cards.models.DataTable;
 import edu.episen.si.ing1.pds.client.swing.cards.models.UserTableModel;
+import edu.episen.si.ing1.pds.client.swing.cards.roles.RoleRequests;
 import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class UsersView implements Routes {
             public void actionPerformed(ActionEvent actionEvent) {
                 int selectedRow = table.getSelectedRow();
                 Map user = model.getDataSource().get(selectedRow);
-                new UserDetails(context.frame(), user);
+                new UserDetails(context, user);
             }
         });
 
@@ -92,10 +93,7 @@ public class UsersView implements Routes {
         nameFieldPanel.add(nameField);
 
         JPanel roleFieldPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        Request request = new Request();
-        request.setEvent("role_list");
-        Response response = Utils.sendRequest(request);
-        List<Map> roleList = (List<Map>) response.getMessage();
+        List<Map> roleList = RoleRequests.fetchRoleList();
         JComboBox comboBox = new JComboBox(new Vector(roleList));
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override

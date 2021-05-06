@@ -34,11 +34,38 @@ public class CardRequests {
         return (List<Map>) response.getMessage();
     }
 
+    public static List<Map> cardTree(Map data) {
+        Request request1 = new Request();
+        request1.setEvent("card_treeview");
+        data.remove("cardId");
+        request1.setData(data);
+        Response response1 = Utils.sendRequest(request1);
+        return  (List<Map>) response1.getMessage();
+    }
+
     public static Boolean updateCard(Map editData) {
         Request editReq = new Request();
         editReq.setEvent("card_update");
         editReq.setData(editData);
         Response ediRes = Utils.sendRequest(editReq);
         return (Boolean) ediRes.getMessage();
+    }
+
+    public static Boolean deleteCard(Map data) {
+        Request request = new Request();
+        request.setEvent("card_delete");
+        if(data.containsKey("cardId")) {
+            data.remove("cardId");
+        }
+        request.setData(data);
+        Response response = Utils.sendRequest(request);
+        return (Boolean) response.getMessage();
+    }
+    public static Boolean inserCard(Map data) {
+        Request insertCardReq = new Request();
+        insertCardReq.setEvent("card_insert");
+        insertCardReq.setData(data);
+        Response response = Utils.sendRequest(insertCardReq);
+        return (Boolean) response.getMessage();
     }
 }

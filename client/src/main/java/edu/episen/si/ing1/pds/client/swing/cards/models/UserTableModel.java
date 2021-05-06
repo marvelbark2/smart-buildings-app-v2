@@ -44,12 +44,7 @@ public class UserTableModel extends DataTable {
     }
 
     public Boolean addData(Map data) {
-        Request request = new Request();
-        request.setEvent("user_insert");
-        request.setData(data);
-        Response response = Utils.sendRequest(request);
-        Boolean isInserted = (Boolean) response.getMessage();
-        return isInserted;
+        return UserRequests.insertUser(data);
     }
 
     public List<Map> getDataSource() {

@@ -5,10 +5,11 @@ import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.swing.cards.ComponentRegister;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.cards.Routes;
+import edu.episen.si.ing1.pds.client.swing.cards.card.dialogs.CardReadDialog;
+import edu.episen.si.ing1.pds.client.swing.cards.card.dialogs.Dialogs;
 import edu.episen.si.ing1.pds.client.swing.cards.card.listeners.CardButtonListener;
 import edu.episen.si.ing1.pds.client.swing.cards.models.CardTableModel;
-import edu.episen.si.ing1.pds.client.swing.cards.models.DualListBox;
-import edu.episen.si.ing1.pds.client.swing.global.MenuItem;
+import edu.episen.si.ing1.pds.client.swing.cards.user.UserRequests;
 import edu.episen.si.ing1.pds.client.swing.global.shared.Ui;
 import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 import edu.episen.si.ing1.pds.client.utils.Utils;
@@ -18,8 +19,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -103,134 +102,12 @@ public class CardView implements Routes {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = table.getSelectedRow();
                 if (table.isRowSelected(selectedRow)) {
-                    Request request = new Request();
-                    request.setEvent("card_byid");
-                    request.setData(
-                            Map.of(
-                                    "id",
-                                    Integer.parseInt(dataTable.get(selectedRow).get(tableModel.getColumnName(0)).toString())
-                            )
-                    );
-                    Response response = Utils.sendRequest(request);
-                    Map<String, Object> responseBody = (Map<String, Object>) response.getMessage();
+                    Map<String, Object> responseBody = CardRequests.fetchCardById(Integer.parseInt(dataTable.get(selectedRow).get(tableModel.getColumnName(0)).toString()));
                     Map<String, Object> data = (Map<String, Object>) responseBody.get("card");
-                    //Map<String, List<Map<String, List>>> accessList = (Map<String, List<Map<String, List>>>) responseBody.get("access_list");
 
-                    Request request1 = new Request();
-                    request1.setEvent("card_treeview");
-                    data.remove("cardId");
-                    request1.setData(data);
+                    Dialogs cardDialog = new CardReadDialog(context, data);
+                    cardDialog.getDialog();
 
-                    Response response1 = Utils.sendRequest(request1);
-                    List<Map> treeview = (List<Map>) response1.getMessage();
-
-
-                    JDialog dialog = new JDialog(context.frame());
-                    dialog.setSize(1000, 1000);
-                    dialog.setPreferredSize(dialog.getSize());
-
-                    UIManager.put("TabbedPane.selected", new Color(72, 64, 92));
-
-                    JPanel contentPane = new JPanel(new BorderLayout(20, 20));
-
-                    MenuItem title = new MenuItem("Voir détails d'une carte");
-                    contentPane.add(title, BorderLayout.PAGE_START);
-
-                    JTabbedPane dialogPanel = new JTabbedPane();
-                    dialogPanel.setOpaque(true);
-                    dialogPanel.setForeground(Ui.OFFWHITE);
-                    dialogPanel.setBackground(Ui.COLOR_INTERACTIVE);
-
-                    JPanel infoPanel = new JPanel(new GridLayout(2, 1, 40,40));
-
-                    String[][] rows = {
-                            { "Matricule", data.get("cardUId").toString() },
-                            { "Provisoire", data.get("expirable").equals(true) ? "Oui" : "Non" },
-                            { "Nom d'utilisateur", ( (Map) data.get("user")).get("name").toString() },
-                            { "Expiration", data.get("expiredDate") == null ? "Infini" : data.get("expiredDate").toString()},
-                            { "Utisilateur", ((Map)data.get("user")).get("name").toString() }
-                    };
-                    JTable showTable = new JTable(rows, new String[]{ " ", " " });
-                    showTable.setOpaque(false);
-                    showTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-                        @Override
-                        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                            setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-                            return this;
-                        }
-                    });
-                    infoPanel.add(showTable);
-
-                    DefaultMutableTreeNode root = new DefaultMutableTreeNode("r");
-
-                    for (Map building: treeview) {
-                        DefaultMutableTreeNode buildNode = new DefaultMutableTreeNode(building);
-                        List<Map> floors = (List<Map>) building.get("floors");
-                        for (Map floor: floors) {
-                            DefaultMutableTreeNode floorNode = new DefaultMutableTreeNode(floor);
-                            buildNode.add(floorNode);
-                            List<Map> wokspaces = (List<Map>) floor.get("workspaces");
-                            if(wokspaces != null) {
-                                for(Map wokspace: wokspaces) {
-                                    DefaultMutableTreeNode workspace = new DefaultMutableTreeNode(wokspace);
-                                    List<Map> equipments = (List<Map>) wokspace.get("equipments");
-                                    if(equipments != null) {
-                                        for (Map equipment: equipments) {
-                                            DefaultMutableTreeNode equipNode = new DefaultMutableTreeNode(equipment);
-                                            workspace.add(equipNode);
-                                        }
-                                    }
-                                    floorNode.add(workspace);
-                                }
-                            }
-                        }
-                        root.add(buildNode);
-                    }
-                    JTree tree = new JTree(root);
-                    tree.setCellRenderer(new DefaultTreeCellRenderer() {
-                        @Override
-                        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                            Object object = ((DefaultMutableTreeNode) value).getUserObject();
-                            if(object instanceof Map) {
-                                Map val = (Map) object;
-                                if(val.containsKey("accessible")) {
-                                    boolean bool = (Boolean)val.get("accessible");
-                                    String path = "";
-                                    if(bool) {
-                                        path = "icon/granted.png";
-                                        logger.info(val.toString());
-                                    } else {
-                                        path = "icon/forbidden.png";
-                                    }
-                                    Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource(path));
-                                    Image resised = icon.getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH);
-                                    setIcon(new ImageIcon(resised));
-                                }
-                                setText(val.get("name").toString());
-                            }
-                            return this;
-                        }
-                    });
-                    tree.setRootVisible(false);
-                    JScrollPane span = new JScrollPane(tree);
-                    infoPanel.add(span);
-
-                    JPanel history = new JPanel(new GridLayout(1,1));
-
-                    JTable histoTable = new JTable(rows, new String[]{ " ", " " });
-                    histoTable.setOpaque(false);
-                    history.add(histoTable);
-
-                    dialogPanel.add("Info sur Carte", infoPanel);
-                    dialogPanel.add("Historique de carte", histoTable);
-
-                    contentPane.add(dialogPanel, BorderLayout.CENTER);
-
-                    dialog.setContentPane(contentPane);
-                    dialog.setLocationRelativeTo(context.frame());
-                    dialog.setVisible(true);
                 } else {
                     toast.warn("Selectionnez une ligne dans tableau");
                 }
@@ -242,12 +119,8 @@ public class CardView implements Routes {
                 int index = dataTable.size() > selectedRow ? selectedRow : selectedRow - 1;
                 Map<String, Object> hm = dataTable.get(index);
                 hm.remove("cardId");
-                Request request = new Request();
-                request.setEvent("card_delete");
-                request.setData(hm);
-                Response response = Utils.sendRequest(request);
-                logger.info(response.getMessage().toString());
-                if (response.getEvent().equals("card_delete") && response.getMessage().equals(true)) {
+                Boolean deleted = CardRequests.deleteCard(hm);
+                if (deleted) {
                     toast.success("La suppression est bien faite");
                     updateTable(table, tableModel);
                 } else {
@@ -272,10 +145,7 @@ public class CardView implements Routes {
         formPanel.setLayout(layout);
         formPanel.setBorder(blackline);
 
-        Request requestUserList = new Request();
-        requestUserList.setEvent("user_list");
-        Response response = Utils.sendRequest(requestUserList);
-        List userList = (List) response.getMessage();
+        List userList = UserRequests.all();
         JComboBox comboBox = new JComboBox(new Vector(userList));
 
         register.registerComboBox("user_list", comboBox);
@@ -364,8 +234,15 @@ public class CardView implements Routes {
 
                 Map insertCardReq =  Map.of("cardUId", snFieldText.getText(), "expirable", expirable.isSelected(), "expiredDate", expireDateValue, "user", comboBox.getSelectedItem());
                 Boolean inserted = tableModel.addData(insertCardReq);
-                if(inserted)
+                if(inserted) {
+                    snFieldText.setText("");
+                    expirable.setSelected(false);
+                    expirableDate.setText("");
+                    comboBox.setSelectedIndex(-1);
                     updateTable(table, tableModel);
+                    toast.success("Utilisateur est bien insere");
+                }
+
                 else
                     toast.error("Erreur! Duplication cartes pour 1 utilisateur");
 

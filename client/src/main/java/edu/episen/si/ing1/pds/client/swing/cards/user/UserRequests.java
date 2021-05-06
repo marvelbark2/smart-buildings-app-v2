@@ -31,4 +31,13 @@ public class UserRequests {
         Response response = Utils.sendRequest(request);
         return (Boolean) response.getMessage();
     }
+
+    public static Boolean insertUser(Map data) {
+        Request request = new Request();
+        request.setEvent("user_insert");
+        request.setData(data);
+        Response response = Utils.sendRequest(request);
+        Boolean isInserted = (Boolean) response.getMessage();
+        return isInserted;
+    }
 }
