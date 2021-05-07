@@ -55,6 +55,22 @@ public class Mapping_Window implements Navigate {
         this.global = global;
     }
 
+    private JToolBar createToolBar() {
+
+        JToolBar toolBar = new JToolBar();
+        JButton retour = new JButton("Retour");
+        retour.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                global.getBloc().removeAll();
+                global.setupFrame();
+                global.getFrame().pack();
+            }
+        });
+        toolBar.add(retour);
+        return toolBar;
+    }
+    
     private void menuScroll(JTree arbre2) {
         JPanel menuPanel = global.getMenu();
         JScrollPane menu = new JScrollPane(arbre2);
@@ -127,22 +143,6 @@ public class Mapping_Window implements Navigate {
             e.printStackTrace();
         }
         return tree;
-    }
-
-    private JToolBar createToolBar() {
-
-        JToolBar toolBar = new JToolBar();
-        JButton retour = new JButton("Retour");
-        retour.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                global.getBloc().removeAll();
-                global.setupFrame();
-                global.getFrame().pack();
-            }
-        });
-        toolBar.add(retour);
-        return toolBar;
     }
 
     private JPanel carte(Integer id) {
@@ -226,33 +226,7 @@ public class Mapping_Window implements Navigate {
         return carte;
     }
 
-    private Map add_equipment(int id_workspace_equipment,int equipment_id) {
-
-        Request request=new Request();
-        request.setEvent("add_equipment");
-        request.setData(Map.of("id_workspace_equipments", id_workspace_equipment, "equipment_id", equipment_id));
-        Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON
-        return (Map) response.getMessage();
-    }
-    
-    private Map delete_equipement(int id_workspace_equipment) {
-    	Request request=new Request();
-        request.setEvent("delete_equipment");
-        request.setData(Map.of("id_workspace_equipments", id_workspace_equipment));
-        Response response = Utils.sendRequest(request); 
-        return (Map) response.getMessage();
-    }
-    
-    private Map update_equipement(int id_workspace_equipment,int equipment_id) {
-    	Request request=new Request();
-        request.setEvent("update_equipment");
-        request.setData(Map.of("id_workspace_equipments", id_workspace_equipment, "equipment_id", equipment_id));
-        Response response = Utils.sendRequest(request); 
-        return (Map) response.getMessage();
-    }
-
     private void bloc_equipement() {
-
 
         JPanel bloc = global.getBloc();
         bloc.setLayout(new GridLayout(6,1));
@@ -277,14 +251,11 @@ public class Mapping_Window implements Navigate {
         JLabel label3 = new JLabel("3",icon3, JLabel.CENTER);
         JLabel label4 = new JLabel("4",icon4, JLabel.CENTER);
 
-
         DragMouseAdapter listener = new DragMouseAdapter();
         label1.addMouseListener(listener);
         label2.addMouseListener(listener);
         label3.addMouseListener(listener);
         label4.addMouseListener(listener);
-
-
 
         label1.setTransferHandler(new TransferHandler("text"));
         label2.setTransferHandler(new TransferHandler("text"));
@@ -300,21 +271,14 @@ public class Mapping_Window implements Navigate {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(clicked.size() > 0) {
-					
- 					System.out.println(clicked.get("equip") + "syys de clicled dans bouton delete");// SYSTEM OUT 
- 					
 					JButton cButton = (JButton) clicked.get("button");
 					cButton.setIcon(null);
+					
 					Map equipdata = (Map) clicked.get("equip");
-					
 					Integer id_workspace_equipment = (Integer) equipdata.get("id_workspace_equipments");
-					//need to call method to delete
-					Map delete = delete_equipement(id_workspace_equipment);
+					Map delete = delete_equipement(id_workspace_equipment);					
 					
-					clicked.clear();
-					
-					System.out.println(delete + "syys de la map delete");// SYSTEM OUT 
-					
+					clicked.clear();					
 					toaster.success("Suppression réussite !");
 					if(delete.get("etat").equals("")) {
 						ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(delete.get("etat")));
@@ -324,9 +288,7 @@ public class Mapping_Window implements Navigate {
 	                    cButton.repaint();
 	                    toaster.success("Suppression de l'équipement réussite !");
 					}
-	
 				}
-
 			}
 		});
         JButton update = new JButton("Changer l'état");
@@ -335,30 +297,18 @@ public class Mapping_Window implements Navigate {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(clicked.size() > 0) {
-					
- 					System.out.println(clicked.get("equip")+ "syys de clicled dans bouton update"); // SYSTEM OUT 
- 					
-					JButton cButton = (JButton) clicked.get("button");
-					
+					JButton cButton = (JButton) clicked.get("button");		
 					Map equipdata = (Map) clicked.get("equip");
-				
 					Integer id_workspace_equipment = (Integer) equipdata.get("id_workspace_equipments");
 					Integer id_equipment = (Integer) equipdata.get("equipment_id");
 					Map update = update_equipement(id_workspace_equipment, id_equipment);
-					
-					System.out.println(update + "syys de la map update"); // SYSTEM OUT 
-					
-				
 					if(!(update.get("etat").equals("") || update.get("etat") == null)) {
 						ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
 	                    cButton.setIcon(icon);
 	                    cButton.repaint();
 	                    toaster.error("Equipement hors service ! ");
-  
-					}
-	
-				}
-				
+					}	
+				}			
 			}
 		});
         
@@ -382,6 +332,31 @@ public class Mapping_Window implements Navigate {
             TransferHandler handler = c.getTransferHandler();
             handler.exportAsDrag(c, e, TransferHandler.COPY);
         }
+    }
+    
+    private Map add_equipment(int id_workspace_equipment,int equipment_id) {
+
+        Request request=new Request();
+        request.setEvent("add_equipment");
+        request.setData(Map.of("id_workspace_equipments", id_workspace_equipment, "equipment_id", equipment_id));
+        Response response = Utils.sendRequest(request);  // Object POJO converti en String <=> Serialization JSON
+        return (Map) response.getMessage();
+    }
+    
+    private Map delete_equipement(int id_workspace_equipment) {
+    	Request request=new Request();
+        request.setEvent("delete_equipment");
+        request.setData(Map.of("id_workspace_equipments", id_workspace_equipment));
+        Response response = Utils.sendRequest(request); 
+        return (Map) response.getMessage();
+    }
+    
+    private Map update_equipement(int id_workspace_equipment,int equipment_id) {
+    	Request request=new Request();
+        request.setEvent("update_equipment");
+        request.setData(Map.of("id_workspace_equipments", id_workspace_equipment, "equipment_id", equipment_id));
+        Response response = Utils.sendRequest(request); 
+        return (Map) response.getMessage();
     }
 
     @Override
