@@ -106,7 +106,7 @@ public class UserDetails extends JDialog {
                     try {
                         Map<String, Object> card = mapper.treeToValue(userInfo.get("card"), HashMap.class);
                         card.remove("cardId");
-                        Boolean cardChange = CardRequests.activeCard(Map.of("card", card, "action", true));
+                        Boolean cardChange = CardRequests.activeCard(Map.of("card", card, "action", false));
                         if(cardChange)
                             toastr.info("card desactivé");
 
