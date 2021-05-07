@@ -34,6 +34,10 @@ public class UsersService implements IUsersService<UsersRequest, UsersResponse> 
         this.connection = connection;
     }
 
+    @Override
+    public void setCompanyId(int companyId) {
+        this.companyId = companyId;
+    }
 
     @Override
     public List<UsersResponse> findAll() {
@@ -130,12 +134,36 @@ public class UsersService implements IUsersService<UsersRequest, UsersResponse> 
 
     @Override
     public Boolean update(UsersRequest request, Integer id) {
-        return null;
-    }
+        Boolean response;
+        try {
+            String query = "UPDATE users SET name = ? WHERE userid = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, request.getName());
+            statement.setInt(2, id);
+            response = statement.executeUpdate() > 0;
 
-    @Override
-    public void setCompanyId(int companyId) {
-        this.companyId = companyId;
+            int roleId = 0;
+            String findPrevRole = "SELECT roleid FROM roles_users where userid = ?";
+            PreparedStatement stRole = connection.prepareStatement(findPrevRole);
+            stRole.setInt(1, id);
+            ResultSet rs = stRole.executeQuery();
+            if(rs.next())
+                roleId = rs.getInt(1);
+
+            String updateRole = "UPDATE roles_users SET roleid = ? WHERE roleid = ? AND userid = ?";
+            PreparedStatement stmt = connection.prepareStatement(updateRole);
+            stmt.setInt(2, roleId);
+            stmt.setInt(1, request.getRole().getRoleId());
+            stmt.setInt(3, id);
+
+            logger.info(statement.toString());
+
+            response = response && stmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return response;
     }
 
     @Override
@@ -177,6 +205,23 @@ public class UsersService implements IUsersService<UsersRequest, UsersResponse> 
             e.printStackTrace();
         }
         return list;
+    }
+
+    @Override
+    public Integer findUserId(UsersRequest user) {
+        int userId = 0;
+        try {
+            String query = "SELECT userid FROM users WHERE user_uid = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, user.getUserUId());
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+               userId = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userId;
     }
 
     private UsersRequest getUserRole(UsersRequest request) {

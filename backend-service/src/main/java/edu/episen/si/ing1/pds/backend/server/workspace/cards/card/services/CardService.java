@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
+import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.access.service.AccessService;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.access.service.IAccessService;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardRequest;
@@ -12,12 +13,15 @@ import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.Cards;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardsResponse;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.Users;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
 public class CardService implements ICardService<CardRequest, CardsResponse> {
+    private final Logger logger = LoggerFactory.getLogger(CardService.class.getName());
     private final Connection connection;
     private int companyId;
     private SqlConfig sql = SqlConfig.Instance;
@@ -101,7 +105,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
     public Boolean add(CardRequest request) {
         try {
             int user_id = findUserId(request);
-            String query = "insert into cards (carduid, userid, expirable, expired_date) VALUES (?, ?, ?, ?)";
+            String query = sql.getCardSql("insert");
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, request.getCardUId());
             statement.setLong(2, user_id);
@@ -110,6 +114,9 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
                 statement.setDate(4, Date.valueOf(request.getExpiredDate()));
             else
                 statement.setDate(4, null);
+
+            statement.setBoolean(5, request.isActive());
+
             return statement.executeUpdate() == 1;
 
         } catch (SQLException throwables) {
@@ -160,9 +167,9 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
 
     public List<Map> getItemAccessList(String serialId) {
         List<Map> list = new ArrayList<>();
-        String sql = "SELECT * from getcardaccessibility(?,?)";
+        String q = sql.getCardSql("accessibility");
         try {
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = connection.prepareStatement(q);
             statement.setString(1, serialId);
             statement.setInt(2, companyId);
             ResultSet rs = statement.executeQuery();
@@ -200,7 +207,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
        try {
            boolean spaceResponse = true;
            for(JsonNode space : spaces) {
-               String selectQuery = "SELECT count(*) fROM desk_permission WHERE cardid = ? AND deskid = ?";
+               String selectQuery = sql.getCardSql("deskpermission");
                PreparedStatement selectStmt = connection.prepareStatement(selectQuery);
                selectStmt.setInt(1, card_id);
                selectStmt.setInt(2, space.get("id").asInt());
@@ -211,7 +218,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
                    count = sRS.getInt(1);
 
                if(count == 0) {
-                   String query = "INSERT INTO desk_permission (cardid, deskid, accessible) VALUES (?, ?, ?)";
+                   String query = sql.getCardSql("adddeskpermission");
                    PreparedStatement statement = connection.prepareStatement(query);
                    statement.setInt(1, card_id);
                    statement.setInt(2, space.get("id").asInt());
@@ -219,7 +226,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
                    int rs = statement.executeUpdate();
                    spaceResponse = spaceResponse && rs > 0;
                } else {
-                   String query = "Update desk_permission SET accessible = ? WHERE cardid = ? AND deskid = ?";
+                   String query = sql.getCardSql("updatedeskpermission");
                    PreparedStatement statement = connection.prepareStatement(query);
                    statement.setInt(2, card_id);
                    statement.setInt(3, space.get("id").asInt());
@@ -231,7 +238,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
 
            boolean equipmentResponse = true;
            for (JsonNode equipment : equipments ) {
-               String selectQuery = "SELECT count(*) fROM equipment_permission WHERE cardid = ? AND equipmentid = ?";
+               String selectQuery = sql.getCardSql("equipmentpermission");
                PreparedStatement selectStmt = connection.prepareStatement(selectQuery);
                selectStmt.setInt(1, card_id);
                selectStmt.setInt(2, equipment.get("id").asInt());
@@ -242,7 +249,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
                    count = sRS.getInt(1);
 
                if(count == 0) {
-                   String query = "INSERT INTO equipment_permission (cardid, equipmentid, accessible) VALUES (?, ?, ?)";
+                   String query = sql.getCardSql("addequippermission");
                    PreparedStatement statement = connection.prepareStatement(query);
                    statement.setInt(1, card_id);
                    statement.setInt(2, equipment.get("id").asInt());
@@ -250,7 +257,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
                    int rs = statement.executeUpdate();
                    equipmentResponse = equipmentResponse && rs > 0;
                } else {
-                   String query = "Update equipment_permission SET accessible = ? WHERE cardid = ? AND equipmentid = ?";
+                   String query = sql.getCardSql("updateequipermission");
                    PreparedStatement statement = connection.prepareStatement(query);
                    statement.setInt(2, card_id);
                    statement.setInt(3, equipment.get("id").asInt());
@@ -271,7 +278,7 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
     public Map<Map, List> getAccessList(Integer card_id) {
         Map<Map, List> data = new HashMap();
 
-        String query = "SELECT b.name as building, concat('Etage ', f.floor_number) as floor, w.workspace_label, iscardaccessibletodesk(?, w.id_workspace) as desk_access FROM buildings b join floors f on b.id_buildings = f.building_number join workspace w on f.id_floor = w.floor_number";
+        String query = sql.getCardSql("permissionlist");
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, card_id);
@@ -313,20 +320,10 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
         return data;
     }
 
-    public List<Map> getCardHistory(String serialNumber) {
-        List<Map> historyList = new ArrayList<>();
-        try {
-            String query = "SELECT * FROM ";
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return historyList;
-    }
-
     private int findUserId(CardRequest request) throws SQLException {
         int user_id = 0;
         UsersRequest usersRequest = request.getUser();
-        String userQuery = "SELECT userid from users where name LIKE ? and user_uid LIKE ?";
+        String userQuery = sql.getCardSql("usercard");
         PreparedStatement userStmt = connection.prepareStatement(userQuery);
         userStmt.setString(1, usersRequest.getName());
         userStmt.setString(2, usersRequest.getUserUId());
@@ -337,8 +334,6 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
     }
 
     public ArrayNode treeView(CardRequest request) {
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayNode response = mapper.createArrayNode();
         IAccessService service = new AccessService(connection);
         service.setCompanyId(companyId);
 
@@ -371,15 +366,85 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
         return buidings;
     }
 
-    private int findCardId(CardRequest request) throws SQLException {
-        int card_id = 0;
-        String query = "SELECT * FROM cards WHERE carduid = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, request.getCardUId());
-        ResultSet rs = statement.executeQuery();
-        if(rs.next())
-            card_id = rs.getInt("cardid");
+    @Override
+    public JsonNode lostCard(CardRequest request) {
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode accessList = mapper.createArrayNode();
+        String queryWs = sql.getCardSql("accessdesk");
+        String queryEq = sql.getCardSql("accessequip");
+        try {
+            int currentId = findCardId(request);
+            PreparedStatement statement = connection.prepareStatement(queryWs);
+            statement.setInt(1, currentId);
+            ResultSet rsWs = statement.executeQuery();
+            while (rsWs.next()) {
+                Map hm = new HashMap();
+                hm.put("type", "desk");
+                hm.put("id", rsWs.getInt("deskid"));
+                hm.put("edited", true);
+                hm.put("accessible", rsWs.getBoolean("accessible"));
+                accessList.add(mapper.valueToTree(hm));
+            }
+            PreparedStatement statement2 = connection.prepareStatement(queryEq);
+            statement2.setInt(1, currentId);
+            ResultSet rsEq = statement2.executeQuery();
+            while (rsEq.next()) {
+                Map hm = new HashMap();
+                hm.put("type", "equipment");
+                hm.put("id", rsEq.getInt("equipmentid"));
+                hm.put("edited", true);
+                hm.put("accessible", rsEq.getBoolean("accessible"));
+                accessList.add(mapper.valueToTree(hm));
+            }
 
+            Boolean removed = delete(request);
+            if(removed) {
+                request.setCardUId(Utils.generateSerialNumber());
+                Boolean inserted = add(request);
+                if(inserted) {
+                    int cardId = findCardId(request);
+                    Optional<CardsResponse> newCard = findById(cardId);
+                    if(newCard.isPresent()){
+                        accessByCard(accessList, cardId);
+                        return mapper.valueToTree(newCard.get());
+                    }
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public Boolean activeCard(CardRequest request, Boolean action) {
+        Boolean response = true;
+        String query = sql.getCardSql("activate");
+        int cardId = findCardId(request);
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(2, cardId);
+            statement.setBoolean(1, action);
+            return response && statement.executeUpdate() > 0;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
+    }
+
+    private int findCardId(CardRequest request) {
+        int card_id = 0;
+        String query = sql.getCardSql("findcardid");
+        try {
+            PreparedStatement  statement = connection.prepareStatement(query);
+            statement.setString(1, request.getCardUId());
+            ResultSet rs = statement.executeQuery();
+            if(rs.next())
+                card_id = rs.getInt("cardid");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
         return card_id;
     }
 

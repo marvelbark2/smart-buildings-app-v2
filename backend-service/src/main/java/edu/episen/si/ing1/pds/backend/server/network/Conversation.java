@@ -4,12 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import edu.episen.si.ing1.pds.backend.server.workspace.Bootstrap;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.network.CardNetwork;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.network.RoleNetwork;
-import edu.episen.si.ing1.pds.backend.server.workspace.location.LocationNetwork;
-import edu.episen.si.ing1.pds.backend.server.workspace.mapping.MappingNetwork;
-import edu.episen.si.ing1.pds.backend.server.workspace.shared.SystemLog;
-import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.network.UsersNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +59,7 @@ public class Conversation implements Runnable {
             //Request Handling
             String request;
             while ((request = reader.readLine()) != null && active) {
+                // deserialization
                 Request requestObj = mapper.readValue(request, Request.class);
                 logger.info(request);
                 logger.info(requestObj.toString());

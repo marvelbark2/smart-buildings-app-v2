@@ -1,11 +1,6 @@
 package edu.episen.si.ing1.pds.client.swing.cards.models;
 
-import edu.episen.si.ing1.pds.client.network.Request;
-import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.swing.cards.card.CardRequests;
-import edu.episen.si.ing1.pds.client.utils.Utils;
-
-import javax.swing.table.AbstractTableModel;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +10,7 @@ public class CardTableModel extends DataTable {
 
     public CardTableModel() {
         super();
-        cardList = CardRequests.fetchCarcardList();
+        cardList = CardRequests.fetchCardList();
     }
 
     @Override

@@ -9,8 +9,10 @@ import edu.episen.si.ing1.pds.client.swing.cards.card.dialogs.CardReadDialog;
 import edu.episen.si.ing1.pds.client.swing.cards.card.dialogs.CardUpdateDialog;
 import edu.episen.si.ing1.pds.client.swing.cards.card.dialogs.Dialogs;
 import edu.episen.si.ing1.pds.client.swing.global.MenuItem;
+import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,6 +31,8 @@ public class UserDetails extends JDialog {
         JPanel header = new JPanel(new BorderLayout());
         JLabel title = new MenuItem("Information d'un utilisateur");
         header.add(title, BorderLayout.CENTER);
+
+        Toast toastr = new Toast(pane);
 
         JPanel body = new JPanel(new GridLayout(2, 1));
 
@@ -56,7 +60,10 @@ public class UserDetails extends JDialog {
                     }
             };
             String[] cardCol = {"ID", "Matricule", "Provisoire", "Date d'expiration"};
-            JTable cardTable = new JTable(cardRow, cardCol) {
+
+            DefaultTableModel model = new DefaultTableModel(cardRow, cardCol);
+
+            JTable cardTable = new JTable(model) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
                     return false;
@@ -73,9 +80,41 @@ public class UserDetails extends JDialog {
             JPanel toolsCard = new JPanel(new GridLayout(2, 2));
 
             JButton activeBtn = new JButton("Active");
+            activeBtn.setEnabled(!userInfo.get("card").get("active").asBoolean());
+            activeBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    try {
+                        Map<String, Object> card = mapper.treeToValue(userInfo.get("card"), HashMap.class);
+                        card.remove("cardId");
+                        Boolean cardChange = CardRequests.activeCard(Map.of("card", card, "action", true));
+                        if(cardChange)
+                            toastr.info("card activé");
+
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
             toolsCard.add(activeBtn);
 
             JButton inactiveBtn = new JButton("Desactive");
+            inactiveBtn.setEnabled(userInfo.get("card").get("active").asBoolean());
+            inactiveBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    try {
+                        Map<String, Object> card = mapper.treeToValue(userInfo.get("card"), HashMap.class);
+                        card.remove("cardId");
+                        Boolean cardChange = CardRequests.activeCard(Map.of("card", card, "action", true));
+                        if(cardChange)
+                            toastr.info("card desactivé");
+
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
             toolsCard.add(inactiveBtn);
 
             JButton edit =  new JButton("Modifier");
@@ -128,7 +167,35 @@ public class UserDetails extends JDialog {
             });
             toolsCard.add(read);
 
-            toolsCard.add(new JButton("Perdue"));
+            JButton lostCardBtn = new JButton("Perdue");
+            lostCardBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    try {
+                        Map<String, Object> card = mapper.treeToValue(userInfo.get("card"), HashMap.class);
+                        JsonNode newCard = CardRequests.lostCard(card);
+
+                        int rows = cardTable.getRowCount();
+                        for(int i=0; i<rows; i++)
+                            model.removeRow(i);
+                        model.addRow(
+                                new String[]  {
+                                        newCard.get("cardId").asText(),
+                                        newCard.get("cardUId").asText(),
+                                        newCard.get("expirable").asBoolean() ? "Oui" : "Non",
+                                        newCard.get("expiredDate").asText() != null ? "Infini" : userInfo.get("card").get("expiredDate").asText(),
+                                }
+                        );
+                        model.fireTableDataChanged();
+                        cardTable.repaint();
+                        toastr.success("La carte est bien renouvelé");
+
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            toolsCard.add(lostCardBtn);
             toolsCard.setBorder(BorderFactory.createTitledBorder("Outils"));
             cardInfoPanel.add(toolsCard, BorderLayout.LINE_END);
 

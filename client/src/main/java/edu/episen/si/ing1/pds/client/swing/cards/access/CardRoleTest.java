@@ -1,11 +1,5 @@
 package edu.episen.si.ing1.pds.client.swing.cards.access;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import edu.episen.si.ing1.pds.client.network.Request;
-import edu.episen.si.ing1.pds.client.network.Response;
-import edu.episen.si.ing1.pds.client.network.SocketFacade;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.cards.Routes;
 import edu.episen.si.ing1.pds.client.swing.cards.card.CardRequests;
@@ -18,11 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -40,7 +29,7 @@ public class CardRoleTest implements Routes {
         JPanel cardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         cardPanel.setOpaque(true);
 
-        List<Map> users = CardRequests.fetchCarcardList();
+        List<Map> users = CardRequests.fetchCardList();
         JComboBox userList = new JComboBox(new Vector(users));
 
         userList.setRenderer(new DefaultListCellRenderer() {

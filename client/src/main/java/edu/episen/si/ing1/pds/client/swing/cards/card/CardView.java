@@ -1,7 +1,5 @@
 package edu.episen.si.ing1.pds.client.swing.cards.card;
 
-import edu.episen.si.ing1.pds.client.network.Request;
-import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.swing.cards.ComponentRegister;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.cards.Routes;
@@ -9,6 +7,7 @@ import edu.episen.si.ing1.pds.client.swing.cards.card.dialogs.CardReadDialog;
 import edu.episen.si.ing1.pds.client.swing.cards.card.dialogs.Dialogs;
 import edu.episen.si.ing1.pds.client.swing.cards.card.listeners.CardButtonListener;
 import edu.episen.si.ing1.pds.client.swing.cards.models.CardTableModel;
+import edu.episen.si.ing1.pds.client.swing.cards.models.DataTable;
 import edu.episen.si.ing1.pds.client.swing.cards.user.UserRequests;
 import edu.episen.si.ing1.pds.client.swing.global.shared.Ui;
 import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
@@ -18,6 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -28,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CardView implements Routes {
     private final Logger logger = LoggerFactory.getLogger(CardView.class.getName());
@@ -77,7 +79,52 @@ public class CardView implements Routes {
         th.repaint();
         header.setBackground(Ui.COLOR_INTERACTIVE_DARKER);
         header.setForeground(Ui.OFFWHITE);
+
+        TableRowSorter<DataTable> sorter = new TableRowSorter<>(tableModel);
+        table.setRowSorter(sorter);
+
         JScrollPane sp = new JScrollPane(table);
+
+        JPanel tablePanel = new JPanel(new BorderLayout());
+
+        JPanel searchBar = new JPanel(new BorderLayout());
+        JTextField searchText = new JTextField(20);
+        searchText.setBorder(BorderFactory.createTitledBorder("Rechercher"));
+        searchText.getDocument().addDocumentListener(new DocumentListener() {
+            private void searchByTewt(DocumentEvent event) {
+                String text = searchText.getText();
+                if (text.length() == 0) {
+                    sorter.setRowFilter(null);
+                    table.clearSelection();
+                } else {
+                    try {
+                        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                        table.clearSelection();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                searchByTewt(event);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                searchByTewt(event);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                searchByTewt(event);
+            }
+        });
+        searchBar.add(searchText, BorderLayout.EAST);
+        tablePanel.add(searchBar, BorderLayout.PAGE_START);
+
+        tablePanel.add(sp, BorderLayout.CENTER);
 
         ListSelectionModel select = table.getSelectionModel();
         JPanel btnPanel = new JPanel(new GridLayout(1, 3, 20, 30));
@@ -145,7 +192,7 @@ public class CardView implements Routes {
         formPanel.setLayout(layout);
         formPanel.setBorder(blackline);
 
-        List userList = UserRequests.all();
+        List<Map> userList = UserRequests.all();
         JComboBox comboBox = new JComboBox(new Vector(userList));
 
         register.registerComboBox("user_list", comboBox);
@@ -155,8 +202,11 @@ public class CardView implements Routes {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Map)
-                    setText(((Map<String, String>) value).get("name"));
+                if (value instanceof Map) {
+                    Map object = (Map) value;
+                    setText(object.get("name").toString());
+                }
+
                 if (index == -1 && value == null)
                     setText("Selectionner un utilisateur");
 
@@ -264,7 +314,7 @@ public class CardView implements Routes {
 
         buttonsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);//0.0
 
-        panel.add(sp);
+        panel.add(tablePanel);
         panel.add(btnPanel);
         panel.add(formPanel);
         panel.add(submit);

@@ -1,5 +1,7 @@
 package edu.episen.si.ing1.pds.client.swing.cards.card;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.utils.Utils;
@@ -8,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 public class CardRequests {
-    public static List<Map> fetchCarcardList() {
+    private static ObjectMapper mapper = new ObjectMapper();
+
+    public static List<Map> fetchCardList() {
         Request req = new Request();
         req.setEvent("card_list");
         Response response = Utils.sendRequest(req);
@@ -61,11 +65,32 @@ public class CardRequests {
         Response response = Utils.sendRequest(request);
         return (Boolean) response.getMessage();
     }
+
     public static Boolean inserCard(Map data) {
         Request insertCardReq = new Request();
         insertCardReq.setEvent("card_insert");
         insertCardReq.setData(data);
         Response response = Utils.sendRequest(insertCardReq);
         return (Boolean) response.getMessage();
+    }
+
+    public static Boolean activeCard(Map data) {
+        Request request = new Request();
+        request.setEvent("card_activation");
+        if(data.containsKey("cardId")) {
+            data.remove("cardId");
+        }
+        request.setData(data);
+        Response response = Utils.sendRequest(request);
+        return (Boolean) response.getMessage();
+    }
+
+    public static JsonNode lostCard(Map data) {
+        Request lostCardReq = new Request();
+        data.remove("cardId");
+        lostCardReq.setData(data);
+        lostCardReq.setEvent("card_lost");
+        Response response = Utils.sendRequest(lostCardReq);
+        return  mapper.valueToTree(response.getMessage());
     }
 }

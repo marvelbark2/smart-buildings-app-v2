@@ -14,6 +14,7 @@ public class UserTableModel extends DataTable {
     private List<Map> userList;
 
     public UserTableModel() {
+        super();
         userList = UserRequests.all();
     }
 

@@ -124,5 +124,27 @@ public class CardNetwork implements Network {
                 e.printStackTrace();
             }
         }
+        else if(event.equals("card_lost")) {
+            JsonNode data = request.getData();
+            try {
+                CardRequest cardRequest = mapper.treeToValue(data, CardRequest.class);
+                JsonNode newCard = service.lostCard(cardRequest);
+                writer.println(mapper.writeValueAsString(Utils.responseFactory(newCard, event)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else if(event.equals("card_activation")) {
+            JsonNode data = request.getData();
+            try {
+                JsonNode card = data.get("card");
+                Boolean action = data.get("action").asBoolean();
+                CardRequest cardRequest = mapper.treeToValue(card, CardRequest.class);
+                Boolean newCard = service.activeCard(cardRequest, action);
+                writer.println(mapper.writeValueAsString(Utils.responseFactory(newCard, event)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

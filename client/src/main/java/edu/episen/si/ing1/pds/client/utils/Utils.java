@@ -82,6 +82,8 @@ public class Utils {
         Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource(path));
         return new ImageIcon(icon);
     }
+
+    // INSERT INTo T ('test', 'id) VALUES (ee,eee),(), (), () ...  ;
     public static Response sendRequest(Request request) {
         PrintWriter writer;
         BufferedReader reader;
@@ -109,10 +111,5 @@ public class Utils {
             e.printStackTrace();
         }
         return response;
-    }
-
-    public static void checkSystemLog() {
-        Timer timer = new Timer();
-        timer.schedule(new SystemLog(), 0, 1000);
     }
 }

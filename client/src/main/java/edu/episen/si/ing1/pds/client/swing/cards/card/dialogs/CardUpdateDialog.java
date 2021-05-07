@@ -23,7 +23,7 @@ public class CardUpdateDialog implements Dialogs{
     public CardUpdateDialog(ContextFrame context, Map<String, Object> data) {
         this.dialog = new JDialog(context.frame());
 
-        dialog.setSize(700,800);
+        dialog.setSize(1200,900);
 
         Toast toast = new Toast(context.getApp().getContext());
 

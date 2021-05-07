@@ -1,16 +1,9 @@
 package edu.episen.si.ing1.pds.backend.server.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import java.io.File;
 import java.security.SecureRandom;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Utils {
 
@@ -62,5 +55,14 @@ public class Utils {
     public static LocalDate localDateParser(String date) {
         String[] dateArr = date.split("/");
         return LocalDate.of(Integer.parseInt(dateArr[2]), Integer.parseInt(dateArr[1]), Integer.parseInt(dateArr[0]));
+    }
+    public static String generateSerialNumber() {
+        String randomString = generateStringId(20).toUpperCase(Locale.ROOT);
+        StringBuilder builder = new StringBuilder(randomString);
+        for (int i = 0; i < builder.length(); i++) {
+            if(i % 5 == 0 && i != 0)
+                builder.insert(i, "-");
+        }
+        return builder.toString();
     }
 }

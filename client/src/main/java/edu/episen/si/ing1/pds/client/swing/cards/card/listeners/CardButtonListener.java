@@ -6,6 +6,7 @@ import edu.episen.si.ing1.pds.client.swing.cards.card.CardRequests;
 import edu.episen.si.ing1.pds.client.swing.cards.card.dialogs.CardUpdateDialog;
 import edu.episen.si.ing1.pds.client.swing.cards.models.CardTableModel;
 import edu.episen.si.ing1.pds.client.swing.cards.models.DataTable;
+import edu.episen.si.ing1.pds.client.swing.global.shared.toast.Toast;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -41,8 +42,8 @@ public class CardButtonListener implements ActionListener {
                     });
                 }
                 else {
-                   // toast.warn("Selectionnez une ligne dans le tableau");
-                    System.out.println("Erreur! Il y a un problème");
+                    Toast toastr = new Toast(context.getApp().getContext());
+                    toastr.warn("Selectionnez une ligne dans le tableau");
                 }
         }
     }

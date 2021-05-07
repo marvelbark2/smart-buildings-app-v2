@@ -13,13 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Vector;
 
 public class UsersView implements Routes {
     private JTable table;
@@ -38,9 +40,51 @@ public class UsersView implements Routes {
 
         table.setVisible(true);
 
+        TableRowSorter<DataTable> sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
+
+        JPanel tablePanel = new JPanel(new BorderLayout());
+
         JScrollPane jScrollPane = new JScrollPane(table);
         jScrollPane.setPreferredSize( new Dimension(400, 600) );
 
+        JPanel searchBar = new JPanel(new BorderLayout());
+        JTextField searchText = new JTextField(20);
+        searchText.setBorder(BorderFactory.createTitledBorder("Rechercher"));
+        searchText.getDocument().addDocumentListener(new DocumentListener() {
+            private void searchByTewt(DocumentEvent event) {
+                String text = searchText.getText();
+                if (text.length() == 0) {
+                    sorter.setRowFilter(null);
+                    table.clearSelection();
+                } else {
+                    try {
+                        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                        table.clearSelection();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                searchByTewt(event);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                searchByTewt(event);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                searchByTewt(event);
+            }
+        });
+        searchBar.add(searchText, BorderLayout.EAST);
+        tablePanel.add(searchBar, BorderLayout.PAGE_START);
+        tablePanel.add(jScrollPane, BorderLayout.CENTER);
 
         JButton button = new JButton("Refresh Table");
         button.addActionListener(new ActionListener() {
@@ -50,16 +94,23 @@ public class UsersView implements Routes {
             }
         });
 
+        Map selectedUser = new HashMap();
+
         JButton edit = new JButton("Modifier");
         JButton delete = new JButton("Supprimer");
         JButton read = new JButton("details");
+
 
         read.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 int selectedRow = table.getSelectedRow();
-                Map user = model.getDataSource().get(selectedRow);
-                new UserDetails(context, user);
+                if(table.isRowSelected(selectedRow)) {
+                    Map user = model.getDataSource().get(selectedRow);
+                    new UserDetails(context, user);
+                } else {
+                    toastr.warn("Selectionner un utilisateur");
+                }
             }
         });
 
@@ -121,23 +172,63 @@ public class UsersView implements Routes {
         insert.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Map data = Map.of(
-                        "name", nameField.getText(),
-                        "role", Objects.requireNonNull(comboBox.getSelectedItem())
-                );
-                logger.info(comboBox.getSelectedItem().toString());
-                Boolean response = model.addData(data);
-                if(response) {
-                    toastr.success("Utilisateur est bien enregister");
-                    refresh();
+                if(nameField.getText().isEmpty()) {
+                    toastr.error("Remplisser formulaire");
+                } else {
+                    if(selectedUser.size() == 0) {
+                        Map data = Map.of(
+                                "name", nameField.getText(),
+                                "role", Objects.requireNonNull(comboBox.getSelectedItem())
+                        );
+                        logger.info(comboBox.getSelectedItem().toString());
+                        Boolean response = model.addData(data);
+                        if(response) {
+                            toastr.success("Utilisateur est bien enregister");
+                            refresh();
+                        }
+                    } else {
+                        Map data = Map.of(
+                                "name", nameField.getText(),
+                                "userUId", selectedUser.get("userUId"),
+                                "role", Objects.requireNonNull(comboBox.getSelectedItem())
+                        );
+                        Boolean response = UserRequests.updateUser(data);
+                        if(response) {
+                            toastr.success("Updated user");
+                            refresh();
+                        } else
+                            toastr.error("Il y a un erreur !");
+                        selectedUser.clear();
+                        comboBox.setSelectedIndex(0);
+                        nameField.setText("");
+                    }
                 }
-
             }
         });
         insert.setBounds(30,30, 50, 50);
 
+        edit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                int selectedRow = table.getSelectedRow();
+                if(table.isRowSelected(selectedRow)) {
+                    selectedUser.putAll(model.getDataSource().get(selectedRow));
+                    nameField.setText(selectedUser.get("name").toString());
+                    Map selectedRole = (Map) selectedUser.get("role");
+                    logger.info(comboBox.getItemAt(0).toString());
+                    for (int i = 0; i < comboBox.getItemCount(); i++) {
+                        Map itemIn = (Map) comboBox.getItemAt(i);
+                        if(selectedRole.get("roleId").equals(itemIn.get("roleId"))){
+                            comboBox.setSelectedIndex(i);
+                            logger.info("found");
+                        }
+                    }
+                    comboBox.setSelectedItem(selectedUser.get("role"));
+                }
+            }
+        });
 
-        frame.add(jScrollPane, JPanel.CENTER_ALIGNMENT);
+        frame.add(tablePanel, JPanel.CENTER_ALIGNMENT);
         frame.add(buttonPanel);
         frame.add(formPanel);
         frame.add(insert);

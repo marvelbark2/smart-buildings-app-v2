@@ -60,7 +60,6 @@ public class RoleList implements Routes {
                     dialog.setPreferredSize(dialog.getSize());
 
                     Map roleSelected = roleModel.getDataSource().get(selectedRow);
-                    System.out.println(roleSelected);
 
                     JPanel pan = new JPanel(new BorderLayout(10, 10));
                     JLabel header = new MenuItem("Modifier un role");
@@ -203,8 +202,6 @@ public class RoleList implements Routes {
 
                     JPanel body = new JPanel(new GridLayout(3, 1, 40, 40));
 
-                    System.out.println(roleSelected);
-
                     String[][] role = { { "Abbreviation", roleSelected.get("abbreviation").toString() }, { "Designation", roleSelected.get("designation").toString() }, { "Numero d'utilisateur", roleSelected.get("usersNumber").toString() } };
                     JTable roleInfo = new JTable(role, new String[]{ " ", " "});
                     body.add(roleInfo);
@@ -255,20 +252,9 @@ public class RoleList implements Routes {
         });
         controllers.add(view);
 
-        JPanel form = new JPanel(new GridLayout(2, 2));
-        JTextField name = new JTextField(10);
-        JTextField abbr = new JTextField(10);
-        JTextField label = new JTextField(10);
-        JButton insert = new JButton("inserer");
-
-        form.add(name);
-        form.add(abbr);
-        form.add(label);
-        form.add(insert);
 
         panel.add(sp);
         panel.add(controllers);
-        panel.add(form);
 
         body.add(panel);
         body.setVisible(true);

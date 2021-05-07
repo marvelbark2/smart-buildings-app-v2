@@ -64,10 +64,24 @@ public class UsersNetwork implements Network {
         else if(event.equals("user_insert")) {
             try {
                 JsonNode data = request.getData();
-                UsersRequest usersRequest = mapper.treeToValue(data, UsersRequest.class);
-                usersRequest.setUserUId(Utils.generateStringId(15));
-                Boolean isUserInserted = service.add(usersRequest);
+                UsersRequest userRequest = mapper.treeToValue(data, UsersRequest.class);
+                userRequest.setUserUId(Utils.generateStringId(15));
+                Boolean isUserInserted = service.add(userRequest);
                 String response = mapper.writeValueAsString(Utils.responseFactory(isUserInserted, event));
+                writer.println(response);
+                logger.info(response);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else if(event.equals("user_update")) {
+            try {
+                JsonNode data = request.getData();
+                UsersRequest userRequest = mapper.treeToValue(data, UsersRequest.class);
+                int userId = service.findUserId(userRequest);
+                Boolean isUserUpdated = service.update(userRequest, userId);
+                String response = mapper.writeValueAsString(Utils.responseFactory(isUserUpdated, event));
                 writer.println(response);
                 logger.info(response);
 
