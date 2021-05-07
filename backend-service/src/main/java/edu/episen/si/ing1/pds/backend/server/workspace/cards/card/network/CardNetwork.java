@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/*
+* Class Network
+* Handling requests recevied from client for card services
+* */
 public class CardNetwork implements Network {
     private final ICardService<CardRequest, CardsResponse> service;
     private final PrintWriter writer;

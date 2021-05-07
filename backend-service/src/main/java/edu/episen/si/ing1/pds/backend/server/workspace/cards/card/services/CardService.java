@@ -20,6 +20,11 @@ import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
+/*
+* DAO class
+* Interaction with db
+* */
+
 public class CardService implements ICardService<CardRequest, CardsResponse> {
     private final Logger logger = LoggerFactory.getLogger(CardService.class.getName());
     private final Connection connection;

@@ -1,6 +1,5 @@
 package edu.episen.si.ing1.pds.backend.server.workspace.cards.access.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
@@ -17,6 +16,11 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+/*
+* Class to handle SQL queries and grabbing data from db for accessing
+* Class act like a Repository / DAO
+* */
 
 public class AccessService implements IAccessService {
     private final Logger logger = LoggerFactory.getLogger(AccessService.class.getName());

@@ -7,6 +7,10 @@ import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersRe
 import java.io.Serializable;
 import java.time.LocalDate;
 
+/*
+* Class response
+* Props be sent to user - Serialized class
+* */
 public class CardsResponse implements Serializable {
     private Long cardId;
     private String cardUId;

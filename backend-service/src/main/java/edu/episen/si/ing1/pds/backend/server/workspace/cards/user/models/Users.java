@@ -2,8 +2,14 @@ package edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models;
 
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.models.Role;
 
+/*
+* Entity Class
+* */
+
 public class Users {
+    // Private key
     private Integer userId;
+    // Public Key
     private String userUId;
     private String name;
     private Role role;

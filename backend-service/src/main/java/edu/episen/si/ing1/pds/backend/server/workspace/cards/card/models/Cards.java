@@ -5,6 +5,10 @@ import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.Users;
 
 import java.time.LocalDate;
 
+/*
+* Class Entity
+* Could act like DTO to copty props from request class to response class
+* */
 public class Cards {
     private Long cardId;
     private String cardUId;
