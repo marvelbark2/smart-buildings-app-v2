@@ -166,7 +166,6 @@ public class Mapping_Window implements Navigate {
             Integer id_workspace_equipments = Integer.valueOf(e.get("id_workspace_equipments").toString());
             Integer id_equipments = Integer.valueOf(e.get("equipment_id").toString());
             String verif_etat = e.get("etat").toString();
-            System.out.println(verif_etat + "sys de verif_etat");
             JButton btn = new JButton();
             equips.put(btn, e);
             if(!e.get("etat").equals("")) {
@@ -178,18 +177,11 @@ public class Mapping_Window implements Navigate {
 
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    JButton bt = (JButton) evt.getSource();
-                    
-                    System.out.println("clic sur un emplacement"); // SYSTEM OUT 
-                    
+                    JButton bt = (JButton) evt.getSource();  
                     if(bt.getIcon() == null) {
                     	if((Integer.valueOf(((AbstractButton) evt.getSource()).getText()) == id_equipments)&& (verif_etat == "")) {
-                            Map update = add_equipment(id_workspace_equipments, id_equipments);
-                            
-                            System.out.println(update + "sys de update"); // SYSTEM OUT 
-                            
+                            Map update = add_equipment(id_workspace_equipments, id_equipments);                           
                             if(!(update.get("etat").equals("") || update.get("etat") == null)) {
-
                                 ImageIcon icon = Utils.getImageIconFromResource(String.valueOf(update.get("etat")));
                                 bt.setIcon(icon);
                                 bt.repaint();                               
@@ -197,9 +189,6 @@ public class Mapping_Window implements Navigate {
                             }
 
                         } else if(verif_etat != "") {
-                        	
-                        	System.out.println(e + "sys de la map e"); // SYSTEM OUT 
-                        	
                         	toaster.warn("L'équipement est déjà mappé !");
                         } 
                         
@@ -208,8 +197,6 @@ public class Mapping_Window implements Navigate {
                             
                         }
                     } else {
-                    	System.out.println("On entre ici quand ? ");
-                    	//toaster.warn("Equipement déjà mappé");
                     	clicked.put("button", bt);
                     	clicked.put("equip", equips.get(bt));
                     }
