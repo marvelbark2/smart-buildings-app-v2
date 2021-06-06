@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.backend.server.workspace.location;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.backend.server.network.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
@@ -85,7 +86,7 @@ public class LocationNetwork {
                  
                  
                  //request to put the state unavailable on each workspace which are in the offer selected by the user
-            case "done_reservtion":
+            /*case "done_reservtion":
                 Map<String, Object> reservat = new HashMap<>();
                 Integer list_worksp = request.getData().get("list_workspace").asInt();
                 Integer reserv_numb = request.getData().get("reserv_numb").asInt();
@@ -107,8 +108,58 @@ public class LocationNetwork {
                 Map response6 = Utils.responseFactory(reservat, event);
                 String msg6 = mapper.writeValueAsString(response6);
                 writer.println(msg6);
-                break;
-                
+                break;*/
+            case "done_reservtion":
+            	
+            	
+try {
+	
+
+                Map data_loading=(Map) request.getData();
+                System.out.println("ws "+(Integer)data_loading.get("workspace_id"));
+                int op1 = connection.createStatement().executeUpdate("UPDATE workspace SET workspace_state = indisponible where id_workspace="+(Integer)data_loading.get("workspace_id"));
+                Map<String,Object> responsee=new HashMap<String,Object>();
+                List<Map> update=new ArrayList<Map>();
+                Map<String,Object> hm=new HashMap<String,Object>();
+                System.out.println("op1 "+op1);
+                hm.put("updated",op1);
+                update.add(hm);
+                responsee.put("data",update);
+                String response_string=mapper.writeValueAsString(responsee);
+            } catch(Exception ev) {
+            	ev.printStackTrace();
+            }
+            	
+            	
+            	
+            	
+//                Map<String, Object> reservat = new HashMap<>();
+//               
+//                Integer id_worksp = request.getData().get("workspace_id").asInt();
+//                Integer list_size = request.getData().get("liste_size").asInt();
+//                Integer reserv_numb = request.getData().get("reserv_numb").asInt();
+//                Integer id_compa = request.getData().get("id_compa").asInt();
+//            
+//                
+//               
+//                String query6 = "UPDATE workspace SET workspace_state ='indisponible' where id_workspace= ?";
+//                String queryInsert = "INSERT INTO reservations (reservation_number ,id_companies,id_workspace) VALUES(?,?,?)";
+//                PreparedStatement statement4 = connection.prepareStatement(query6);
+//                
+//                statement4.setInt(1, id_worksp);
+//
+//                PreparedStatement stmtUpdate = connection.prepareStatement(queryInsert);
+//                stmtUpdate.setInt(1, reserv_numb);
+//                stmtUpdate.setInt(2, id_compa);
+//                stmtUpdate.setInt(3, id_worksp);
+//
+//                statement4.executeUpdate();
+//                stmtUpdate.executeUpdate();
+//               
+//                Map response6 = Utils.responseFactory(reservat, event);
+//                String msg6 = mapper.writeValueAsString(response6);
+//                writer.println(msg6);
+//                break;
                 
                 //request made in order to get a full list of the workspace that have been booked by a company 
             case "reservation_list":
@@ -140,7 +191,7 @@ public class LocationNetwork {
                 }
                 Map response8 = Utils.responseFactory(nb_reserva, event);
                 String msg8 = mapper.writeValueAsString(response8);
-                writer.println(msg8);
+                writer.println(msg8); 
                 break;
                 
                 
