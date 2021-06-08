@@ -1,7 +1,10 @@
 package edu.episen.si.ing1.pds.backend.server.workspace.location;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import edu.episen.si.ing1.pds.backend.server.network.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 
@@ -86,7 +89,7 @@ public class LocationNetwork {
                  
                  
                  //request to put the state unavailable on each workspace which are in the offer selected by the user
-            /*case "done_reservtion":
+           /* case "done_reservtion":
                 Map<String, Object> reservat = new HashMap<>();
                 Integer list_worksp = request.getData().get("list_workspace").asInt();
                 Integer reserv_numb = request.getData().get("reserv_numb").asInt();
@@ -109,7 +112,9 @@ public class LocationNetwork {
                 String msg6 = mapper.writeValueAsString(response6);
                 writer.println(msg6);
                 break;*/
-            case "done_reservtion":
+                 
+                 
+          /* case "done_reservtion":
             	
             	
 try {
@@ -128,7 +133,34 @@ try {
                 String response_string=mapper.writeValueAsString(responsee);
             } catch(Exception ev) {
             	ev.printStackTrace();
-            }
+            }*/
+                 
+                 
+            case "done_reservation":
+            			String query = "UPDATE workspace SET workspace_state = 'indisponible' where id_workspace = ?";
+            			//String nbreserv = "SELECT COUNT(*) FROM reservations";
+            			Integer id_compa = request.getCompanyId();
+            			
+            			String queryInsert	= "INSERT INTO reservations (id_companies,id_workspace) VALUES(?,?)";
+            			ArrayNode ids = (ArrayNode) request.getData().get("workspace_id");
+            			
+            			
+            			
+            			
+            			
+            			List<Integer> idsList = mapper.convertValue(ids, new TypeReference<List<Integer>>(){});
+            			
+            			for(Integer id: idsList) {
+                			PreparedStatement statement4 = connection.prepareStatement(query);
+                			statement4.setInt(1, id);
+                			statement4.executeUpdate();
+                			PreparedStatement statement42 = connection.prepareStatement("INSERT INTO reservations (id_companies,id_workspace,reservation_number) VALUES (?,?, (SELECT max(reservation_number)+1 from reservations))");
+                			statement42.setInt(1,id_compa);
+                			statement42.setInt(2,id);
+                			statement42.executeUpdate();
+            			}
+            			
+            		break;
             	
             	
             	

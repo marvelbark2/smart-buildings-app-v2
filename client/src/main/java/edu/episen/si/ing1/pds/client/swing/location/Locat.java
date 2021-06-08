@@ -68,8 +68,12 @@ public class Locat implements Way {
 		    JButton retButton = new JButton("retour");
 		    p.setLayout(new GridLayout(12, 1));
 		    
-		    valid.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+		    valid.addActionListener(new ActionListener(){
+		    	public void actionPerformed(ActionEvent e) {
+		    	if(!bureau_ferme.isSelected() && !openspace.isSelected()){
+		    		JOptionPane.showMessageDialog(new JPanel(), "Tous les champs ne sont pas bien renseignes", "Erreur", JOptionPane.ERROR_MESSAGE);
+		    	}else {
+				
 					//getting the text from the different criteria we ask in the first interface
 					int Numbdesk = Integer.valueOf(nbBureau.getText());
 					int NumbOp = Integer.valueOf(nbOpenspace.getText());
@@ -87,6 +91,7 @@ public class Locat implements Way {
 					List <Integer> liste0= new ArrayList<Integer>();
 			         List <Integer> liste1= new ArrayList<Integer>();
 			          List <Integer> liste2= new ArrayList<Integer>();
+			          boolean x =true;
 			          
 					for (int i = 0; i<3;i++) {// this loop is made three time, each time is a different offer
 						List <Integer> listesp = new ArrayList<Integer>();
@@ -100,8 +105,9 @@ public class Locat implements Way {
 						
 						proposition[i]=new JLabel("");
 						reserv[i]= new JButton("réserver");
-						while(totsize<tmax && totpers<persmax &&totprice<prixmax ){
 						
+						while(totsize<tmax && totpers<persmax &&totprice<prixmax ){
+						valid.setEnabled(x);
 						if(bureau_ferme.isSelected() && openspace.isSelected()) {
 							
 							Request request=new Request();
@@ -171,10 +177,9 @@ public class Locat implements Way {
 							}*/
 						listesp.add(Integer.valueOf(ex.get("id").toString()));
 						}}
-						} else {
-							
-						}
+						} 
 						
+						if(x==true) {
 						proposition[i].setText("cette offre contient les salles: "+ listesp+ " dont  x bureau fermé et y"
 				    	  		+ " openspace pour une taille de "+	totsize+" metres carrés et un prix de "+totprice +" euros, il peut contenir "+totpers+" employés ");
 				    	  p.add(proposition[i]);
@@ -182,7 +187,7 @@ public class Locat implements Way {
 				          p.add(reserv[i]);
 				         
 				          
-				          
+						}
 				          }
 				        switch (i) {
 				          case 0:
@@ -202,6 +207,9 @@ public class Locat implements Way {
 				          }
 				       
 				         }
+					if(x==true) {
+							p.add(retButton) ;
+					}
 				          final List <Integer> listeA= liste0;
 				          final List <Integer> listeB= liste1;
 				          final List <Integer> listeC= liste2;
@@ -212,100 +220,99 @@ public class Locat implements Way {
 				         reserv[0].addActionListener(new ActionListener(){
 				        
 				        	  public void actionPerformed(ActionEvent e) {
-				        		  nbreserv++;
-				        		  int b = 0;
-				        		  for (int i : listeA) {
-				        			  try {
-				        		  Request request = new Request();
-				        			request.setEvent("done_reservation");
-				        			Map<String, Object> hm = new HashMap<>();
+				        		  if(reserv[0].getText().equalsIgnoreCase("réservation acceptée !")){
+				  		    		JOptionPane.showMessageDialog(new JPanel(), "déjà réservé", "Erreur", JOptionPane.ERROR_MESSAGE);
+				  		    	}else {
 				        		
-				        			hm.put("workspace_id", listeA.get(b));
-				        			
-				        			//hm.put("reserv_numb",nbreserv);
-				        			//hm.put("liste_size", lA);
-				        			request.setData(hm);
-				        			
-				        			b++;
-				        			Response response = Utils.sendRequest(request);
-				        		  } catch(Exception event) {
-			                    	  event.printStackTrace();
-			                      }
-				        		  }
+				        		  try {
+					        		  Request request = new Request();
+					        			request.setEvent("done_reservation");
+					        			Map<String, Object> hm = new HashMap<>();
+					        		
+					        			hm.put("workspace_id", listeA);
+					        			
+					        			//hm.put("reserv_numb",nbreserv);
+					        			//hm.put("liste_size", lA);
+					        			request.setData(hm);
+					        			
+					        			
+					        			Response response = Utils.sendRequest(request);
+					        		  } catch(Exception event) {
+				                    	  event.printStackTrace();
+				                      }
 				        			//Map<String, Object>  data = (Map<String, Object>) response.getMessage();
 				        		  reserv[0].setText("réservation acceptée !");
 				          
 				          
-				        	  }
+				        	  }}
 				          });
 				          reserv[1].addActionListener(new ActionListener(){
-				        	
 				        	  public void actionPerformed(ActionEvent e) {
-				        		  nbreserv++;
-				        		  int b = 0;
-				        		  for (int i : listeB) {
-				        			  try {
+				        		  if(reserv[1].getText().equalsIgnoreCase("réservation acceptée !")){
+					  		    		JOptionPane.showMessageDialog(new JPanel(), "déjà réservé", "Erreur", JOptionPane.ERROR_MESSAGE);
+					  		    	}else {
+				        	  try {
 				        		  Request request = new Request();
 				        			request.setEvent("done_reservation");
 				        			Map<String, Object> hm = new HashMap<>();
-				        			hm.put("workspace_id", listeB.get(b));
+				        		
+				        			hm.put("workspace_id", listeB);
 				        			
 				        			//hm.put("reserv_numb",nbreserv);
-				        			//hm.put("liste_size", lB);
+				        			//hm.put("liste_size", lA);
 				        			request.setData(hm);
-				        			
-				        			b++;
+				        	 
 				        			Response response = Utils.sendRequest(request);
 				        			  } catch(Exception event) {
 				                    	  event.printStackTrace();
 				                      }
-				        		  }
+				        		  
 				        			//Map<String, Object>  data = (Map<String, Object>) response.getMessage();
 				        		  reserv[1].setText("réservation acceptée !");
 				          
 				          
-				        	  }
+				        	  }}
 				          });
 				          reserv[2].addActionListener(new ActionListener(){
 				        	  
 				        	  public void actionPerformed(ActionEvent e) {
-				        		  nbreserv++;
-				        		  int b = 0;
-				        		  for (int i : listeC) {
-
-				                      try {
-				                    	  Request request = new Request();
-				                    	  request.setEvent("done_reservation");
-				                    	  Map<String, Object> hm = new HashMap<>();
-				                    	  hm.put("workspace_id", listeC.get(b));
-				                    	  //hm.put("reserv_numb",nbreserv);
-				                    	  //hm.put("liste_size", lC);
-				                    	  request.setData(hm);
-				        			
-				                    	  b++;
-				                    	  Response response = Utils.sendRequest(request);
-				                    	  
-				                      } catch(Exception event) {
-				                    	  event.printStackTrace();
-				                      }
-				                      }
-				        			//Map<String, Object>  data = (Map<String, Object>) response.getMessage();
-				        		  reserv[2].setText("réservation acceptée !");
+				        		  if(reserv[2].getText().equalsIgnoreCase("réservation acceptée !")){
+					  		    		JOptionPane.showMessageDialog(new JPanel(), "déjà réservé", "Erreur", JOptionPane.ERROR_MESSAGE);
+					  		    	}else {
+					        	  try {
+					        		  Request request = new Request();
+					        			request.setEvent("done_reservation");
+					        			Map<String, Object> hm = new HashMap<>();
+					        		
+					        			hm.put("workspace_id", listeC);
+					        			
+					        			//hm.put("reserv_numb",nbreserv);
+					        			//hm.put("liste_size", lA);
+					        			request.setData(hm);
+					        	 
+					        			Response response = Utils.sendRequest(request);
+					        			  } catch(Exception event) {
+					                    	  event.printStackTrace();
+					                      }
+					        		  
+					        			//Map<String, Object>  data = (Map<String, Object>) response.getMessage();
+					        		  reserv[2].setText("réservation acceptée !");
 				          
 				          
-				        		  }  
+				        		  }  }
 				          });
 				           
-					p.add(retButton) ;
-				       	  
 					
+				       	  
+					valid.setEnabled(true);
 					
 				p.invalidate();
 				p.validate();
 				p.repaint();
-			
-				}});
-						
+				}
+		    	}
+				});
+		   		
 		    
 retButton.addActionListener(new ActionListener() {
 				
