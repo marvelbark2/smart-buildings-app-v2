@@ -145,6 +145,13 @@ try {
             			ArrayNode ids = (ArrayNode) request.getData().get("workspace_id");
             			
             			
+            			PreparedStatement statement41 = connection.prepareStatement("SELECT max(reservation_number)+1 as max from reservations");
+            			ResultSet resnb = statement41.executeQuery();
+            			int reservnb = 0;
+            			if(resnb.next()) {
+            			int max =resnb.getInt("max");
+            			reservnb = max;
+            			}
             			
             			
             			
@@ -154,9 +161,10 @@ try {
                 			PreparedStatement statement4 = connection.prepareStatement(query);
                 			statement4.setInt(1, id);
                 			statement4.executeUpdate();
-                			PreparedStatement statement42 = connection.prepareStatement("INSERT INTO reservations (id_companies,id_workspace,reservation_number) VALUES (?,?, (SELECT max(reservation_number)+1 from reservations))");
+                			PreparedStatement statement42 = connection.prepareStatement("INSERT INTO reservations (id_companies,id_workspace,reservation_number) VALUES (?,?,?)");
                 			statement42.setInt(1,id_compa);
                 			statement42.setInt(2,id);
+                			statement42.setInt(3, reservnb);
                 			statement42.executeUpdate();
             			}
             			
@@ -194,7 +202,7 @@ try {
 //                break;
                 
                 //request made in order to get a full list of the workspace that have been booked by a company 
-            case "reservation_list":
+            /*case "reservation_list":
                 Map<String, Object> list_reserv = new HashMap<>();
                 Integer company = request.getData().get("company_id").asInt();
                 String query7 = "SELECT * FROM reservations WHERE id_companies = ?";
@@ -207,11 +215,12 @@ try {
                 Map response7 = Utils.responseFactory(list_reserv, event);
                 String msg7 = mapper.writeValueAsString(response7);
                 writer.println(msg7);
-                break;
+                break;*/
+              
                 
                 
                 // request made to get the number of reservation made by a company
-            case "nb_reservation_list":
+            /*case "nb_reservation_list":
                 Map<String, Object> nb_reserva = new HashMap<>();
                 Integer company1 = request.getData().get("company_id").asInt();
                 String query8 = "SELECT count(*) FROM reservations WHERE id_companies = ?";
@@ -224,11 +233,67 @@ try {
                 Map response8 = Utils.responseFactory(nb_reserva, event);
                 String msg8 = mapper.writeValueAsString(response8);
                 writer.println(msg8); 
-                break;
+                break;*/
                 
+            case "nb_reservation_list":
+            	List<Map<String,Object>> numb_res = new ArrayList<>();
+            	Integer id_compan = request.getCompanyId();
+            	PreparedStatement statement8 = connection.prepareStatement("select count(*) as numb_r from reservations where id_companies = ?");
+            	statement8.setInt(1, id_compan);
+    			ResultSet rs8 = statement8.executeQuery();
+    			 if(rs8.next()) {
+            		 Map<String, Object> rep = new HashMap<>();
+            		 rep.put("count",rs8.getInt("numb_r"));
+            		 numb_res.add(rep);
+    			 }
+    			 Map response8 = Utils.responseFactory(numb_res, event);
+    			 String msg8 = mapper.writeValueAsString(response8);
+                 writer.println(msg8);
+            	
+    			break;
+    			
+            case "reservation_list":
+            	Integer last_time = request.getData().get("last_id_res").asInt();
+            	Integer id_company = request.getCompanyId();
+            	List<Map<String,Object>> res = new ArrayList<>();
+            	PreparedStatement statement9 = connection.prepareStatement("select * from reservations inner join workspace on reservations.id_workspace = workspace.id_workspace\r\n" + 
+            			"where id_companies = ? and id_reservation>? limit 1");
+            	statement9.setInt(1, id_company);
+            	statement9.setInt(2, last_time);
+            	ResultSet rs9 = statement9.executeQuery();
+            	if(rs9.next()) {
+           		 Map<String, Object> mapOF = new HashMap<>();
+           		 mapOF.put("id",rs9.getInt("id_workspace"));
+           		 mapOF.put("size",rs9.getInt("size"));
+           		 mapOF.put("price",rs9.getInt("price"));
+           		 mapOF.put("employee",rs9.getInt("max_person"));
+           		 mapOF.put("id_reserv", rs9.getInt("id_reservation"));
+           		 res.add(mapOF);
+           		Map response9 = Utils.responseFactory(res, event);
+                String msg9 = mapper.writeValueAsString(response9);
+                writer.println(msg9);
+           	 }
+            	break;
                 
-                //request made in order to overwrite the state available on the status available. It also remove the workspace from the table reservation
+            	
             case "kill_reservation":
+            	List<Map<String,Object>> res_kill = new ArrayList<>();
+            	Integer id_res_to_kill = request.getData().get("idres").asInt();
+            	
+            	System.out.print("text :"+id_res_to_kill);
+            	PreparedStatement statement10 = connection.prepareStatement("UPDATE workspace SET workspace_state = 'disponible' WHERE id_workspace = ?");
+            	PreparedStatement statement11= connection.prepareStatement("DELETE FROM reservations WHERE id_workspace = ?");
+            	statement10.setInt(1, id_res_to_kill);
+            	statement10.executeUpdate();
+            	statement11.setInt(1, id_res_to_kill);
+            	statement11.executeUpdate();
+            	
+            	break;
+            	
+            	
+            	
+                //request made in order to overwrite the state available on the status available. It also remove the workspace from the table reservation
+            /*case "kill_reservation":
               Map<String, Object> ask_destroy = new HashMap<>();
                 int reservationId = request.getData().get("reservation_id").asInt();
                 int idW = request.getData().get("workspace_id").asInt();
@@ -239,21 +304,21 @@ try {
                 statement7.setInt(1, idW);
                 statement7.executeUpdate();
                 writer.println(Utils.responseFactory(true ,event));
-                break;
+                break;*/
                 
                 
                 //request made to get the list of the Buildings especially the name
             case "buildings_list":
             	List<Map> response = new ArrayList<>();                            
-                Statement statement8 = connection.createStatement();
-                ResultSet rs9 = statement8.executeQuery("SELECT * FROM buildings");
-                while (rs9.next()) {
+                Statement statement120 = connection.createStatement();
+                ResultSet rs120 = statement120.executeQuery("SELECT * FROM buildings");
+                while (rs120.next()) {
                     Map bMap=new HashMap();
-                    bMap.put("name", rs9.getString("name"));
+                    bMap.put("name", rs120.getString("name"));
                     response.add(bMap);
                 }
-                Map response9=Utils.responseFactory(response, event);
-                String msg10=mapper.writeValueAsString(response9);
+                Map response120=Utils.responseFactory(response, event);
+                String msg10=mapper.writeValueAsString(response120);
                 writer.println(msg10);
                 break;
                 
@@ -262,12 +327,12 @@ try {
                 //request made to get the list of the floors in a buildings
             case "floors_list":
             	List<Map<Map,Object>> response10 = new ArrayList<>();                            
-                Statement statement9 = connection.createStatement();
+                Statement statement90 = connection.createStatement();
                 String building_id1 = request.getData().get("building_id").toString();
-                ResultSet rs10 = statement9.executeQuery("SELECT * FROM floors INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE buildings.name =" + building_id1);
-                while (rs10.next()) {
+                ResultSet rs100 = statement90.executeQuery("SELECT * FROM floors INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE buildings.name =" + building_id1);
+                while (rs100.next()) {
                     Map fMap=new HashMap();
-                    fMap.put("number", rs10.getInt("floor_number"));
+                    fMap.put("number", rs100.getInt("floor_number"));
                     response10.add(fMap);
                 }
                 Map rsp11=Utils.responseFactory(response10, event);
@@ -278,13 +343,13 @@ try {
                 //request made in order to get the number of workspace in a floor
             case "numb_workspace":
             	List<Map<Map,Object>> response11 = new ArrayList<>();                            
-                Statement statement10 = connection.createStatement();
+                Statement statement100 = connection.createStatement();
                 String building_id2 = request.getData().get("building_id").toString();
                 Integer floor_id = request.getData().get("floor_id").asInt(); ;
-                ResultSet rs11 = statement10.executeQuery("SELECT COUNT(*) FROM workspace INNER JOIN floors ON workspace.floor_number = floors.floor_number INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE floors.floor_number = "+ floor_id +" AND  buildings.name =" + building_id2);
-                while (rs11.next()) {
+                ResultSet rs110 = statement100.executeQuery("SELECT COUNT(*) FROM workspace INNER JOIN floors ON workspace.floor_number = floors.floor_number INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE floors.floor_number = "+ floor_id +" AND  buildings.name =" + building_id2);
+                while (rs110.next()) {
                     Map wMap=new HashMap();
-                    wMap.put("wnumber", rs11.getInt("count"));
+                    wMap.put("wnumber", rs110.getInt("count"));
                     response11.add(wMap);
                 }
                 Map rsp12=Utils.responseFactory(response11, event);
