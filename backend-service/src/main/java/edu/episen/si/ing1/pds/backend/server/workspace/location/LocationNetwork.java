@@ -310,35 +310,37 @@ try {
                 //request made to get the list of the Buildings especially the name
             case "buildings_list":
             	List<Map> response = new ArrayList<>();                            
-                Statement statement120 = connection.createStatement();
-                ResultSet rs120 = statement120.executeQuery("SELECT * FROM buildings");
-                while (rs120.next()) {
+                Statement statement12 = connection.createStatement();
+                ResultSet rs12 = statement12.executeQuery("SELECT * FROM buildings");
+                while (rs12.next()) {
                     Map bMap=new HashMap();
-                    bMap.put("name", rs120.getString("name"));
+                    bMap.put("name", rs12.getString("name"));
                     response.add(bMap);
                 }
-                Map response120=Utils.responseFactory(response, event);
-                String msg10=mapper.writeValueAsString(response120);
-                writer.println(msg10);
+                Map response12=Utils.responseFactory(response, event);
+                String msg12=mapper.writeValueAsString(response12);
+                writer.println(msg12);
                 break;
                 
                 
                 
                 //request made to get the list of the floors in a buildings
             case "floors_list":
-            	List<Map<Map,Object>> response10 = new ArrayList<>();                            
-                Statement statement90 = connection.createStatement();
-                String building_id1 = request.getData().get("building_id").toString();
-                ResultSet rs100 = statement90.executeQuery("SELECT * FROM floors INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE buildings.name =" + building_id1);
-                while (rs100.next()) {
+            	List<Map> response13 = new ArrayList<>();                            
+                String building_id13 = request.getData().get("building_name").toString();
+            	Statement statement13 = connection.createStatement();
+    			ResultSet rs13 = statement13.executeQuery("SELECT * FROM floors INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE buildings.name = " + building_id13);
+                while (rs13.next()) {
                     Map fMap=new HashMap();
-                    fMap.put("number", rs100.getInt("floor_number"));
-                    response10.add(fMap);
+                    fMap.put("number", rs13.getInt("floor_number"));
+                    response13.add(fMap);
                 }
-                Map rsp11=Utils.responseFactory(response10, event);
-                String msg11=mapper.writeValueAsString(rsp11);
-                writer.println(msg11);
+                Map rsp13=Utils.responseFactory(response13, event);
+                String msg13=mapper.writeValueAsString(rsp13);
+                writer.println(msg13);
                 break;
+                
+                
                 
                 //request made in order to get the number of workspace in a floor
             case "numb_workspace":
@@ -352,9 +354,9 @@ try {
                     wMap.put("wnumber", rs110.getInt("count"));
                     response11.add(wMap);
                 }
-                Map rsp12=Utils.responseFactory(response11, event);
-                String msg12=mapper.writeValueAsString(rsp12);
-                writer.println(msg12);
+                Map rsp120=Utils.responseFactory(response11, event);
+                String msg120=mapper.writeValueAsString(rsp120);
+                writer.println(msg120);
                 break;
     }
 }
