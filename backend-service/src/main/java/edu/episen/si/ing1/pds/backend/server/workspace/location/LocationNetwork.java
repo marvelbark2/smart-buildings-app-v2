@@ -314,7 +314,7 @@ try {
                 ResultSet rs12 = statement12.executeQuery("SELECT * FROM buildings");
                 while (rs12.next()) {
                     Map bMap=new HashMap();
-                    bMap.put("name", rs12.getString("name"));
+                    bMap.put("name", rs12.getString("id_buildings"));
                     response.add(bMap);
                 }
                 Map response12=Utils.responseFactory(response, event);
@@ -326,10 +326,12 @@ try {
                 
                 //request made to get the list of the floors in a buildings
             case "floors_list":
-            	List<Map> response13 = new ArrayList<>();                            
-                String building_id13 = request.getData().get("building_name").toString();
+            	List<Map> response13 = new ArrayList<>(); 
+            	
+                Integer building_name = request.getData().get("building_name").asInt();
+               System.out.println(building_name);
             	Statement statement13 = connection.createStatement();
-    			ResultSet rs13 = statement13.executeQuery("SELECT * FROM floors INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE buildings.name = " + building_id13);
+    			ResultSet rs13 = statement13.executeQuery("SELECT * FROM floors INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE id_buildings = "+ building_name/*"'Batiment 1'*/+"");
                 while (rs13.next()) {
                     Map fMap=new HashMap();
                     fMap.put("number", rs13.getInt("floor_number"));

@@ -14,6 +14,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,7 +145,7 @@ import java.util.Vector;
 		
 	    }*/
 		
-public class MapCity implements Way {
+/*public class MapCity implements Way {
 	private List<Map> buildings;
 	private List<Map> floors;
 	
@@ -153,7 +155,7 @@ public class MapCity implements Way {
 		JPanel panm = new JPanel(new BorderLayout());
 		JPanel panm_north = new JPanel();
 		JComboBox combofloor = new JComboBox();
-		String name ="";
+		//String name ="";
 		JButton validplace = new JButton("valider");
 		
 		buildings = getBuildingList();
@@ -168,8 +170,8 @@ public class MapCity implements Way {
                 return this;
             }
         }); 
-        name = (String) ((Map) comboBuild.getSelectedItem()).get("name");
-
+        //name = (String) ((Map) comboBuild.getSelectedItem()).get("name");
+       Object name = (Object)((Map) comboBuild.getSelectedItem()).get("name");
         System.out.print(name);
         
         
@@ -215,6 +217,153 @@ public class MapCity implements Way {
         Response response = Utils.sendRequest(req);
         return  (List<Map>) response.getMessage();
     }
+}*/
+
+public class MapCity implements Way {
+	private List<Map> buildings;
+	private List<Map> floors;
+	
+	
+	@SuppressWarnings("unchecked")
+	public void begin(LocationMenu men) {
+		JPanel panelmap = men.getApp().getContext();
+		JPanel panm = new JPanel(new BorderLayout());
+		JPanel panm_north = new JPanel();
+		
+		JLabel bld = new JLabel("Batiment : ");
+		JLabel  flr= new JLabel("etage : ");
+		
+		JButton validplace = new JButton("valider");
+		
+		buildings = getBuildingList();
+		JComboBox comboBuild= new JComboBox(new Vector(buildings));
+        comboBuild.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if(value instanceof Map) {
+                    setText(((Map) value).get("name").toString());
+                }
+                return this;
+            }
+        }); 
+        
+        JComboBox combobuild = comboBuild;
+       
+        
+        
+        String name = (String) ((Map) comboBuild.getSelectedItem()).get("name");
+        Integer nome =Integer.valueOf(name);
+        
+        Request request = new Request();
+        request.setEvent("floors_list");
+        Map<String,Object> hm = new HashMap<>();
+ 		hm.put("building_name", nome);
+ 		request.setData(hm);
+        Response response = Utils.sendRequest(request);
+   
+        floors = (List<Map>) response.getMessage();
+        //System.out.println(response);
+        JComboBox comboFloor= new JComboBox(new Vector(floors));
+        comboFloor.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if(value instanceof Map) {
+                    setText(((Map) value).get("number").toString());
+                }
+                return this;
+            }
+        });
+        
+        
+        //JComboBox combofloor=comboFloor;
+        //panm.remove(comboFloor);;
+
+        panm_north.add(bld);
+        panm_north.add(combobuild);
+        panm_north.add(flr);
+        panm_north.add(comboFloor);
+        
+        
+       panm_north.add(validplace);
+        
+      
+        combobuild.addItemListener(new ItemListener() {
+
+			
+			public void itemStateChanged(ItemEvent e) {
+				String name = (String) ((Map) comboBuild.getSelectedItem()).get("name");
+      Integer nome =Integer.valueOf(name);
+       System.out.print(name);
+       System.out.print(nome);
+        
+			
+       
+     //if(comboBuild.getSelectedItem() != x ) {
+       Request request = new Request();
+       request.setEvent("floors_list");
+       Map<String,Object> hm = new HashMap<>();
+		hm.put("building_name", nome);
+		request.setData(hm);
+       Response response = Utils.sendRequest(request);
+  
+       floors = (List<Map>) response.getMessage();
+       //System.out.println(response);
+       JComboBox comboFloor= new JComboBox(new Vector(floors));
+       comboFloor.setRenderer(new DefaultListCellRenderer() {
+           @Override
+           public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+               super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+               if(value instanceof Map) {
+                   setText(((Map) value).get("number").toString());
+               }
+               return this;
+           }
+       });
+       
+       
+       //JComboBox combofloor=comboFloor;
+       //panm.remove(comboFloor);;
+       panm_north.removeAll();
+       panm_north.add(bld);
+       panm_north.add(combobuild);
+       panm_north.add(flr);
+       panm_north.add(comboFloor);
+       
+       
+      panm_north.add(validplace);
+      panm.invalidate();
+      panm.validate();
+      panm.repaint();
+			}
+        	});
+        
+        
+			 
+	        panm.add(panm_north,BorderLayout.NORTH);
+	       
+	       
+	       
+	        
+			
+        
+        
+       // JComboBox comboflooor = new JComboBox();
+        
+        
+        
+        
+	//}
+        
+       // panm.add(panm_center);
+		panelmap.add(panm);
+	}
+	
+	private List<Map> getBuildingList() {
+        Request req = new Request();
+        req.setEvent("buildings_list");
+        Response response = Utils.sendRequest(req);
+        return  (List<Map>) response.getMessage();
+    }
 }
-
-
