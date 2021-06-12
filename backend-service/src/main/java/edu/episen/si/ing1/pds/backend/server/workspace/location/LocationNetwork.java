@@ -334,7 +334,7 @@ try {
     			ResultSet rs13 = statement13.executeQuery("SELECT * FROM floors INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE id_buildings = "+ building_name/*"'Batiment 1'*/+"");
                 while (rs13.next()) {
                     Map fMap=new HashMap();
-                    fMap.put("number", rs13.getInt("floor_number"));
+                    fMap.put("number", rs13.getString("floor_number"));
                     response13.add(fMap);
                 }
                 Map rsp13=Utils.responseFactory(response13, event);
@@ -344,8 +344,8 @@ try {
                 
                 
                 
-                //request made in order to get the number of workspace in a floor
-            case "numb_workspace":
+               //request made in order to get the number of workspace in a floor
+            /*case "numb_workspace":
             	List<Map<Map,Object>> response11 = new ArrayList<>();                            
                 Statement statement100 = connection.createStatement();
                 String building_id2 = request.getData().get("building_id").toString();
@@ -359,7 +359,39 @@ try {
                 Map rsp120=Utils.responseFactory(response11, event);
                 String msg120=mapper.writeValueAsString(rsp120);
                 writer.println(msg120);
-                break;
+                break;*/
+            case "numb_workspace":
+            	List<Map> response14 = new ArrayList<>(); 
+            	Integer bui = request.getData().get("building_nb").asInt();
+                Integer flo = request.getData().get("floor_nb").asInt();
+                Statement statement14 = connection.createStatement();
+    			ResultSet rs14 = statement14.executeQuery("select count(*)as nb_wsp from workspace inner join floors on workspace.floor_number=floors.id_floor where floors.floor_number ="+flo+" and floors.building_number="+bui+"");
+    			if (rs14.next()) {
+                    Map fMap=new HashMap();
+                    fMap.put("nb_wp", rs14.getInt("nb_wsp"));
+                    response14.add(fMap);
+                }
+    			 Map rsp14=Utils.responseFactory(response14, event);
+                 String msg14=mapper.writeValueAsString(rsp14);
+                 writer.println(msg14);
+    			break;
+    			
+            case "wp_esp":
+            	List<Map> response15 = new ArrayList<>(); 
+            	Integer buil = request.getData().get("building_nb").asInt();
+                Integer floo = request.getData().get("floor_nb").asInt();
+                Statement statement15 = connection.createStatement();
+    			ResultSet rs15 = statement15.executeQuery("select * from workspace inner join floors on workspace.floor_number=floors.id_floor where floors.floor_number ="+floo+" and floors.building_number="+buil+" order by id_workspace asc");
+    			while (rs15.next()) {
+    				Map wpMap=new HashMap();
+                    wpMap.put("state", rs15.getString("workspace_state"));
+                    wpMap.put("numb", rs15.getInt("id_workspace"));
+                    response15.add(wpMap);
+    			}
+    			 Map rsp15=Utils.responseFactory(response15, event);
+                 String msg15=mapper.writeValueAsString(rsp15);
+                 writer.println(msg15);
+            	break;
     }
 }
 }
