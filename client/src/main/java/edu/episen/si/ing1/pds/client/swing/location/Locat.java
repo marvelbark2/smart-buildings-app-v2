@@ -24,14 +24,10 @@ public class Locat implements Way {
 	JCheckBox bureau_ferme =new JCheckBox("bureau ferme");
     JCheckBox openspace =new JCheckBox("openspace");
     JTextField tailleMax = new JTextField(10);
-    JTextField nbBureau = new JTextField(10);
-    JTextField nbOpenspace = new JTextField(10);
-    JTextField tailleMin = new JTextField(10);
+  
     JTextField persMax = new JTextField(10);
     JTextField prixMax = new JTextField(10);
-    JCheckBox screen =new JCheckBox("ecran");
-    JCheckBox captor =new JCheckBox("capteur");
-    JCheckBox prise =new JCheckBox("prise");
+   
     
     int nbreserv = 0;
     int answer =5;
@@ -46,27 +42,20 @@ public class Locat implements Way {
 		JPanel panrech = men.getApp().getContext();
 		 JPanel p = new JPanel( );
 		 
-		 JLabel Nbdesk = new JLabel("nombre de bureau fermé",JLabel.LEFT);
-		 Nbdesk.setLabelFor(nbBureau);
-		 
-		 JLabel Nbopenspace = new JLabel("nombre d'openspace",JLabel.LEFT);
-		 Nbopenspace.setLabelFor(nbOpenspace);
 		
-		 JLabel Tmin = new JLabel("taille minimale", JLabel.LEFT);
-		    Tmin.setLabelFor(tailleMax);
 		    
-		    JLabel Tmax = new JLabel("taille maximale", JLabel.LEFT);
-		    Tmax.setLabelFor(tailleMin);
+		    JLabel Tmax = new JLabel("taille approximative souhaitée :", JLabel.LEFT);
+		    Tmax.setLabelFor(tailleMax);
 		 
-		    JLabel PersMax = new JLabel("nombre de personne", JLabel.LEFT);
+		    JLabel PersMax = new JLabel("nombre d'employés approximatif :", JLabel.LEFT);
 		    PersMax.setLabelFor(persMax);
 		 
-		    JLabel Pmax = new JLabel("prix maximum", JLabel.LEFT);
+		    JLabel Pmax = new JLabel("prix total approximatif :", JLabel.LEFT);
 		    Pmax.setLabelFor(prixMax);
 		    
 		   
 		    JButton retButton = new JButton("retour");
-		    p.setLayout(new GridLayout(12, 1));
+		    p.setLayout(new GridLayout(6, 1));
 		    
 		    valid.addActionListener(new ActionListener(){
 		    	public void actionPerformed(ActionEvent e) {
@@ -75,9 +64,7 @@ public class Locat implements Way {
 		    	}else {
 				
 					
-					int Numbdesk = Integer.valueOf(nbBureau.getText());
-					int NumbOp = Integer.valueOf(nbOpenspace.getText());
-					int tmin = Integer.valueOf(tailleMin.getText()); 
+					
 					int tmax = Integer.valueOf(tailleMax.getText());
 					int persmax = Integer.valueOf(persMax.getText());
 					int prixmax = Integer.valueOf(prixMax.getText());
@@ -158,8 +145,8 @@ public class Locat implements Way {
 						} 
 						
 						if(x==true) {
-						proposition[i].setText("cette offre contient les salles: "+ listesp+ " dont  x bureau fermé et y"
-				    	  		+ " openspace pour une taille de "+	totsize+" metres carrés et un prix de "+totprice +" euros, il peut contenir "+totpers+" employés ");
+						proposition[i].setText("<html>cette offre contient les salles: "+ listesp+ ""
+				    	  		+ " pour une taille totale de "+	totsize+" metres carrés et un prix total de "+totprice +" euros, ils peuvent contenir un total de "+totpers+" employés</html> ");
 				    	  p.add(proposition[i]);
 				    	   
 				          p.add(reserv[i]);
@@ -191,9 +178,7 @@ public class Locat implements Way {
 				          final List <Integer> listeA= liste0;
 				          final List <Integer> listeB= liste1;
 				          final List <Integer> listeC= liste2;
-				          int lA = listeA.size();
-				          int lB = listeB.size();
-				          int lC = listeC.size();
+				        
 				          
 				         reserv[0].addActionListener(new ActionListener(){
 				        
@@ -296,21 +281,14 @@ retButton.addActionListener(new ActionListener() {
 					
 					p.add(bureau_ferme);
 				   	p.add(openspace);
-				    p.add(Nbdesk);
-				    p.add(nbBureau);
-				    p.add(Nbopenspace);
-				    p.add(nbOpenspace);
-				    p.add(Tmin);
-				    p.add(tailleMin);
+				 
 				    p.add(Tmax);
 				    p.add(tailleMax);
 				    p.add(PersMax);
 				    p.add(persMax);
 				    p.add(Pmax);
 				    p.add(prixMax);  
-				    p.add(screen);
-				    p.add(prise);
-				    p.add(captor);
+				  
 				    p.add(valid);
 					p.invalidate();
 					 p.validate();
@@ -320,21 +298,14 @@ retButton.addActionListener(new ActionListener() {
     
     p.add(bureau_ferme);
    	p.add(openspace);
-    p.add(Nbdesk);
-    p.add(nbBureau);
-    p.add(Nbopenspace);
-    p.add(nbOpenspace);
-    p.add(Tmin);
-    p.add(tailleMin);
+  
     p.add(Tmax);
     p.add(tailleMax);
     p.add(PersMax);
     p.add(persMax);
     p.add(Pmax);
     p.add(prixMax); 
-    p.add(screen);
-    p.add(prise);
-    p.add(captor);
+   
     p.add(valid);
     panrech.add(p);
 }
