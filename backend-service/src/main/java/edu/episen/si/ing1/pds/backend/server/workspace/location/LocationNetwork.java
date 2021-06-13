@@ -88,52 +88,7 @@ public class LocationNetwork {
                  break;
                  
                  
-                 //request to put the state unavailable on each workspace which are in the offer selected by the user
-           /* case "done_reservtion":
-                Map<String, Object> reservat = new HashMap<>();
-                Integer list_worksp = request.getData().get("list_workspace").asInt();
-                Integer reserv_numb = request.getData().get("reserv_numb").asInt();
-                Integer id_compa = request.getData().get("id_compa").asInt();
-                Integer id_worksp = request.getData().get("id_worksp").asInt();
-                String query6 = "UPDATE workspace SET workspace_state ='indisponible' where id_workspace= ?";
-                String queryInsert	= "INSERT INTO reservations (reservation_number ,id_companies,id_workspace) VALUES(?,?,?)";
-                PreparedStatement statement4 = connection.prepareStatement(query6);
-                statement4.setInt(1, list_worksp);
-
-                PreparedStatement stmtUpdate = connection.prepareStatement(queryInsert);
-                stmtUpdate.setInt(1, reserv_numb);
-                stmtUpdate.setInt(2, id_compa);
-                stmtUpdate.setInt(3, id_worksp);
-
-                statement4.executeUpdate();
-                stmtUpdate.executeUpdate();
-
-                Map response6 = Utils.responseFactory(reservat, event);
-                String msg6 = mapper.writeValueAsString(response6);
-                writer.println(msg6);
-                break;*/
-                 
-                 
-          /* case "done_reservtion":
-            	
-            	
-try {
-	
-
-                Map data_loading=(Map) request.getData();
-                System.out.println("ws "+(Integer)data_loading.get("workspace_id"));
-                int op1 = connection.createStatement().executeUpdate("UPDATE workspace SET workspace_state = indisponible where id_workspace="+(Integer)data_loading.get("workspace_id"));
-                Map<String,Object> responsee=new HashMap<String,Object>();
-                List<Map> update=new ArrayList<Map>();
-                Map<String,Object> hm=new HashMap<String,Object>();
-                System.out.println("op1 "+op1);
-                hm.put("updated",op1);
-                update.add(hm);
-                responsee.put("data",update);
-                String response_string=mapper.writeValueAsString(responsee);
-            } catch(Exception ev) {
-            	ev.printStackTrace();
-            }*/
+               
                  
                  
             case "done_reservation":
@@ -172,68 +127,9 @@ try {
             	
             	
             	
-            	
-//                Map<String, Object> reservat = new HashMap<>();
-//               
-//                Integer id_worksp = request.getData().get("workspace_id").asInt();
-//                Integer list_size = request.getData().get("liste_size").asInt();
-//                Integer reserv_numb = request.getData().get("reserv_numb").asInt();
-//                Integer id_compa = request.getData().get("id_compa").asInt();
-//            
-//                
-//               
-//                String query6 = "UPDATE workspace SET workspace_state ='indisponible' where id_workspace= ?";
-//                String queryInsert = "INSERT INTO reservations (reservation_number ,id_companies,id_workspace) VALUES(?,?,?)";
-//                PreparedStatement statement4 = connection.prepareStatement(query6);
-//                
-//                statement4.setInt(1, id_worksp);
-//
-//                PreparedStatement stmtUpdate = connection.prepareStatement(queryInsert);
-//                stmtUpdate.setInt(1, reserv_numb);
-//                stmtUpdate.setInt(2, id_compa);
-//                stmtUpdate.setInt(3, id_worksp);
-//
-//                statement4.executeUpdate();
-//                stmtUpdate.executeUpdate();
-//               
-//                Map response6 = Utils.responseFactory(reservat, event);
-//                String msg6 = mapper.writeValueAsString(response6);
-//                writer.println(msg6);
-//                break;
-                
-                //request made in order to get a full list of the workspace that have been booked by a company 
-            /*case "reservation_list":
-                Map<String, Object> list_reserv = new HashMap<>();
-                Integer company = request.getData().get("company_id").asInt();
-                String query7 = "SELECT * FROM reservations WHERE id_companies = ?";
-                PreparedStatement statement5 = connection.prepareStatement(query7);
-                statement5.setInt(1, company);
-                ResultSet rs7 = statement5.executeQuery();
-                while (rs7.next()) {
-                    list_reserv.put("id", rs7.getInt("id_workspace"));
-                }
-                Map response7 = Utils.responseFactory(list_reserv, event);
-                String msg7 = mapper.writeValueAsString(response7);
-                writer.println(msg7);
-                break;*/
-              
+
                 
                 
-                // request made to get the number of reservation made by a company
-            /*case "nb_reservation_list":
-                Map<String, Object> nb_reserva = new HashMap<>();
-                Integer company1 = request.getData().get("company_id").asInt();
-                String query8 = "SELECT count(*) FROM reservations WHERE id_companies = ?";
-                PreparedStatement statement6 = connection.prepareStatement(query8);
-                statement6.setInt(1, company1);
-                ResultSet rs8 = statement6.executeQuery();
-                if (rs8.next()) {
-      
-                }
-                Map response8 = Utils.responseFactory(nb_reserva, event);
-                String msg8 = mapper.writeValueAsString(response8);
-                writer.println(msg8); 
-                break;*/
                 
             case "nb_reservation_list":
             	List<Map<String,Object>> numb_res = new ArrayList<>();
@@ -256,7 +152,7 @@ try {
             	Integer last_time = request.getData().get("last_id_res").asInt();
             	Integer id_company = request.getCompanyId();
             	List<Map<String,Object>> res = new ArrayList<>();
-            	PreparedStatement statement9 = connection.prepareStatement("select * from reservations inner join workspace on reservations.id_workspace = workspace.id_workspace\r\n" + 
+            	PreparedStatement statement9 = connection.prepareStatement("select  reservations.id_workspace,workspace.size,workspace.price,workspace.max_person,reservations.id_reservation,floors.building_number,floors.floor_number  from reservations inner join workspace on reservations.id_workspace = workspace.id_workspace  inner join floors on workspace.floor_number = id_floor\r\n" + 
             			"where id_companies = ? and id_reservation>? limit 1");
             	statement9.setInt(1, id_company);
             	statement9.setInt(2, last_time);
@@ -268,6 +164,8 @@ try {
            		 mapOF.put("price",rs9.getInt("price"));
            		 mapOF.put("employee",rs9.getInt("max_person"));
            		 mapOF.put("id_reserv", rs9.getInt("id_reservation"));
+           		 mapOF.put("fln",rs9.getInt("floor_number"));
+           		mapOF.put("bln",rs9.getInt("building_number"));
            		 res.add(mapOF);
            		Map response9 = Utils.responseFactory(res, event);
                 String msg9 = mapper.writeValueAsString(response9);
@@ -292,22 +190,7 @@ try {
             	
             	
             	
-                //request made in order to overwrite the state available on the status available. It also remove the workspace from the table reservation
-            /*case "kill_reservation":
-              Map<String, Object> ask_destroy = new HashMap<>();
-                int reservationId = request.getData().get("reservation_id").asInt();
-                int idW = request.getData().get("workspace_id").asInt();
-
-                connection.prepareStatement("DELETE FROM reservations WHERE id_reservation = " + reservationId).executeUpdate();
-                String query9 = "UPDATE workspace SET workspace_state ='disponible' where id_workspace = ?";
-                PreparedStatement statement7 = connection.prepareStatement(query9);
-                statement7.setInt(1, idW);
-                statement7.executeUpdate();
-                writer.println(Utils.responseFactory(true ,event));
-                break;*/
                 
-                
-                //request made to get the list of the Buildings especially the name
             case "buildings_list":
             	List<Map> response = new ArrayList<>();                            
                 Statement statement12 = connection.createStatement();
@@ -324,7 +207,7 @@ try {
                 
                 
                 
-                //request made to get the list of the floors in a buildings
+              
             case "floors_list":
             	List<Map> response13 = new ArrayList<>(); 
             	
@@ -344,22 +227,7 @@ try {
                 
                 
                 
-               //request made in order to get the number of workspace in a floor
-            /*case "numb_workspace":
-            	List<Map<Map,Object>> response11 = new ArrayList<>();                            
-                Statement statement100 = connection.createStatement();
-                String building_id2 = request.getData().get("building_id").toString();
-                Integer floor_id = request.getData().get("floor_id").asInt(); ;
-                ResultSet rs110 = statement100.executeQuery("SELECT COUNT(*) FROM workspace INNER JOIN floors ON workspace.floor_number = floors.floor_number INNER JOIN buildings ON floors.building_number = buildings.id_buildings WHERE floors.floor_number = "+ floor_id +" AND  buildings.name =" + building_id2);
-                while (rs110.next()) {
-                    Map wMap=new HashMap();
-                    wMap.put("wnumber", rs110.getInt("count"));
-                    response11.add(wMap);
-                }
-                Map rsp120=Utils.responseFactory(response11, event);
-                String msg120=mapper.writeValueAsString(rsp120);
-                writer.println(msg120);
-                break;*/
+              
             case "numb_workspace":
             	List<Map> response14 = new ArrayList<>(); 
             	Integer bui = request.getData().get("building_nb").asInt();

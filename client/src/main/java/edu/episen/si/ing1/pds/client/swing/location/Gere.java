@@ -15,63 +15,7 @@ import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.utils.Utils;
 
-/*public class Gere implements Way {
-	 int nb_reserv= 16;
-	 JButton[] bouton = new JButton[nb_reserv];
-	 JLabel[] lab = new JLabel[nb_reserv];
-	
-	 
-	
-	
-	public void begin(LocationMenu men) {
-		JPanel pangere = men.getApp().getContext();
-		JPanel pg = new JPanel( );
-		
-		//asking for the number of reservation made by a company
-		Request request = new Request();
-		request.setEvent("nb_reservation_list");
-		Map<String, Integer> hm = new HashMap<>();
-		//hm.put("company_id", ?);
-		request.setData(hm);
-		Response response = Utils.sendRequest(request);
-		Map<String, Object>  data = (Map<String, Object>) response.getMessage();
-		
-		
-		//asking for the list of the reservation
-		Request request2 = new Request();
-		request.setEvent("reservation_list");
-		Map<String, Integer> hm2 = new HashMap<>();
-		//hm.put("company_id", ?);--error
-		request.setData(hm);
-		//Response response = Utils.sendRequest(request);--error
-		//Map<String, Object> data = (Map<String, Object>) response.getMessage();--error
-		/*SocketConfig.Instance.setEnv(true);
-		Request request=new Request();
-		request.setEvent("random_offer");
-		Response response = Utils.sendRequest(request);
-		int data_reserv = response.getMessage();
-		
-		
-		
-		int data_reserv = 16;//number of rseervation
-	      for (int r = 0; r < data_reserv; r++) {  		
-	    	  lab[r]=new JLabel("pos");
-	    	 // lab[r].setText("l'espace "+esp_reserv+"a été réservé");--error
-			  pg.add(lab[r]);
-	          bouton[r]= new JButton("annuler reservation"); 
-	          pg.add(bouton[r]);
-	          
-	          bouton[r].addActionListener(new ActionListener(){
-	        	  public void actionPerformed(ActionEvent e) {
-	        		 
-	        		// here should be the request for changing the state to available to available and remove from the table reservation(kill_reservation)
-	        		  
-	        	  }
-	          });
-	          
-	}
-	}
-}*/
+
 
 public class Gere implements Way {
 	int nb_reserv= 0;
@@ -90,7 +34,7 @@ public class Gere implements Way {
 			nb_reserv=k;
 		}
 		
-		System.out.println(nb_reserv);
+		
 		 JLabel[] proposition = new JLabel[nb_reserv];
 		 JButton[] left = new JButton[nb_reserv];
 		 int[] id_wsp = new int[nb_reserv];
@@ -98,6 +42,8 @@ public class Gere implements Way {
 		 int[] price_wsp = new int[nb_reserv];
 		 int[] maxpers_wsp = new int[nb_reserv];
 		 int[] nbres = new int[nb_reserv];
+		 int[] bln = new int[nb_reserv];
+		 int[] fln = new int[nb_reserv];
 		 int l = 0;
 		 
 		 for(int i=0;i<nb_reserv;i++) {
@@ -106,7 +52,7 @@ public class Gere implements Way {
 		 }
 		 final int[] fori = nbres;
 		 
-		 pg.setLayout(new GridLayout(nb_reserv, 1));
+		 pg.setLayout(new GridLayout(nb_reserv, 1,20,20));
 		 
 		 
 		 
@@ -118,6 +64,8 @@ public class Gere implements Way {
 				size_wsp[i] = 0;
 				price_wsp[i] =0;
 				maxpers_wsp[i]=0;
+				bln[i]=0;
+				fln[i]=0;
 				
 				
 				
@@ -136,10 +84,12 @@ public class Gere implements Way {
 				price_wsp[i] =Integer.valueOf(ex.get("price").toString());
 				maxpers_wsp[i]=Integer.valueOf(ex.get("employee").toString());;
 				last_id_reserv= Integer.valueOf(ex.get("id_reserv").toString());
+				bln[i]= Integer.valueOf(ex.get("bln").toString());
+				fln[i] =Integer.valueOf(ex.get("fln").toString()) ;
 			}
 				
 			 
-			 proposition[i].setText("l'espace "+id_wsp[i]+" est réservé, il a une taille de "+size_wsp[i]+" et peut contenir "+maxpers_wsp[i]+" personnes, pour un prix de "+price_wsp[i]+" euros.");
+			 proposition[i].setText("<html>l'espace "+id_wsp[i]+" se situant dans le batiment "+bln[i]+" à l'étage "+fln[i]+" est réservé, il a une taille de "+size_wsp[i]+" et peut contenir "+maxpers_wsp[i]+" personnes, pour un prix de "+price_wsp[i]+" euros.</html>");
 			 pg.add(proposition[i]);
 			 pg.add(left[i]);
 			
