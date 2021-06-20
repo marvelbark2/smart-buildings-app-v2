@@ -153,7 +153,7 @@ public class LocationNetwork {
             	Integer id_company = request.getCompanyId();
             	List<Map<String,Object>> res = new ArrayList<>();
             	PreparedStatement statement9 = connection.prepareStatement("select  reservations.id_workspace,workspace.size,workspace.price,workspace.max_person,reservations.id_reservation,floors.building_number,floors.floor_number  from reservations inner join workspace on reservations.id_workspace = workspace.id_workspace  inner join floors on workspace.floor_number = id_floor\r\n" + 
-            			"where id_companies = ? and id_reservation>? limit 1");
+            			"where id_companies = ? and id_reservation>? order by id_reservation asc limit 1");
             	statement9.setInt(1, id_company);
             	statement9.setInt(2, last_time);
             	ResultSet rs9 = statement9.executeQuery();
@@ -254,6 +254,7 @@ public class LocationNetwork {
     				Map wpMap=new HashMap();
                     wpMap.put("state", rs15.getString("workspace_state"));
                     wpMap.put("numb", rs15.getInt("id_workspace"));
+                    wpMap.put("type",rs15.getString("workspace_type"));
                     response15.add(wpMap);
     			}
     			 Map rsp15=Utils.responseFactory(response15, event);

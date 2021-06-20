@@ -3,5 +3,7 @@ pathServer=/usr/local/smart-building
 jarPath=lib/edu/episen/si/ing1/pds/backend-service/1.0-SNAPSHOT
 configPath=configs/smart-build-config.yaml
 
-scp ${jarFile} pdsBack:${pathServer}/${jarPath} & wait
- scp ${SMARTBUILDCONFIG} pdsBack:${pathServer}/${configPath}
+scp ${jarFile} root@172.31.254.83:${pathServer}/${jarPath} 
+
+
+ 

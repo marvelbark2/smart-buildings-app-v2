@@ -28,6 +28,7 @@ public class MapCity implements Way {
 	private List<Integer> bui_list=  new ArrayList<Integer>();
 	private List<Integer> floor_list=  new ArrayList<Integer>();
 	private List<String> state_list=  new ArrayList<String>();
+	private List<String> type_list=  new ArrayList<String>();
 	private List<Integer> nbwsp_list=  new ArrayList<Integer>();
 	private Integer nbwp= 0;
 	
@@ -52,6 +53,10 @@ public class MapCity implements Way {
 		
 		validplace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				try {
+				if(build.getText().equals("")||floor.getText().equals("")) {
+					JOptionPane.showMessageDialog(new JPanel(), "Tous les champs ne sont pas bien renseignes", "Erreur", JOptionPane.ERROR_MESSAGE);
+				}else {
 				panm_center.removeAll();
 				bui_list.clear();
 				Integer bui = Integer.valueOf(build.getText());
@@ -102,6 +107,7 @@ public class MapCity implements Way {
 		        			panm_center.setLayout(new GridLayout(nbwp/2, 1,20,20));
 		        			state_list.clear();
 		        			nbwsp_list.clear();
+		        			type_list.clear();
 		        			Request request3 = new Request();
 		        			request3.setEvent("wp_esp");
 		        			Map<String, Object> rwp = new HashMap<>();
@@ -113,6 +119,7 @@ public class MapCity implements Way {
 			        			for(Map ex:data3) {
 			        				state_list.add(ex.get("state").toString());
 			        				nbwsp_list.add(Integer.valueOf(ex.get("numb").toString()));
+			        				type_list.add(ex.get("type").toString());
 			        			}
 			        	  
 			        	     
@@ -130,7 +137,7 @@ public class MapCity implements Way {
 										box.setBorder(new LineBorder(Color.red));
 										box.setBackground(Color.red);
 									}
-									box.add(new JLabel("salle "+ nbwsp_list.get(x)));
+									box.add(new JLabel("salle "+ nbwsp_list.get(x)+ " : "+ type_list.get(x)));
 									x++;
 									panm_center.add(box);
 								}
@@ -152,8 +159,11 @@ public class MapCity implements Way {
 		        }
 				
 			}
-			
-		});
+			}catch (NumberFormatException f) {
+				JOptionPane.showMessageDialog(new JPanel(), "Tous les champs ne sont pas bien renseignes, mauvais type", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+			}});
+		
 		
 		
 		panm.add(panm_center,BorderLayout.CENTER);

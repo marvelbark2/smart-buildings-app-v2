@@ -29,13 +29,12 @@ public class Gere implements Way {
 		request.setEvent("nb_reservation_list");
 		Response response = Utils.sendRequest(request);
 		List<Map> data=(List<Map>) response.getMessage();
-		for(Map ex:data) {
-			int k = Integer.valueOf(ex.get("count").toString());
+		
+			int k = Integer.valueOf(data.get(0).get("count").toString());
 			nb_reserv=k;
-		}
 		
 		
-		 JLabel[] proposition = new JLabel[nb_reserv];
+		JLabel[] proposition = new JLabel[nb_reserv];
 		 JButton[] left = new JButton[nb_reserv];
 		 int[] id_wsp = new int[nb_reserv];
 		 int[] size_wsp = new int[nb_reserv];
@@ -58,6 +57,7 @@ public class Gere implements Way {
 		 
 		 int last_id_reserv=0;
 		 for(int i=0;i<nb_reserv;i++) {
+			 
 			 proposition[i]=new JLabel("");
 				left[i]= new JButton("rendre espace");
 				id_wsp[i] =0;
@@ -89,7 +89,7 @@ public class Gere implements Way {
 			}
 				
 			 
-			 proposition[i].setText("<html>l'espace "+id_wsp[i]+" se situant dans le batiment "+bln[i]+" à l'étage "+fln[i]+" est réservé, il a une taille de "+size_wsp[i]+" et peut contenir "+maxpers_wsp[i]+" personnes, pour un prix de "+price_wsp[i]+" euros.</html>");
+			 proposition[i].setText("<html>l'espace "+id_wsp[i]+" se situant dans le batiment "+bln[i]+" à l'étage "+fln[i]+" est réservé, il a une taille de "+size_wsp[i]+" mètres carrés et peut contenir "+maxpers_wsp[i]+" personnes, pour un prix de "+price_wsp[i]+" euros.</html>");
 			 pg.add(proposition[i]);
 			 pg.add(left[i]);
 			

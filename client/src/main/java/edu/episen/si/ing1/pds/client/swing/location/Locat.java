@@ -59,7 +59,11 @@ public class Locat implements Way {
 		    
 		    valid.addActionListener(new ActionListener(){
 		    	public void actionPerformed(ActionEvent e) {
+		    		try {
 		    	if(!bureau_ferme.isSelected() && !openspace.isSelected()){
+		    		JOptionPane.showMessageDialog(new JPanel(), "Tous les champs ne sont pas bien renseignes", "Erreur", JOptionPane.ERROR_MESSAGE);
+		    		System.out.println("LUDO EST UN CON ");
+		    	}else if (tailleMax.getText().equals("")||persMax.getText().equals("")||prixMax.getText().equals("")){
 		    		JOptionPane.showMessageDialog(new JPanel(), "Tous les champs ne sont pas bien renseignes", "Erreur", JOptionPane.ERROR_MESSAGE);
 		    	}else {
 				
@@ -270,6 +274,9 @@ public class Locat implements Way {
 				p.validate();
 				p.repaint();
 				}
+		    		}catch (NumberFormatException f) {
+						JOptionPane.showMessageDialog(new JPanel(), "Tous les champs ne sont pas bien renseignes, mauvais type", "Erreur", JOptionPane.ERROR_MESSAGE);
+		            }
 		    	}
 				});
 		   		
