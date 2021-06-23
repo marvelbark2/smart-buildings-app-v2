@@ -207,7 +207,10 @@ public class DualListBox extends JPanel {
                 Object selected[] = sourceList.getSelectedValues();
                 Map selectedMap = (Map) selected[0];
                 selectedMap.put(key, !(Boolean) selectedMap.get(key));
-                selectedMap.put("edited", ! (Boolean) selectedMap.get("edited"));
+                if(selectedMap.containsKey("edited"))
+                    selectedMap.put("edited", ! (Boolean) selectedMap.get("edited"));
+                else if(selectedMap.containsKey("modified"))
+                    selectedMap.put("modified", ! (Boolean) selectedMap.get("modified"));
                 addDestinationElements(selected);
                 clearSourceSelected();
             }
@@ -225,7 +228,10 @@ public class DualListBox extends JPanel {
                 Object selected[] = destList.getSelectedValues();
                 Map selectedMap = (Map) selected[0];
                 selectedMap.put(key, !(Boolean) selectedMap.get(key));
-                selectedMap.put("edited", ! (Boolean) selectedMap.get("edited"));
+                if(selectedMap.containsKey("edited"))
+                    selectedMap.put("edited", ! (Boolean) selectedMap.get("edited"));
+                else if(selectedMap.containsKey("modified"))
+                    selectedMap.put("modified", ! (Boolean) selectedMap.get("modified"));
                 addSourceElements(selected);
                 clearDestinationSelected();
             }

@@ -5,10 +5,19 @@ import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.network.SocketFacade;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.Timer;
+
+/*
+* Utils class
+* Contain some tools to handle some stucks
+* */
 
 public class Utils {
 
@@ -39,6 +48,13 @@ public class Utils {
         return guestPage;
     }
 
+    /*
+    * Method to deserialize to Map
+    * Removing from brackets
+    * Split by comma
+    * putting in new map
+    * */
+
     public static Map<String, String> toMap(String value) {
         value = value.substring(1, value.length()-1);
         String[] keyValuePairs = value.split(",");
@@ -51,6 +67,12 @@ public class Utils {
         }
         return map;
     }
+
+    /*
+    * Generate a unique string - UUID based on length of string we want
+    * Combining random characters token from alphabet string
+    * */
+
     public static String generateStringId(int length) {
         StringBuilder returnValue = new StringBuilder(length);
         final Random RANDOM = new SecureRandom();
@@ -60,10 +82,18 @@ public class Utils {
         }
         return new String(returnValue);
     }
+
+    /*
+    * Give a file which path is stored in env variable
+    * By reading env variable and returns File Object ready to be use
+    * */
+
     public static File getFileContent(String varEnv) {
         String varValue = System.getenv(varEnv);
         return new File(varValue);
     }
+
+
     public static String generateSerialNumber() {
         String randomString = generateStringId(20).toUpperCase(Locale.ROOT);
         StringBuilder builder = new StringBuilder(randomString);
@@ -74,6 +104,21 @@ public class Utils {
         return builder.toString();
     }
 
+    /*
+    * Get resources or assets stored in Jar
+    * */
+    public static ImageIcon getImageIconFromResource(String path) {
+        Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource(path));
+        return new ImageIcon(icon);
+    }
+
+    /*
+    * Send Request to server socket and take the response
+    * By Taking event first then serialize Request object to Json string
+    * then send it to server by PrintWriter object
+    * After that deserialize Json response to Response Object
+    * Finally return the Response Object
+    * */
     public static Response sendRequest(Request request) {
         PrintWriter writer;
         BufferedReader reader;
@@ -101,10 +146,5 @@ public class Utils {
             e.printStackTrace();
         }
         return response;
-    }
-
-    public static void checkSystemLog() {
-        Timer timer = new Timer();
-        timer.schedule(new SystemLog(), 0, 1000);
     }
 }

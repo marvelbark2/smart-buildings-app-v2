@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/*
+* Class Network
+* Handling requests recevied from client for card services
+* */
 public class CardNetwork implements Network {
     private final ICardService<CardRequest, CardsResponse> service;
     private final PrintWriter writer;
@@ -58,8 +62,7 @@ public class CardNetwork implements Network {
                 } else {
                     msg = "No record found";
                 }
-                Map<Map, List> accessList = service.getAccessList(card_id);
-                Map responseBody = Map.of("card", msg,"access_list", accessList);
+                Map responseBody = Map.of("card", msg);
 
                 logger.info(responseBody.toString());
 
@@ -90,6 +93,17 @@ public class CardNetwork implements Network {
                 e.printStackTrace();
             }
         }
+        else if(event.equals("card_treeview")) {
+            try {
+                JsonNode data = request.getData();
+                CardRequest cardRequest = mapper.treeToValue(data, CardRequest.class);
+                logger.info(cardRequest.toString());
+                ArrayNode response = service.treeView(cardRequest);
+                writer.println(mapper.writeValueAsString(Utils.responseFactory(response, event)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         else if (event.equals("card_access_list")) {
             JsonNode data = request.getData();
             List<Map> response = service.getItemAccessList(data.get("serialId").asText());
@@ -110,6 +124,28 @@ public class CardNetwork implements Network {
                 Boolean accessByCard = service.accessByCard(spaces, card_id);
                 writer.println(mapper.writeValueAsString(Utils.responseFactory(updateResponse && accessByCard, event)));
 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else if(event.equals("card_lost")) {
+            JsonNode data = request.getData();
+            try {
+                CardRequest cardRequest = mapper.treeToValue(data, CardRequest.class);
+                JsonNode newCard = service.lostCard(cardRequest);
+                writer.println(mapper.writeValueAsString(Utils.responseFactory(newCard, event)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else if(event.equals("card_activation")) {
+            JsonNode data = request.getData();
+            try {
+                JsonNode card = data.get("card");
+                Boolean action = data.get("action").asBoolean();
+                CardRequest cardRequest = mapper.treeToValue(card, CardRequest.class);
+                Boolean newCard = service.activeCard(cardRequest, action);
+                writer.println(mapper.writeValueAsString(Utils.responseFactory(newCard, event)));
             } catch (Exception e) {
                 e.printStackTrace();
             }

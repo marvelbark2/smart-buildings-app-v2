@@ -14,133 +14,164 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+
+
 public class MapCity implements Way {
-	private List<Map> buildings;
-	private List<Map> floors;
+	private List<Integer> bui_list=  new ArrayList<Integer>();
+	private List<Integer> floor_list=  new ArrayList<Integer>();
+	private List<String> state_list=  new ArrayList<String>();
+	private List<String> type_list=  new ArrayList<String>();
+	private List<Integer> nbwsp_list=  new ArrayList<Integer>();
+	private Integer nbwp= 0;
 	
 	public void begin(LocationMenu men) {
 		JPanel panelmap = men.getApp().getContext();
 		JPanel panm = new JPanel(new BorderLayout());
 		JPanel panm_north = new JPanel();
+		JPanel panm_center = new JPanel();
+		JLabel bld =new JLabel("Batiment : ");
+		JLabel flr =new JLabel("Etage : ");
+		JTextField build = new JTextField(10);
+		JTextField floor = new JTextField(10);
 		
-		// il me faut une requetes qui vont prendre la liste
-		//des bâtiments et la mettre dans un JComboBox et uen qui fait la même avec les étage
-		
-		
-		 
-		
-		String labelsbat[] = {/*liste des batiments*/};
-		String labelsfloors[] = {/*liste des étages*/};
-		
-		//JComboBox<String> comboBoxbat = new JComboBox<>(labelsbat);
-		//JComboBox<String> comboBoxfloors = new JComboBox<>(labelsfloors);
 		JButton validplace = new JButton("valider");
 		
 		
-		
-			buildings = getBuildingList();
-			JComboBox comboBuild= new JComboBox(new Vector(buildings));
-
-	        comboBuild.setRenderer(new DefaultListCellRenderer() {
-	            @Override
-	            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-	                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-	                if(value instanceof Map) {
-	                    setText(((Map) value).get("name").toString());
-	                }
-	                return this;
-	            }
-	        });
-	        
-	        
-	        floors = getFloorList();
-	        JComboBox comboFloor= new JComboBox(new Vector(floors));
-	        comboFloor.setRenderer(new DefaultListCellRenderer() {
-	            @Override
-	            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-	                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-	                if(value instanceof Map) {
-	                    setText(((Map) value).get("number").toString());
-	                }
-	                return this;
-	            }
-	        });
-	        
-
-	        panm_north.add(comboBuild);
-	        panm_north.add(comboFloor);
-		
-		//panm_north.add(comboBoxbat);
-		//panm_north.add(comboBoxfloors);
+		panm_north.add(bld);
+		panm_north.add(build);
+		panm_north.add(flr);		
+		panm_north.add(floor);
 		panm_north.add(validplace);
 		
-		panm.add(panm_north,BorderLayout.NORTH);
-		
-		//il me fait une requete qui récupère tous les workspace et les états de cette selection
-		//il me faut une requete qui recupere le nombre d'espace
-		int k =4;//nb de salle
-		
 		validplace.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					for (int i = 0; i<2;i++) {
-						for (int j = 0; j< k/*nb de salle*/;j++) {
-							int x = 1;
-							Box box = Box.createVerticalBox();
-							//on fait la requete pour recupérer les salles
-							String state = "";
-							if(state.equals("disponble")) {
-								box.setBorder(new LineBorder(Color.green));
-							}else {
-								box.setBorder(new LineBorder(Color.red));
+			public void actionPerformed(ActionEvent e) {
+				try {
+				if(build.getText().equals("")||floor.getText().equals("")) {
+					JOptionPane.showMessageDialog(new JPanel(), "Tous les champs ne sont pas bien renseignes", "Erreur", JOptionPane.ERROR_MESSAGE);
+				}else {
+				panm_center.removeAll();
+				bui_list.clear();
+				Integer bui = Integer.valueOf(build.getText());
+				//System.out.print(bui);
+				Integer floo = Integer.valueOf(floor.getText());
+				//System.out.print(floo);
+				
+				Request request = new Request();
+				request.setEvent("buildings_list");
+				Response response = Utils.sendRequest(request);
+		        List<Map> data =(List<Map>) response.getMessage();
+		        for(Map ex:data) {
+		        	bui_list.add(Integer.valueOf(ex.get("name").toString()));
+		        }
+		        //System.out.print(bui_list);
+		        
+		        if(bui_list.contains(bui)) {
+		        	floor_list.clear();
+		        	//System.out.print("cake");
+		        	
+		        	Request req = new Request();
+		            req.setEvent("floors_list");
+		            Map<String,Object> hmi = new HashMap<>();
+		     		hmi.put("building_name", bui);
+		     		req.setData(hmi);
+		            Response res = Utils.sendRequest(req);
+		            List<Map> dat =(List<Map>) res.getMessage();
+			        for(Map ex:dat) {
+			        	floor_list.add(Integer.valueOf(ex.get("number").toString()));
+			        }
+			        
+			       // System.out.print(floor_list);
+		           if(floor_list.contains(floo)) {
+		        	   
+		        	   Request request2 = new Request();
+		        	     request2.setEvent("numb_workspace");
+		        	     Map<String, Object> rnb = new HashMap<>();
+		        	     rnb.put("building_nb",bui);
+		        	     rnb.put("floor_nb",floo);
+		        	     request2.setData(rnb);
+		        	     Response response2 = Utils.sendRequest(request2);
+		        			List<Map> data2=(List<Map>) response2.getMessage();
+		        			for(Map ex:data2) {
+		        				int k = Integer.valueOf(ex.get("nb_wp").toString());
+		        				nbwp=k;
+		        			}
+		        	   
+		        			panm_center.setLayout(new GridLayout(nbwp/2, 1,20,20));
+		        			state_list.clear();
+		        			nbwsp_list.clear();
+		        			type_list.clear();
+		        			Request request3 = new Request();
+		        			request3.setEvent("wp_esp");
+		        			Map<String, Object> rwp = new HashMap<>();
+			        	     rwp.put("building_nb",bui);
+			        	     rwp.put("floor_nb",floo);
+			        	     request3.setData(rwp);
+			        	     Response response3 = Utils.sendRequest(request3);
+			        	     List<Map> data3=(List<Map>) response3.getMessage();
+			        			for(Map ex:data3) {
+			        				state_list.add(ex.get("state").toString());
+			        				nbwsp_list.add(Integer.valueOf(ex.get("numb").toString()));
+			        				type_list.add(ex.get("type").toString());
+			        			}
+			        	  
+			        	     
+		        			int x = 0;
+		        			for (int i = 0; i<1;i++) {
+								for (int j = 0; j< nbwp;j++) {
+									
+									Box box = Box.createVerticalBox();
+									//on fait la requete pour recupérer les salles
+									String state = state_list.get(x);
+									if(state.equals("disponible")) {
+										box.setBorder(new LineBorder(Color.green));
+										box.setBackground(Color.green);
+									}else {
+										box.setBorder(new LineBorder(Color.red));
+										box.setBackground(Color.red);
+									}
+									box.add(new JLabel("salle "+ nbwsp_list.get(x)+ " : "+ type_list.get(x)));
+									x++;
+									panm_center.add(box);
+								}
 							}
-							box.add(new JLabel("salle "+ x));
-							x++;
-						}
-					}
-				}
-		});
+		        			
+		        	   //System.out.print(nbwp);
+		        	   panm_center.invalidate();
+		        	      panm_center.validate();
+		        	      panm_center.repaint();
+		        	  
+		           } else {
+		        	   JOptionPane.showMessageDialog(new JPanel(), "les étages possibles pour le bâtiment "+ bui+" sont : "+ floor_list, "Erreur", JOptionPane.ERROR_MESSAGE);
+		           }
+		        	
+		        	
+		        	
+		        } else {
+		        	JOptionPane.showMessageDialog(new JPanel(), "les batiments possibles sont : "+ bui_list, "Erreur", JOptionPane.ERROR_MESSAGE);
+		        }
+				
+			}
+			}catch (NumberFormatException f) {
+				JOptionPane.showMessageDialog(new JPanel(), "Tous les champs ne sont pas bien renseignes, mauvais type", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+			}});
 		
-		panelmap.add(panm);
-		};
 		
-		private List<Map> getBuildingList() {
-		        Request req = new Request();
-		        req.setEvent("buildings_list");
-		        Response response = Utils.sendRequest(req);
-		        return  (List<Map>) response.getMessage();
-		    }
 		
-		private List<Map> getFloorList() {
-	        Request request = new Request();
-	        request.setEvent("floors_list");
-	        Map<String, Integer> hm = new HashMap<>();
-			hm.put("building_id", 2);
-			request.setData(hm);
-	        Response response = Utils.sendRequest(request);
-	        return  (List<Map>) response.getMessage();
-	    }
-		/*Request request = new Request();
-		request.setEvent("location_building_byid");
-
-
-		Map<String, Integer> hm = new HashMap<>();
-		hm.put("building_id", 2);
-		request.setData(hm);
-
-		Response response = Utils.sendRequest(request);
-
-		Map<String, Object>  data = (Map<String, Object>) response.getMessage();
-
-		JLabel name = new JLabel(data.get("name").toString());
-		JButton id = new JButton(data.get("id").toString());
-
-		panel.add(name);
-		panel.add(id);*/
+		panm.add(panm_center,BorderLayout.CENTER);
+        panm.add(panm_north,BorderLayout.NORTH);
+           
+   
+	panelmap.add(panm);
+		
 	}
-
-
+	
+}

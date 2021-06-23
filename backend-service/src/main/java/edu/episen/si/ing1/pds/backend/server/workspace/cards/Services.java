@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.shared;
+package edu.episen.si.ing1.pds.backend.server.workspace.cards;
 
 import java.sql.SQLException;
 import java.util.List;

@@ -1,11 +1,5 @@
 package edu.episen.si.ing1.pds.client.swing.cards.access;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import edu.episen.si.ing1.pds.client.network.Request;
-import edu.episen.si.ing1.pds.client.network.Response;
-import edu.episen.si.ing1.pds.client.network.SocketFacade;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.cards.Routes;
 import edu.episen.si.ing1.pds.client.swing.cards.card.CardRequests;
@@ -18,11 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -40,7 +29,7 @@ public class CardRoleTest implements Routes {
         JPanel cardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         cardPanel.setOpaque(true);
 
-        List<Map> users = CardRequests.fetchCarcardList();
+        List<Map> users = CardRequests.fetchCardList();
         JComboBox userList = new JComboBox(new Vector(users));
 
         userList.setRenderer(new DefaultListCellRenderer() {
@@ -175,6 +164,7 @@ public class CardRoleTest implements Routes {
                     comboBox.setPreferredSize(comboBox.getSize());
                     comboBox.setSelectedIndex(-1);
                     comboBox2.setEnabled(false);
+                    jButton.setEnabled(false);
                 }
             }
         });
@@ -222,14 +212,14 @@ public class CardRoleTest implements Routes {
         JPanel rejected = new JPanel(new BorderLayout());
         JLabel rejectLabel = new JLabel("Cet utilisateur n'a pas l'accès", SwingConstants.CENTER);
         rejectLabel.setForeground(Color.WHITE);
-        rejected.setBackground(Color.red);
+        rejected.setBackground(new Color(90, 38, 54));
         rejected.add(rejectLabel, BorderLayout.CENTER);
         responsePanel.add(rejected, "rejected");
 
         JPanel granted = new JPanel(new BorderLayout());
         JLabel grantedLabel = new JLabel("Cet utilisateur peut acceder", SwingConstants.CENTER);
-        grantedLabel.setForeground(Color.WHITE);
-        granted.setBackground(Color.GREEN);
+        granted.setBackground(new Color(3, 146, 26));
+        grantedLabel.setForeground(Color.white);
         granted.add(grantedLabel, BorderLayout.CENTER);
         responsePanel.add(granted, "granted");
 

@@ -5,6 +5,10 @@ import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersRe
 
 import java.time.LocalDate;
 
+/*
+* Class request's data received from client
+* deserialization class
+* */
 public class CardRequest {
     private String cardUId;
     private boolean expirable;

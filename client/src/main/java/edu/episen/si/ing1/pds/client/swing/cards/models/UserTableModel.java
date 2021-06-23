@@ -9,11 +9,12 @@ import javax.swing.table.AbstractTableModel;
 import java.util.List;
 import java.util.Map;
 
-public class UserTableModel extends AbstractTableModel {
+public class UserTableModel extends DataTable {
 
     private List<Map> userList;
 
     public UserTableModel() {
+        super();
         userList = UserRequests.all();
     }
 
@@ -44,16 +45,10 @@ public class UserTableModel extends AbstractTableModel {
     }
 
     public Boolean addData(Map data) {
-        Request request = new Request();
-        request.setEvent("user_insert");
-        request.setData(data);
-
-        Response response = Utils.sendRequest(request);
-        Boolean isInserted = (Boolean) response.getMessage();
-        return isInserted;
+        return UserRequests.insertUser(data);
     }
 
-    public List<Map> getUserList() {
+    public List<Map> getDataSource() {
         return userList;
     }
 }

@@ -62,8 +62,7 @@ public class CompanyFrame extends JPanel {
     private void addLogo(JPanel panel1) {
         JLabel label1 = new JLabel();
         label1.setFocusable(false);
-        Image icon = Toolkit.getDefaultToolkit().getImage(Thread.currentThread().getContextClassLoader().getResource("icon/logo.png"));
-        label1.setIcon(new ImageIcon(icon));
+        label1.setIcon(Utils.getImageIconFromResource("icon/logo.png"));
         label1.setBounds(55, 120, 200, 110);
         label1.setVisible(true);
         panel1.add(label1);

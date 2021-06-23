@@ -14,7 +14,9 @@ import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardReq
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.Map;
-
+/*
+* Class to handle Access network's requests
+* */
 public class AccessNetwork implements Network {
     private final ObjectMapper mapper = new ObjectMapper();
     private final PrintWriter writer;
@@ -30,6 +32,7 @@ public class AccessNetwork implements Network {
         String event = request.getEvent();
         service.setCompanyId(companyId);
 
+        // grabbing access list of buildings
         if(event.equals("access_building_list")) {
             ArrayNode list = service.buildingList();
             Map<String, Object> responseFormatter = Utils.responseFactory(list, event);
@@ -39,7 +42,9 @@ public class AccessNetwork implements Network {
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-        } else if(event.equals("access_floor_list")) {
+        }
+        // grabbing access list of floors
+        else if(event.equals("access_floor_list")) {
             JsonNode data = request.getData();
             int building_id = data.get("id_building").asInt();
             ArrayNode list = service.floorList(building_id);
@@ -50,7 +55,9 @@ public class AccessNetwork implements Network {
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-        } else if(event.equals("access_workspace_list")) {
+        }
+        // grabbing access list of workspaces
+        else if(event.equals("access_workspace_list")) {
             JsonNode data = request.getData();
             int floor_id = data.get("id_floor").asInt();
             ArrayNode list = service.workspaceList(floor_id);
@@ -61,7 +68,9 @@ public class AccessNetwork implements Network {
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-        } else if(event.equals("access_equipment_list")) {
+        }
+        // grabbing access list of equioments
+        else if(event.equals("access_equipment_list")) {
             JsonNode data = request.getData();
             int workspace_id = data.get("id_workspace").asInt();
             ArrayNode list = service.equipmentList(workspace_id);
@@ -72,7 +81,9 @@ public class AccessNetwork implements Network {
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-        } else if(event.equals("access_workspace_verify")) {
+        }
+        // Verify if card has access to specific workspace
+        else if(event.equals("access_workspace_verify")) {
             JsonNode data = request.getData();
             int workspace_id = data.get("id_workspace").asInt();
             JsonNode cardNode = data.get("card");
@@ -85,7 +96,9 @@ public class AccessNetwork implements Network {
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-        } else if(event.equals("access_equipment_verify")) {
+        }
+        // Verify if card has access to specific equipment
+        else if(event.equals("access_equipment_verify")) {
             JsonNode data = request.getData();
             int equipment_id = data.get("id_equipment").asInt();
             JsonNode cardNode = data.get("card");
