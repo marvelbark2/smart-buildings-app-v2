@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.backend.server.network.server;
 
+import edu.episen.si.ing1.pds.backend.server.network.exchange.SocketHandler;
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 
@@ -10,6 +11,7 @@ public final class ServerBuilder {
     protected boolean cacheThreadPool = false;
     protected int nbThread = 0;
     protected boolean testMode;
+    protected SocketHandler handler;
 
     protected ServerBuilder() {
     }
@@ -39,6 +41,11 @@ public final class ServerBuilder {
     }
     public ServerBuilder testMode(boolean testMode) {
         this.testMode = testMode;
+        return this;
+    }
+
+    public ServerBuilder setHandler(SocketHandler handler) {
+        this.handler = handler;
         return this;
     }
 

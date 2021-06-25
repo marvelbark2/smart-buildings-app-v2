@@ -1,11 +1,17 @@
 package edu.episen.si.ing1.pds.backend.server.network.server;
 
+import edu.episen.si.ing1.pds.backend.server.network.exchange.Receiver;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.Sender;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.SocketHandler;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.SocketParams;
+import edu.episen.si.ing1.pds.backend.server.pool.ConnectionPool;
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 import edu.episen.si.ing1.pds.backend.server.utils.Properties;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -29,15 +35,9 @@ public class Server {
         }
         if(builder.ds != 0) {
             DataSource ds = new DataSource(builder.ds, 100);
-            for (int i = 0; i < 6; i++) {
-                Connection connection = ds.getConnectionPool().getConnection();
-                String sql = "SELECT * FROM cards LIMIT 2";
-                Statement statement = connection.createStatement();
-                ResultSet rs = statement.executeQuery(sql);
-                while (rs.next()) {
-                    logger.info("first data {}", rs.getInt("cardid"));
-                }
-            }
+            SocketServer server = new SocketServer(builder.encrypted);
+            ExecutorService service = Properties.executor;
+            service.execute(new Executable(server, builder.handler));
             logger.info("Pool connections: {}", ds.poolSize());
         }
         logger.info("Builder {}", builder);
@@ -51,5 +51,24 @@ public class Server {
 
     public static ServerBuilder init() {
         return new ServerBuilder();
+    }
+
+    private class Executable implements Runnable {
+        private final SocketServer server;
+        private final SocketHandler handler;
+
+        public Executable(SocketServer server, SocketHandler handler){
+            this.server = server;
+            this.handler = handler;
+        }
+
+        @Override
+        public void run() {
+            try {
+                server.startServer(handler);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
     }
 }

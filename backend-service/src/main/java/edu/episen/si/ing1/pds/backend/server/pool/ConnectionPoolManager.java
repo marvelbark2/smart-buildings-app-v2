@@ -83,11 +83,23 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
         if (!shutdownPool) {
             try {
                 Future<ConnectionPool> future = executor.submit(() -> {
+                    int i = 0;
                     while (true) {
                         if (mountedConnection.size() != 0 && maxConnection >= currentConnection) {
                             ConnectionPool connectionPool = mountedConnection.poll(time, unit);
-                            if(connectionPool != null)
+                            if(connectionPool != null){
+                                i = 0;
                                 return getConnection(connectionPool);
+                            } else {
+                                return connectionFactory(true);
+                            }
+                        } else {
+                            if(i > 0) {
+                                return connectionFactory(true);
+                            } else {
+                                Thread.sleep(time);
+                                i++;
+                            }
                         }
                     }
                 });
@@ -187,12 +199,15 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
         public void run() {
             while (true) {
                 try {
-                    if (isReturned || !connection.isTmp() || connection.isClosed()) {
+                    if (isReturned && !connection.isTmp() && !connection.isClosed()) {
                         queue.put(connection);
+                        logger.info("Connection returned to pool  {}", connection);
                     } else {
                         connection.close();
+                        logger.info("Connection closed: {}", connection);
                     }
                     --currentConnection;
+                    logger.info("Recalcul pool size {}, size fun : {}", mountedConnection.size(), queue.size());
                     break;
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
