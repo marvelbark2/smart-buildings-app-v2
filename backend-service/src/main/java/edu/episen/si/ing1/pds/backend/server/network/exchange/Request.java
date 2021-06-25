@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.backend.server.network;
+package edu.episen.si.ing1.pds.backend.server.network.exchange;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

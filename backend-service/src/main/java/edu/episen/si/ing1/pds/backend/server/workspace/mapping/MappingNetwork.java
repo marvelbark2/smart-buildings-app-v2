@@ -3,8 +3,9 @@ package edu.episen.si.ing1.pds.backend.server.workspace.mapping;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.episen.si.ing1.pds.backend.server.network.Request;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
+import edu.episen.si.ing1.pds.backend.server.utils.aes.AESUtils;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -210,7 +211,7 @@ public class MappingNetwork {
                 }
                 Map responseMsg=Utils.responseFactory(response, event);
                 String serializedMsgString=mapper.writeValueAsString(responseMsg);
-                writer.println(serializedMsgString);
+                writer.println(AESUtils.encrypt(serializedMsgString));
 
             } catch (Exception e ){
                 e.printStackTrace();

@@ -7,16 +7,16 @@ public class DataSource {
     private BlockingPool pool;
     private long time;
 
-    public DataSource(int n, long time) {
-        pool = PoolFactory.Instance.newPool(n);
+    public DataSource(int n, int max, long time) {
+        pool = PoolFactory.Instance.newPool(n, max);
         this.time = time;
     }
-    public DataSource(int n) {
-        pool = PoolFactory.Instance.newPool(n);
+    public DataSource(int n, int max) {
+        pool = PoolFactory.Instance.newPool(n, max);
         this.time = 1_000;
     }
 
-    public Connection getConnection() {
+    public ConnectionPool getConnectionPool() {
         return pool.getConnection(time, TimeUnit.MILLISECONDS);
     }
 
@@ -24,7 +24,7 @@ public class DataSource {
         pool.shutdown();
     }
 
-    public void release(Connection connection) {
+    public void release(ConnectionPool connection) {
         pool.release(connection);
     }
 

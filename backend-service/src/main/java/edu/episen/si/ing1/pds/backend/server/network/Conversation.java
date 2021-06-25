@@ -2,7 +2,9 @@ package edu.episen.si.ing1.pds.backend.server.network;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.episen.si.ing1.pds.backend.server.network.exchange.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
+import edu.episen.si.ing1.pds.backend.server.utils.aes.AESUtils;
 import edu.episen.si.ing1.pds.backend.server.workspace.Bootstrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +62,8 @@ public class Conversation implements Runnable {
             String request;
             while ((request = reader.readLine()) != null && active) {
                 // deserialization
-                Request requestObj = mapper.readValue(request, Request.class);
+                String decryptedRequest = AESUtils.decrypt(request);
+                Request requestObj = mapper.readValue(decryptedRequest, Request.class);
                 logger.info(request);
                 logger.info(requestObj.toString());
                 logger.info("Request ID: {}",requestObj.getRequestId());
@@ -69,7 +72,7 @@ public class Conversation implements Runnable {
 
                 Map<String, Object> endResponse = Utils.responseFactory("end", "end");
                 String createMessage = mapper.writeValueAsString(endResponse);
-                writer.println(createMessage);
+                writer.println(AESUtils.encrypt(createMessage));
             }
 
             socket.close();
@@ -100,12 +103,12 @@ public class Conversation implements Runnable {
             String error = sWriter.toString();
 
             message.put("message", "Server Error: " + error);;
-            String errprMessage = mapper.writeValueAsString(message);
-            writer.println(errprMessage);
+            String errorMessage = mapper.writeValueAsString(message);
+            writer.println(AESUtils.encrypt(errorMessage));
             stringVar.close();
             writer.close();
             socket.close();
-        } catch (IOException ioException) {
+        } catch (Exception ioException) {
             logger.error(ioException.getMessage(), ioException);
         }
     }

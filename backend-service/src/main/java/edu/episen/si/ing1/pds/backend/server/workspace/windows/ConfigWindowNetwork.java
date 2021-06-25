@@ -1,4 +1,5 @@
-package edu.episen.si.ing1.pds.backend.server.workspace.ConfigFenetre;
+package edu.episen.si.ing1.pds.backend.server.workspace.windows;
+
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +15,6 @@ import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 
 
 public class ConfigWindowNetwork {
-
     private String id;
 
     public ConfigWindowNetwork(Request request, Connection connection, PrintWriter writer) throws Exception {
@@ -91,6 +91,4 @@ public class ConfigWindowNetwork {
         }
 
     }
-
-
 }

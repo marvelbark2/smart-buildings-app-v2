@@ -1,6 +1,9 @@
 package edu.episen.si.ing1.pds.backend.server.pool;
 
 import edu.episen.si.ing1.pds.backend.server.pool.config.DBConfig;
+import edu.episen.si.ing1.pds.backend.server.utils.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,25 +11,29 @@ import java.sql.SQLException;
 import java.util.concurrent.*;
 
 public class ConnectionPoolManager extends AbstractPool implements BlockingPool {
-
-    private BlockingQueue<Connection> mountedConnection;
-    private ExecutorService executor = Executors.newCachedThreadPool();
+    private final Logger logger = LoggerFactory.getLogger(ConnectionPoolManager.class.getName());
+    private final ExecutorService executor = Properties.executor;
+    private BlockingQueue<ConnectionPool> mountedConnection;
     private volatile boolean shutdownPool;
     private boolean isReturned = true;
+    private int maxConnection;
+    private int currentConnection = 0;
 
     public ConnectionPoolManager() {
         shutdownPool = false;
     }
 
-    public void init(int nPool) {
+    public void init(int nPool, int maxConnection) {
+        this.maxConnection = maxConnection;
         mountedConnection = new LinkedBlockingQueue<>(nPool);
         for (int i = 0; i < nPool; i++) {
-            Connection connection = connectionFactory();
+            ConnectionPool connection = connectionFactory(false);
             mountedConnection.add(connection);
         }
+        logger.info("Pool connections : {}", mountedConnection.size());
     }
 
-    private Connection connectionFactory() {
+    private ConnectionPool connectionFactory(Boolean tmp) {
         Connection connection = null;
         DBConfig config = DBConfig.Instance;
         String url = config.HOST;
@@ -34,48 +41,78 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
         String pass = config.PASS;
         try {
             connection = DriverManager.getConnection(url, user, pass);
+            ++currentConnection;
         } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
             Thread.currentThread().interrupt();
         }
-        return connection;
+
+        return new ConnectionPool(connection, tmp);
     }
 
     @Override
-    protected void handleInvalidReturn(Connection con) {
+    protected void handleInvalidReturn(ConnectionPool con) {
         throw new IllegalStateException("Error! Cannot put this Connection: " + con + " to the pool");
     }
 
     @Override
-    protected void returnToPool(Connection connection) {
+    protected void returnToPool(ConnectionPool connection) {
         if (isValid(connection))
             executor.submit(new ObjectReturner(mountedConnection, connection));
     }
 
     @Override
-    protected boolean isValid(Connection connection) {
-        boolean status = false;
+    protected boolean isValid(ConnectionPool connection) {
         try {
-            status = (!(connection == null || connection.isClosed()));
+            if (connection == null || connection.isClosed())
+                return false;
+            else {
+                Connection con = connection.getConnection();
+                if(con == null) {
+                    return  false;
+                } else return !con.isClosed();
+            }
         } catch (SQLException throwables) {
             Thread.currentThread().interrupt();
+            return false;
         }
-        return status;
     }
 
     @Override
-    public Connection getConnection(long time, TimeUnit unit) {
+    public ConnectionPool getConnection(long time, TimeUnit unit) {
         if (!shutdownPool) {
-            Connection connection = null;
             try {
-                connection = mountedConnection.poll(time, unit);
-                if (!isValid(connection)) connection = connectionFactory();
-            } catch (InterruptedException ie) {
+                Future<ConnectionPool> future = executor.submit(() -> {
+                    while (true) {
+                        if (mountedConnection.size() != 0 && maxConnection >= currentConnection) {
+                            ConnectionPool connectionPool = mountedConnection.poll(time, unit);
+                            if(connectionPool != null)
+                                return getConnection(connectionPool);
+                        }
+                    }
+                });
+                while (true) {
+                    if(future.isDone()) {
+                         return future.get();
+                    }
+                }
+            } catch (Exception ie) {
+                logger.error(ie.getLocalizedMessage(), ie);
                 Thread.currentThread().interrupt();
+                return null;
             }
-            return connection;
+
         } else {
             throw new IllegalStateException("Pool is shutdown");
         }
+    }
+
+    private ConnectionPool getConnection(ConnectionPool connectionPool) {
+        if (!isValid(connectionPool)) {
+            mountedConnection.remove(connectionPool);
+            connectionPool = connectionFactory(false);
+        }
+        return connectionPool;
     }
 
     @Override
@@ -88,9 +125,24 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
         if (!shutdownPool) {
             Connection connection = null;
             try {
-                connection = mountedConnection.take();
-                if (!isValid(connection)) connection = connectionFactory();
-            } catch (InterruptedException ie) {
+                Future<ConnectionPool> future = executor.submit(() -> {
+                    while (true) {
+                        if (mountedConnection.size() != 0) {
+                            ConnectionPool connectionPool = mountedConnection.take();
+                            return getConnection(connectionPool);
+                        } else {
+                            mountedConnection.wait(1000);
+                        }
+                    }
+                });
+                while (true) {
+                    if(future.isDone()) {
+                        //TODO: Update it to be integrable in pool system
+                        connection = future.get().getConnection();
+                        break;
+                    }
+                }
+            } catch (Exception ie) {
                 Thread.currentThread().interrupt();
             }
             return connection;
@@ -112,21 +164,21 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
     }
 
     private void closeConnections() {
-        mountedConnection.stream()
+        mountedConnection
                 .forEach(connection -> {
                     try {
                         connection.close();
-                    } catch (SQLException throwables) {
-                        throwables.printStackTrace();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
                     }
                 });
     }
 
     private class ObjectReturner implements Runnable {
-        private BlockingQueue<Connection> queue;
-        private Connection connection;
+        private final BlockingQueue<ConnectionPool> queue;
+        private final ConnectionPool connection;
 
-        ObjectReturner(BlockingQueue<Connection> queue, Connection connection) {
+        ObjectReturner(BlockingQueue<ConnectionPool> queue, ConnectionPool connection) {
             this.queue = queue;
             this.connection = connection;
         }
@@ -135,11 +187,14 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
         public void run() {
             while (true) {
                 try {
-                    if(isReturned) {
-                        mountedConnection.put(connection);
+                    if (isReturned || !connection.isTmp() || connection.isClosed()) {
+                        queue.put(connection);
+                    } else {
+                        connection.close();
                     }
+                    --currentConnection;
                     break;
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     Thread.currentThread().interrupt();
                 }
 

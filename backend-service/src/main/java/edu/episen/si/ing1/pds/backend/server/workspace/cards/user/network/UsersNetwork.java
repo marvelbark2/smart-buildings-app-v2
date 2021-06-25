@@ -5,8 +5,9 @@ import com.fasterxml.jackson.datatype.jsr310.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import edu.episen.si.ing1.pds.backend.server.network.Request;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
+import edu.episen.si.ing1.pds.backend.server.utils.aes.AESUtils;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.Network;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.models.UsersResponse;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.user.services.IUsersService;
@@ -40,8 +41,8 @@ public class UsersNetwork implements Network {
                 Map<String, Object> usersCollection = Utils.responseFactory(service.findAll(), "user_list");
                 String collectionSerialized = mapper.writeValueAsString(usersCollection);
                 logger.info("Receiving user_list request");
-                writer.println(collectionSerialized);
-            } catch (JsonProcessingException e) {
+                writer.println(AESUtils.encrypt(collectionSerialized));
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

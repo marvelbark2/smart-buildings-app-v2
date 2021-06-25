@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.backend.server.network;
+package edu.episen.si.ing1.pds.backend.server.network.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,14 +9,12 @@ import java.io.File;
 
 public enum SocketConfig {
     Instance;
-    int PORT;
+    public int PORT;
 
     SocketConfig() {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        File reader = Utils.getFileContent("SMARTBUILDCONFIG");
         try {
-            JsonNode jsonNode = mapper.readTree(reader).get("socket");
-
+            JsonNode configNode = Utils.getConfigNode();
+            JsonNode jsonNode = configNode.get("socket");
             PORT = jsonNode.get("port").asInt();
         } catch (Exception e) {
             e.printStackTrace();

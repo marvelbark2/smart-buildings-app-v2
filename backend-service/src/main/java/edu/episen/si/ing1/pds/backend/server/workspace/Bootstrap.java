@@ -1,8 +1,9 @@
 package edu.episen.si.ing1.pds.backend.server.workspace;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.episen.si.ing1.pds.backend.server.network.Request;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
+import edu.episen.si.ing1.pds.backend.server.utils.aes.AESUtils;
 import edu.episen.si.ing1.pds.backend.server.workspace.ConfigFenetre.ConfigWindowNetwork;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.Network;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.access.network.AccessNetwork;
@@ -33,7 +34,7 @@ public class Bootstrap {
             }
             Map responseMsg = Utils.responseFactory(response, request.getEvent());
             String serializedMsgString = mapper.writeValueAsString(responseMsg);
-            writer.println(serializedMsgString);
+            writer.println(AESUtils.encrypt(serializedMsgString));
         }
         Network cardNetwork = new CardNetwork(connection, writer);
         cardNetwork.execute(request);

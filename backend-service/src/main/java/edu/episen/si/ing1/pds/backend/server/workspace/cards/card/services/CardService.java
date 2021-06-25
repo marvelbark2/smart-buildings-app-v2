@@ -348,20 +348,23 @@ public class CardService implements ICardService<CardRequest, CardsResponse> {
             for (JsonNode floor: floors) {
                 ArrayNode workspaces = service.workspaceList(floor.get("floor_id").asInt());
                 int i = 0;
-                for (JsonNode workspace: workspaces) {
-                    Boolean accessible = service.hasAccessToWorkspace(request, workspace.get("workspace_id").asInt());
-                    ArrayNode equipments = service.equipmentList(workspace.get("workspace_id").asInt());
-                    if(equipments.size() > 0) {
-                        for (JsonNode equipment: equipments) {
-                            Boolean accessibleEqui = service.hasAccessToEquipment(request, equipment.get("equipment_id").asInt());
-                            ((ObjectNode) equipment).put("accessible", accessibleEqui);
+                if(workspaces.size() > 0) {
+                    for (Iterator<JsonNode> it = workspaces.iterator(); it.hasNext();) {
+                        JsonNode workspace = it.next();
+                        Boolean accessible = service.hasAccessToWorkspace(request, workspace.get("workspace_id").asInt());
+                        ArrayNode equipments = service.equipmentList(workspace.get("workspace_id").asInt());
+                        if(equipments.size() > 0) {
+                            for (JsonNode equipment: equipments) {
+                                Boolean accessibleEqui = service.hasAccessToEquipment(request, equipment.get("equipment_id").asInt());
+                                ((ObjectNode) equipment).put("accessible", accessibleEqui);
+                            }
                         }
+                        ((ObjectNode) workspace).put("accessible", accessible);
+                        ((ObjectNode) workspace).put("equipments", equipments);
+                        //workspaces.remove(i);
+                       // workspaces.add(workspace);
+                        ++i;
                     }
-                    ((ObjectNode) workspace).put("accessible", accessible);
-                    ((ObjectNode) workspace).put("equipments", equipments);
-                    workspaces.remove(i);
-                    workspaces.add(workspace);
-                    ++i;
                 }
 
                 ((ObjectNode) floor).put("workspaces", workspaces);

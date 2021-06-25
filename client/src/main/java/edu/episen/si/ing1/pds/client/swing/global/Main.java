@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.client.swing.global;
 
+import edu.episen.si.ing1.pds.client.swing.ConfigFenetre.EntryPoint;
 import edu.episen.si.ing1.pds.client.swing.cards.ContextFrame;
 import edu.episen.si.ing1.pds.client.swing.global.shared.Ui;
 import edu.episen.si.ing1.pds.client.swing.location.LocationMenu;
@@ -171,7 +172,7 @@ public class Main implements MouseListener {
 
         JLabel windows = new MenuItem("Configurer les fenêtres");
         windows.addMouseListener(this);
-        frames.put(windows, null);
+        frames.put(windows, new EntryPoint(this));
 
 
         menu.add(location);

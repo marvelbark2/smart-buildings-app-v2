@@ -35,7 +35,6 @@ public class BackendService {
 
         logger.info("Backend Service has been started");
 
-        DBConfig.Instance.setEnv(itestMode);
         PoolFactory.Instance.setNotReturnable(!iNotReturnable);
 
         Server serverSocket = new Server(iMaxConnection);

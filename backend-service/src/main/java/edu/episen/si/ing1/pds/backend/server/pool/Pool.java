@@ -4,13 +4,13 @@ import java.sql.Connection;
 
 public interface Pool {
     //Init pool
-    void init(int nPool);
+    void init(int nPool, int maxConnection);
 
     // Asking for connection object if pool is empty wait until it will has a connection
     Connection getConnection();
 
     // Return pbject to the pool
-    void release(Connection connection);
+    void release(ConnectionPool connection);
 
     // Is connections returnable to pool
     void isReturnedTo(Boolean v);

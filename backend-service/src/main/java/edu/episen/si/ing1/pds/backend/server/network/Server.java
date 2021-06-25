@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.backend.server.network;
 
+import edu.episen.si.ing1.pds.backend.server.network.config.SocketConfig;
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 import edu.episen.si.ing1.pds.backend.server.pool.PoolFactory;
 
@@ -22,7 +23,7 @@ public class Server {
     private ServerSocket serverSocket;
 
     public Server(int nPool) {
-    	ds = new DataSource(nPool);
+    	ds = new DataSource(nPool, 100);
     }
 
     public void serve() {
@@ -38,7 +39,7 @@ public class Server {
 
                 ds.returnable(PoolFactory.Instance.isNotReturnable());
 
-                Connection connection = ds.getConnection();
+                Connection connection = ds.getConnectionPool().getConnection();
 
                 if(ds.poolSize() == 0) {
                     logger.info("Pool is Empty !");
@@ -46,7 +47,7 @@ public class Server {
                 conversation.setConnection(connection);
 
                 executor.execute(conversation);
-                ds.release(connection);
+                ds.release(null);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

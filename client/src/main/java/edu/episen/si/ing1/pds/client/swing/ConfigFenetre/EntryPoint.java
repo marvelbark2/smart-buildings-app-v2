@@ -1,4 +1,6 @@
 package edu.episen.si.ing1.pds.client.swing.ConfigFenetre;
+
+import edu.episen.si.ing1.pds.client.swing.ConfigFenetre.dialogs.WindowPicker;
 import edu.episen.si.ing1.pds.client.swing.cards.access.AccessRequests;
 import edu.episen.si.ing1.pds.client.swing.global.Main;
 import edu.episen.si.ing1.pds.client.swing.global.Navigate;
@@ -15,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-public class EntryPoint implements Navigate  {
-
+public class EntryPoint implements Navigate {
     private final Logger logger = LoggerFactory.getLogger(EntryPoint.class.getName());
     private final Main app;
     private JButton okBtn;
@@ -157,5 +158,3 @@ public class EntryPoint implements Navigate  {
             }
     }
 }
-
-

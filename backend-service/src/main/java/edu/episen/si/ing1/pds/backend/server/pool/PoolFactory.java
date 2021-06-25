@@ -9,8 +9,8 @@ public enum PoolFactory {
         pool = new ConnectionPoolManager();
     }
 
-    BlockingPool newPool(int n) {
-        pool.init(n);
+    BlockingPool newPool(int n, int maxConnection) {
+        pool.init(n, maxConnection);
         return pool;
     }
     public boolean isNotReturnable() {

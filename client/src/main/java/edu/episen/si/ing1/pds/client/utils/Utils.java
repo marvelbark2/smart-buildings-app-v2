@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.episen.si.ing1.pds.client.network.Request;
 import edu.episen.si.ing1.pds.client.network.Response;
 import edu.episen.si.ing1.pds.client.network.SocketFacade;
+import edu.episen.si.ing1.pds.client.utils.aes.AESUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,6 +23,7 @@ import java.util.Timer;
 * */
 
 public class Utils {
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class.getName());
 
     private static int companyId;
     private static boolean guestPage = true;
@@ -130,11 +134,13 @@ public class Utils {
             writer = new PrintWriter(socket.getOutputStream(), true);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String requestSerialized = mapper.writeValueAsString(request);
-            writer.println(requestSerialized);
+            String encryptedRequest = AESUtils.encrypt(requestSerialized);
+            writer.println(encryptedRequest);
             while (true) {
-                String req = reader.readLine();
-                if(req == null)
-                    break;
+                String reqEncrypted = reader.readLine();
+                logger.info("Receiving encrypted from server : {}", reqEncrypted);
+                String req = AESUtils.decrypt(reqEncrypted);
+                logger.info("Receiving decrypted from server : {}", req);
                 Response res = mapper.readValue(req, Response.class);
                 if(res.getEvent().equals("end"))
                     break;
