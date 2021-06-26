@@ -3,10 +3,13 @@ package edu.episen.si.ing1.pds.backend.server.network.exchange;
 import edu.episen.si.ing1.pds.backend.server.network.server.SocketServer;
 
 import java.nio.channels.SelectionKey;
+import java.sql.Connection;
 
 public class SocketParams {
     private final SelectionKey key;
     private boolean encrypted;
+    private boolean closed = false;
+    private static Connection connection;
 
     public SocketParams(SelectionKey key, boolean encrypted) {
         this.key = key;
@@ -30,11 +33,28 @@ public class SocketParams {
         this.encrypted = encrypted;
     }
 
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public static Connection getConnection() {
+        return connection;
+    }
+
+    public static void setConnection(Connection connection) {
+        SocketParams.connection = connection;
+    }
+
     @Override
     public String toString() {
         return "SocketParams{" +
                 "key=" + key +
                 ", encrypted=" + encrypted +
+                ", closed=" + closed +
                 '}';
     }
 }

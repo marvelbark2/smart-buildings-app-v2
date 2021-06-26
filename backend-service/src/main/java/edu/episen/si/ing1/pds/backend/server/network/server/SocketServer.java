@@ -2,6 +2,7 @@ package edu.episen.si.ing1.pds.backend.server.network.server;
 
 import edu.episen.si.ing1.pds.backend.server.network.config.SocketConfig;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.*;
+import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -21,6 +22,7 @@ public class SocketServer {
     private Selector selector;
     private InetSocketAddress listenAddress;
     private final boolean encrypted;
+    private DataSource ds;
 
     public SocketServer(boolean encrypted) throws IOException {
         InetAddress address = InetAddress.getByName("127.0.0.1");
@@ -40,8 +42,6 @@ public class SocketServer {
 
         System.out.println("Server started...");
 
-        CountDownLatch latch = new CountDownLatch(1);
-
         while (true) {
             // wait for events
             this.selector.select();
@@ -49,12 +49,12 @@ public class SocketServer {
             Iterator keys = this.selector.selectedKeys().iterator();
             while (keys.hasNext()) {
                 SelectionKey key = (SelectionKey) keys.next();
-
+                System.out.println("keys: " + key);
                 if (key.isAcceptable()) {
                     this.accept(key);
                     System.out.println("Accepted");
                 }
-                else if (key.isReadable() || key.isWritable()) {
+                else if (key.isValid()) {
                     System.out.println("Ready for use");
                     SocketParams params = new SocketParams(key, encrypted);
                     System.out.println(params);
@@ -62,8 +62,15 @@ public class SocketServer {
                     Sender sender = new Sender(params);
 
                     SocketExchange exchange = new SocketExchange(receiver, sender);
+                    exchange.setClosed(params.isClosed());
                     handler.handle(exchange);
-                }
+                    if(!params.isClosed())
+                        sender.println("end\n");
+                    else {
+                        System.out.println("Disconnected");
+                    }
+                } else if(!key.isValid())
+                    System.out.println("user disconnected");
                 keys.remove();
             }
         }
@@ -77,7 +84,12 @@ public class SocketServer {
         Socket socket = channel.socket();
         SocketAddress remoteAddr = socket.getRemoteSocketAddress();
         System.out.println("Connected to: " + remoteAddr);
+        SocketParams.setConnection(ds.getConnectionPool().getConnection());
         channel.register(this.selector, SelectionKey.OP_READ);
+    }
+
+    public void setDataSource(DataSource ds) {
+        this.ds = ds;
     }
 }
 

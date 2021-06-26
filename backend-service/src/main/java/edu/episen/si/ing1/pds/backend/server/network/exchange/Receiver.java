@@ -18,27 +18,33 @@ public class Receiver {
 
     public String nextLine() throws Exception {
         SelectionKey key = params.getKey();
-        SocketChannel channel = (SocketChannel) key.channel();
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
-        int numRead = -1;
-        numRead = channel.read(buffer);
+        if(key.isReadable()) {
+            SocketChannel channel = (SocketChannel) key.channel();
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            int numRead = -1;
+            numRead = channel.read(buffer);
 
-        if (numRead == -1) {
-            Socket socket = channel.socket();
-            SocketAddress remoteAddr = socket.getRemoteSocketAddress();
-            System.out.println("Connection closed by client: " + remoteAddr);
-            channel.close();
-            key.cancel();
-            throw new RuntimeException("Error key is not valid to read");
+            if (numRead == -1) {
+                Socket socket = channel.socket();
+                SocketAddress remoteAddr = socket.getRemoteSocketAddress();
+                System.out.println("Connection closed by client: " + remoteAddr);
+                channel.close();
+                key.cancel();
+                params.setClosed(true);
+                return null;
+            }
+
+            byte[] data = new byte[numRead];
+            System.arraycopy(buffer.array(), 0, data, 0, numRead);
+            boolean encrypted = params.isEncrypted();
+            String received = new String(data);
+            if(!encrypted)
+                return  received;
+            else
+                return AESUtils.decrypt(received);
+        } else {
+            return null;
         }
 
-        byte[] data = new byte[numRead];
-        System.arraycopy(buffer.array(), 0, data, 0, numRead);
-        boolean encrypted = params.isEncrypted();
-        String received = new String(data);
-        if(!encrypted)
-            return  received;
-        else
-            return AESUtils.decrypt(received);
     }
 }

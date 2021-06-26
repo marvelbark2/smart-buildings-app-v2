@@ -36,16 +36,13 @@ public class Server {
         if(builder.ds != 0) {
             DataSource ds = new DataSource(builder.ds, 100);
             SocketServer server = new SocketServer(builder.encrypted);
+            server.setDataSource(ds);
             ExecutorService service = Properties.executor;
             service.execute(new Executable(server, builder.handler));
             logger.info("Pool connections: {}", ds.poolSize());
         }
         logger.info("Builder {}", builder);
 
-
-    }
-
-    private void serve() {
 
     }
 

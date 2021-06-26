@@ -12,7 +12,7 @@ import java.util.concurrent.*;
 
 public class ConnectionPoolManager extends AbstractPool implements BlockingPool {
     private final Logger logger = LoggerFactory.getLogger(ConnectionPoolManager.class.getName());
-    private final ExecutorService executor = Properties.executor;
+    private final ExecutorService executor = Executors.newCachedThreadPool();
     private BlockingQueue<ConnectionPool> mountedConnection;
     private volatile boolean shutdownPool;
     private boolean isReturned = true;

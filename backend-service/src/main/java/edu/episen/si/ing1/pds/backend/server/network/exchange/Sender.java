@@ -16,15 +16,16 @@ public class Sender {
     }
 
     public void println(String msg) throws Exception {
-        boolean encrypted = params.isEncrypted();
-        if(encrypted)
-            msg = AESUtils.encrypt(msg);
-
-        System.out.println("msg to be sent: " + msg);
-        SelectionKey key = params.getKey();
-        SocketChannel channel = (SocketChannel) key.channel();
-        ByteBuffer buffer = ByteBuffer.wrap(msg.getBytes());
-        channel.write(buffer);
-        buffer.clear();
+        if(msg != null) {
+            boolean encrypted = params.isEncrypted();
+            if(encrypted)
+                msg = AESUtils.encrypt(msg);
+            SelectionKey key = params.getKey();
+            System.out.println("msg to be sent: " + msg);
+            SocketChannel channel = (SocketChannel) key.channel();
+            ByteBuffer buffer = ByteBuffer.wrap(msg.getBytes());
+            channel.write(buffer);
+            buffer.clear();
+        }
     }
 }

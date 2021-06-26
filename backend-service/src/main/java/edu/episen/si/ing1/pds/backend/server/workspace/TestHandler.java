@@ -4,6 +4,9 @@ import edu.episen.si.ing1.pds.backend.server.network.exchange.Receiver;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.Sender;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.SocketExchange;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.SocketHandler;
+import edu.episen.si.ing1.pds.backend.server.test.models.Companies;
+
+import java.util.List;
 
 public class TestHandler implements SocketHandler {
     @Override
@@ -12,8 +15,13 @@ public class TestHandler implements SocketHandler {
         Sender writer = exchange.getSender();
 
         String msg = reader.nextLine();
-        System.out.println("msg received is " + msg);
-
-        writer.println("received :" + msg);
+        if(msg != null) {
+            System.out.println("receiving: " + msg);
+            Companies user = new Companies();
+            List<Companies> list = user.all();
+            System.out.println(list);
+            writer.println("list: " + list);
+        }
+        System.out.println(exchange);
     }
 }
