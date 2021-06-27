@@ -1,6 +1,4 @@
-package edu.episen.si.ing1.pds.backend.server.network.exchange;
-
-import edu.episen.si.ing1.pds.backend.server.network.server.SocketServer;
+package edu.episen.si.ing1.pds.backend.server.network.exchange.socket;
 
 import java.nio.channels.SelectionKey;
 import java.sql.Connection;

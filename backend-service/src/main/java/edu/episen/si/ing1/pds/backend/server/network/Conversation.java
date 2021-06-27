@@ -2,7 +2,7 @@ package edu.episen.si.ing1.pds.backend.server.network;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.episen.si.ing1.pds.backend.server.network.exchange.Request;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.models.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import edu.episen.si.ing1.pds.backend.server.utils.aes.AESUtils;
 import edu.episen.si.ing1.pds.backend.server.workspace.Bootstrap;

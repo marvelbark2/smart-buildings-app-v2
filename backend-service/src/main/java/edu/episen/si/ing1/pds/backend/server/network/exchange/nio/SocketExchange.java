@@ -1,4 +1,7 @@
-package edu.episen.si.ing1.pds.backend.server.network.exchange;
+package edu.episen.si.ing1.pds.backend.server.network.exchange.nio;
+
+import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Receiver;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Sender;
 
 public class SocketExchange {
     private final Receiver receiver;

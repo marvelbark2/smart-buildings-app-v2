@@ -1,21 +1,12 @@
 package edu.episen.si.ing1.pds.backend.server.network.server;
 
-import edu.episen.si.ing1.pds.backend.server.network.exchange.Receiver;
-import edu.episen.si.ing1.pds.backend.server.network.exchange.Sender;
-import edu.episen.si.ing1.pds.backend.server.network.exchange.SocketHandler;
-import edu.episen.si.ing1.pds.backend.server.network.exchange.SocketParams;
-import edu.episen.si.ing1.pds.backend.server.pool.ConnectionPool;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketHandler;
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 import edu.episen.si.ing1.pds.backend.server.utils.Properties;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

@@ -1,8 +1,6 @@
 package edu.episen.si.ing1.pds.backend.server.network.server;
 
-import edu.episen.si.ing1.pds.backend.server.network.exchange.SocketHandler;
-import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
-import edu.episen.si.ing1.pds.backend.server.utils.Utils;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketHandler;
 
 public final class ServerBuilder {
     protected int ds;

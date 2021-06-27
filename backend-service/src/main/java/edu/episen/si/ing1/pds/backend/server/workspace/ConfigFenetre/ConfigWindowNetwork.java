@@ -9,7 +9,7 @@ import java.util.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.episen.si.ing1.pds.backend.server.network.exchange.Request;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.models.Request;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 
 

@@ -1,12 +1,11 @@
-package edu.episen.si.ing1.pds.backend.server.network.exchange;
+package edu.episen.si.ing1.pds.backend.server.network.exchange.nio;
 
+import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketParams;
 import edu.episen.si.ing1.pds.backend.server.utils.aes.AESUtils;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
 
 public class Sender {
     private final SocketParams params;

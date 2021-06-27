@@ -1,7 +1,11 @@
 package edu.episen.si.ing1.pds.backend.server.network.server;
 
 import edu.episen.si.ing1.pds.backend.server.network.config.SocketConfig;
-import edu.episen.si.ing1.pds.backend.server.network.exchange.*;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Receiver;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Sender;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.SocketExchange;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketHandler;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketParams;
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 
 import java.io.IOException;
@@ -9,14 +13,11 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 
 public class SocketServer {
     private Selector selector;
@@ -52,12 +53,10 @@ public class SocketServer {
                 System.out.println("keys: " + key);
                 if (key.isAcceptable()) {
                     this.accept(key);
-                    System.out.println("Accepted");
-                }
-                else if (key.isValid()) {
+                    // new ciient !!
                     System.out.println("Ready for use");
                     SocketParams params = new SocketParams(key, encrypted);
-                    System.out.println(params);
+                    System.out.println(params.hashCode());
                     Receiver receiver = new Receiver(params);
                     Sender sender = new Sender(params);
 

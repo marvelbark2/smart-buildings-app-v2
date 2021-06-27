@@ -1,23 +1,14 @@
 package edu.episen.si.ing1.pds.backend.server.orm.eloquent;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.episen.si.ing1.pds.backend.server.network.exchange.SocketParams;
 import edu.episen.si.ing1.pds.backend.server.orm.builder.Builder;
-import edu.episen.si.ing1.pds.backend.server.orm.builder.DbColumn;
 import edu.episen.si.ing1.pds.backend.server.orm.builder.DbTable;
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
-import edu.episen.si.ing1.pds.backend.server.test.models.Companies;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,13 +16,12 @@ import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@JsonDeserialize(as= Companies.class)
 public class Models implements Serializable {
     private String tableName;
     private String primaryKey = "id";
     private final ObjectMapper mapper = Utils.jsonMapper;
 
-    public final  <T extends Models> List<T> all() throws SQLException, ClassNotFoundException, JsonProcessingException {
+    public final  <T extends Models> List<T> all() throws SQLException, ClassNotFoundException {
         final List<T> alll = new LinkedList<>();
         DbTable sqlTable = new DbTable(this.tableName != null ? this.tableName : this.getClass().getSimpleName().toLowerCase(Locale.ROOT));
         List<String> fields = Arrays.stream(this.getClass().getDeclaredFields()).map(Field::getName).collect(Collectors.toList());
@@ -53,8 +43,7 @@ public class Models implements Serializable {
                 else System.out.println("out of bound");
             }
             System.out.println(lhm);
-            String json = mapper.writeValueAsString(lhm);
-            T t = mapper.readValue(json, new TypeReference<T>() {});
+            T t = (T) mapper.convertValue(lhm, this.getClass());
             alll.add(t);
         }
 
