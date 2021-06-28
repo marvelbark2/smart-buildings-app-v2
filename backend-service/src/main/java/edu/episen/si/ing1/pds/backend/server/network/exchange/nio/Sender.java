@@ -16,6 +16,7 @@ public class Sender {
 
     public void println(String msg) throws Exception {
         if(msg != null) {
+            msg += "\n";
             boolean encrypted = params.isEncrypted();
             if(encrypted)
                 msg = AESUtils.encrypt(msg);

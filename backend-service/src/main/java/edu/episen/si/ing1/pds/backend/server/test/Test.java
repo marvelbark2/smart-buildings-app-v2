@@ -38,10 +38,10 @@ public class Test {
         logger.info("SQL query3: {}", sqlInsert);
         Properties.executor = Executors.newCachedThreadPool();
 
-        Companies c = new Companies();
+       /* Companies c = new Companies();
         List<Companies> l = c.all();
         logger.info("list: {}", l);
-
+*/
         Server.init()
                 .testMode(false)
                 .setConfigVar("toto")

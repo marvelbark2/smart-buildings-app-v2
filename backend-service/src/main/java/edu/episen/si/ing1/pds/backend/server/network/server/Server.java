@@ -28,8 +28,7 @@ public class Server {
             DataSource ds = new DataSource(builder.ds, 100);
             SocketServer server = new SocketServer(builder.encrypted);
             server.setDataSource(ds);
-            ExecutorService service = Properties.executor;
-            service.execute(new Executable(server, builder.handler));
+            server.startServer(builder.handler);
             logger.info("Pool connections: {}", ds.poolSize());
         }
         logger.info("Builder {}", builder);

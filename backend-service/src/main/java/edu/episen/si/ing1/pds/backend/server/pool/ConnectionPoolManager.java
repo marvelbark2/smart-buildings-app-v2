@@ -24,6 +24,7 @@ public class ConnectionPoolManager extends AbstractPool implements BlockingPool 
     }
 
     public void init(int nPool, int maxConnection) {
+        logger.info("Pool Init...ted");
         this.maxConnection = maxConnection;
         mountedConnection = new LinkedBlockingQueue<>(nPool);
         for (int i = 0; i < nPool; i++) {

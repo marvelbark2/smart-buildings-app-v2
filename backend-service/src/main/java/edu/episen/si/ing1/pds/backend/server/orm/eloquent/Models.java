@@ -2,6 +2,7 @@ package edu.episen.si.ing1.pds.backend.server.orm.eloquent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketParams;
 import edu.episen.si.ing1.pds.backend.server.orm.builder.Builder;
 import edu.episen.si.ing1.pds.backend.server.orm.builder.DbTable;
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
@@ -26,7 +27,8 @@ public class Models implements Serializable {
         DbTable sqlTable = new DbTable(this.tableName != null ? this.tableName : this.getClass().getSimpleName().toLowerCase(Locale.ROOT));
         List<String> fields = Arrays.stream(this.getClass().getDeclaredFields()).map(Field::getName).collect(Collectors.toList());
         String sql = Builder.selectBuilder().from(sqlTable).build();
-        Connection connection = new DataSource(6, 10).getConnectionPool().getConnection();
+        Connection connection = SocketParams.getConnection();
+        System.out.println("Con :" + connection);
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery(sql);
         while (rs.next()) {
@@ -34,15 +36,12 @@ public class Models implements Serializable {
 
             for (String col: fields) {
                 int i = rs.findColumn(col);
-                System.out.println(i);
                 Class clzz = Class.forName(rs.getMetaData().getColumnClassName(i));
                 if(clzz == Integer.class)
                     lhm.put(col, rs.getInt(i));
                 else if(clzz == String.class)
                     lhm.put(col, rs.getString(i));
-                else System.out.println("out of bound");
             }
-            System.out.println(lhm);
             T t = (T) mapper.convertValue(lhm, this.getClass());
             alll.add(t);
         }
