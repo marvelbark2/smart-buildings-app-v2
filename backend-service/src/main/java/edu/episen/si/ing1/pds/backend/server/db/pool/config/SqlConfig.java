@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.backend.server.pool.config;
+package edu.episen.si.ing1.pds.backend.server.db.pool.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;

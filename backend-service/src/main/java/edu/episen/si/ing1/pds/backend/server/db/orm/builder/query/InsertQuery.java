@@ -1,12 +1,9 @@
-package edu.episen.si.ing1.pds.backend.server.orm.builder.query;
+package edu.episen.si.ing1.pds.backend.server.db.orm.builder.query;
 
-import edu.episen.si.ing1.pds.backend.server.orm.builder.DbColumn;
-import edu.episen.si.ing1.pds.backend.server.orm.builder.DbTable;
+import edu.episen.si.ing1.pds.backend.server.db.orm.builder.DbColumn;
+import edu.episen.si.ing1.pds.backend.server.db.orm.builder.DbTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class InsertQuery {
     private final Logger logger = LoggerFactory.getLogger(InsertQuery.class.getName());

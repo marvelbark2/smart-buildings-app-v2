@@ -1,11 +1,13 @@
-package edu.episen.si.ing1.pds.backend.server.orm.eloquent;
+package edu.episen.si.ing1.pds.backend.server.db.orm.eloquent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.episen.si.ing1.pds.backend.server.db.orm.eloquent.collection.CollectionModel;
+import edu.episen.si.ing1.pds.backend.server.db.orm.eloquent.collection.ICollectionModel;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketParams;
-import edu.episen.si.ing1.pds.backend.server.orm.builder.Builder;
-import edu.episen.si.ing1.pds.backend.server.orm.builder.DbTable;
-import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.db.orm.builder.Builder;
+import edu.episen.si.ing1.pds.backend.server.db.orm.builder.DbTable;
+import edu.episen.si.ing1.pds.backend.server.db.pool.DataSource;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 
 import java.io.Serializable;
@@ -21,8 +23,13 @@ public class Models implements Serializable {
     private String tableName;
     private String primaryKey = "id";
     private final ObjectMapper mapper = Utils.jsonMapper;
+    private static Class<? extends Models> currentModel;
 
-    public final  <T extends Models> List<T> all() throws SQLException, ClassNotFoundException {
+    public static void setCurrentModel(Class<? extends Models> model) {
+        currentModel = model;
+    }
+
+    public final  <T extends Models> CollectionModel<T> all() throws SQLException, ClassNotFoundException {
         final List<T> alll = new LinkedList<>();
         DbTable sqlTable = new DbTable(this.tableName != null ? this.tableName : this.getClass().getSimpleName().toLowerCase(Locale.ROOT));
         List<String> fields = Arrays.stream(this.getClass().getDeclaredFields()).map(Field::getName).collect(Collectors.toList());
@@ -46,8 +53,14 @@ public class Models implements Serializable {
             alll.add(t);
         }
 
-        return alll;
+        return new ICollectionModel<>(alll);
     }
+
+    public static String getNameTOTO() {
+        String className = currentModel.getName();
+        return className;
+    }
+
 
     private final String json() {
         try {
@@ -60,5 +73,10 @@ public class Models implements Serializable {
     @Override
     public String toString() {
         return this.json();
+    }
+
+    public <T extends Models> Map<Object, T> map() {
+        Map<Object, T> hm = new HashMap<>();
+        return mapper.convertValue(this,  hm.getClass());
     }
 }

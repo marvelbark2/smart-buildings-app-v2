@@ -3,17 +3,14 @@ package edu.episen.si.ing1.pds.backend.server.test;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.routes.CallBack;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.routes.RouteService;
 import edu.episen.si.ing1.pds.backend.server.network.server.Server;
-import edu.episen.si.ing1.pds.backend.server.orm.builder.Builder;
-import edu.episen.si.ing1.pds.backend.server.orm.builder.DbColumn;
-import edu.episen.si.ing1.pds.backend.server.orm.builder.DbTable;
+import edu.episen.si.ing1.pds.backend.server.db.orm.builder.Builder;
+import edu.episen.si.ing1.pds.backend.server.db.orm.builder.DbColumn;
+import edu.episen.si.ing1.pds.backend.server.db.orm.builder.DbTable;
 import edu.episen.si.ing1.pds.backend.server.test.models.Companies;
-import edu.episen.si.ing1.pds.backend.server.test.models.Users;
 import edu.episen.si.ing1.pds.backend.server.utils.Properties;
-import edu.episen.si.ing1.pds.backend.server.workspace.TestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.Executors;
 
 public class Test {
@@ -40,6 +37,8 @@ public class Test {
         logger.info("SQL query3: {}", sqlInsert);
         Properties.executor = Executors.newCachedThreadPool();
 
+
+
         RouteService.INSTANCE.get("/tot/me", new CallBack() {
             @Override
             public Object callBack() {
@@ -58,44 +57,27 @@ public class Test {
                 return "toto";
             }
         });
-        RouteService.INSTANCE.get("/tot/:to", new CallBack() {
-            @Override
-            public Object callBack(Object... t) {
-                return  t[0];
-            }
-        });
+        RouteService.INSTANCE.get("/tot/:me", CompanyController.class, "index");
         RouteService.INSTANCE.get("/bre/me/:mo", new CallBack() {
             @Override
             public Object callBack(Object... t) {
                 return t[0];
             }
         });
-
        /* Companies c = new Companies();
         List<Companies> l = c.all();
         logger.info("list: {}", l);
-*/
+        */
+        Class.forName(Companies.class.getName());
+        System.out.println(Companies.getNameTOTO());
         Server.init()
                 .testMode(false)
                 .setConfigVar("toto")
                 .setEncrypted(false)
                 .setDs(6)
-                .setHandler(new TestHandler())
+               // .setHandler(new TestHandler())
                 .thread(true)
                 .serve();
         Properties.executor.shutdownNow().forEach(System.out::println);
-
-        /*/
-
-        Server.init()
-                .testMode(false)
-                .setConfigVar("toto")
-                .setEncrypted(false)
-                .setDs(6)
-                .setHandler(new TestHandler())
-                .thread(true)
-                .serve();
-        Properties.executor.shutdownNow().forEach(System.out::println);
-         */
     }
 }

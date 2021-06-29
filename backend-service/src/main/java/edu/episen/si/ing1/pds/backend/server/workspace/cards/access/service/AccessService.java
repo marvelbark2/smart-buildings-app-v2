@@ -2,7 +2,7 @@ package edu.episen.si.ing1.pds.backend.server.workspace.cards.access.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
+import edu.episen.si.ing1.pds.backend.server.db.pool.config.SqlConfig;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardRequest;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.models.CardsResponse;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.card.services.CardService;

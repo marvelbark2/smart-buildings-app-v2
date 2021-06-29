@@ -1,7 +1,6 @@
-package edu.episen.si.ing1.pds.backend.server.pool;
+package edu.episen.si.ing1.pds.backend.server.db.pool;
 
-import edu.episen.si.ing1.pds.backend.server.pool.config.DBConfig;
-import edu.episen.si.ing1.pds.backend.server.utils.Properties;
+import edu.episen.si.ing1.pds.backend.server.db.pool.config.DBConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

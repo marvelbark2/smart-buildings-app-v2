@@ -1,6 +1,6 @@
 package edu.episen.si.ing1.pds.backend.server.utils;
 
-import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.db.pool.DataSource;
 
 import java.util.concurrent.ExecutorService;
 

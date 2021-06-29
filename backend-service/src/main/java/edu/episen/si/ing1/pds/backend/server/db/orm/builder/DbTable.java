@@ -1,8 +1,6 @@
-package edu.episen.si.ing1.pds.backend.server.orm.builder;
+package edu.episen.si.ing1.pds.backend.server.db.orm.builder;
 
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 public class DbTable {

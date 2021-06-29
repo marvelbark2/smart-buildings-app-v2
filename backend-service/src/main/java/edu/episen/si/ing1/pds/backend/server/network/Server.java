@@ -1,8 +1,8 @@
 package edu.episen.si.ing1.pds.backend.server.network;
 
 import edu.episen.si.ing1.pds.backend.server.network.config.SocketConfig;
-import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
-import edu.episen.si.ing1.pds.backend.server.pool.PoolFactory;
+import edu.episen.si.ing1.pds.backend.server.db.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.db.pool.PoolFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

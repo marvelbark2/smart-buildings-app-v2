@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.episen.si.ing1.pds.backend.server.pool.config.SqlConfig;
+import edu.episen.si.ing1.pds.backend.server.db.pool.config.SqlConfig;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.models.Role;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.models.RoleRequest;
 import edu.episen.si.ing1.pds.backend.server.workspace.cards.role.models.RoleResponse;

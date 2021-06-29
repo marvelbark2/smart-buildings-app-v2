@@ -1,4 +1,4 @@
-package edu.episen.si.ing1.pds.backend.server.orm.builder;
+package edu.episen.si.ing1.pds.backend.server.db.orm.builder;
 
 import java.sql.Types;
 

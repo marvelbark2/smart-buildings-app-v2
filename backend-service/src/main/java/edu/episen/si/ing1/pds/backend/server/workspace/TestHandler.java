@@ -1,5 +1,6 @@
 package edu.episen.si.ing1.pds.backend.server.workspace;
 
+import edu.episen.si.ing1.pds.backend.server.db.orm.eloquent.collection.CollectionModel;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Receiver;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Sender;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.SocketExchange;
@@ -23,7 +24,7 @@ public class TestHandler implements SocketHandler {
         logger.info(exchange.getRequest().getHeader().getParam().toString());
         logger.info(exchange.getRequest().getHeader().getQuery().toString());
         Companies user = new Companies();
-        List<Companies> list = user.all();
+        CollectionModel<Companies> list = user.all();
         writer.println("hashcode: " + SocketParams.getConnection().hashCode());
         System.out.println(exchange);
     }

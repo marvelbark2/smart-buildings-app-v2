@@ -1,13 +1,13 @@
 package edu.episen.si.ing1.pds.backend.server.network.server;
 
+import edu.episen.si.ing1.pds.backend.server.network.exchange.handler.BaseHandler;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketHandler;
-import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.db.pool.DataSource;
 import edu.episen.si.ing1.pds.backend.server.utils.Properties;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
@@ -28,7 +28,10 @@ public class Server {
             DataSource ds = new DataSource(builder.ds, 100);
             SocketServer server = new SocketServer(builder.encrypted);
             server.setDataSource(ds);
-            server.startServer(builder.handler);
+            if(builder.handler != null)
+                server.startServer(builder.handler);
+            else
+                server.startServer(new BaseHandler());
             logger.info("Pool connections: {}", ds.poolSize());
         }
         logger.info("Builder {}", builder);

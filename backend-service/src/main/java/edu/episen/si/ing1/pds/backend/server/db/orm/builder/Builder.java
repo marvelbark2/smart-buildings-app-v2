@@ -1,7 +1,7 @@
-package edu.episen.si.ing1.pds.backend.server.orm.builder;
+package edu.episen.si.ing1.pds.backend.server.db.orm.builder;
 
-import edu.episen.si.ing1.pds.backend.server.orm.builder.query.InsertQuery;
-import edu.episen.si.ing1.pds.backend.server.orm.builder.query.SelectQuery;
+import edu.episen.si.ing1.pds.backend.server.db.orm.builder.query.InsertQuery;
+import edu.episen.si.ing1.pds.backend.server.db.orm.builder.query.SelectQuery;
 
 public class Builder {
     private DbTable table;

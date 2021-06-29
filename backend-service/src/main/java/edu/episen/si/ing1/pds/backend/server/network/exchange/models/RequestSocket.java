@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class RequestSocket {
     private String requestId;
     private RequestHeader header;
+    private Object callBack;
     private JsonNode body;
 
     public String getRequestId() {
@@ -29,6 +30,14 @@ public class RequestSocket {
 
     public void setBody(JsonNode body) {
         this.body = body;
+    }
+
+    public Object getCallBack() {
+        return callBack;
+    }
+
+    public void setCallBack(Object callBack) {
+        this.callBack = callBack;
     }
 
     @Override

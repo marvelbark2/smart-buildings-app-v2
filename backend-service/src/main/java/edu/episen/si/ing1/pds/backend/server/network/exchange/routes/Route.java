@@ -1,5 +1,7 @@
 package edu.episen.si.ing1.pds.backend.server.network.exchange.routes;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,6 +72,15 @@ public class Route {
                 return cb.callBack(cb.callBack(param.values().toArray()));
             } else {
                 return cb.callBack();
+            }
+        } else if(callback instanceof Method) {
+            try {
+                Method method = (Method) callback;
+                Class<?> clzz = Class.forName(method.getDeclaringClass().getName());
+                return method.invoke(clzz.newInstance(), null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
             }
         }
         return callback;

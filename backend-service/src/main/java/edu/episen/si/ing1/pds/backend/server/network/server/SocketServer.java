@@ -2,7 +2,6 @@ package edu.episen.si.ing1.pds.backend.server.network.server;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import edu.episen.si.ing1.pds.backend.server.network.config.SocketConfig;
-import edu.episen.si.ing1.pds.backend.server.network.exchange.models.Request;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.models.RequestHeader;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.models.RequestSocket;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Receiver;
@@ -12,8 +11,8 @@ import edu.episen.si.ing1.pds.backend.server.network.exchange.routes.Route;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.routes.RouteService;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketHandler;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketParams;
-import edu.episen.si.ing1.pds.backend.server.pool.ConnectionPool;
-import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
+import edu.episen.si.ing1.pds.backend.server.db.pool.ConnectionPool;
+import edu.episen.si.ing1.pds.backend.server.db.pool.DataSource;
 import edu.episen.si.ing1.pds.backend.server.utils.Properties;
 import edu.episen.si.ing1.pds.backend.server.utils.Utils;
 import org.slf4j.Logger;
@@ -80,15 +79,18 @@ public class SocketServer {
                                String path = request.get("path").asText();
                                Route route = RouteService.INSTANCE.findRoute(path);
                                if(route != null) {
+                                   SocketChannel client = (SocketChannel) key.channel();
+                                   ConnectionPool cp = cpk.get(client.hashCode());
+                                   SocketParams.setConnection(cp.getConnection());
+
                                    RequestHeader header = new RequestHeader(path,route);
                                    RequestSocket requestSocket = new RequestSocket();
                                    requestSocket.setBody(request.get("body"));
                                    requestSocket.setHeader(header);
                                    requestSocket.setRequestId(request.get("request_id").asText());
+                                   requestSocket.setCallBack(route.getCallback());
 
-                                   SocketChannel client = (SocketChannel) key.channel();
-                                   ConnectionPool cp = cpk.get(client.hashCode());
-                                   SocketParams.setConnection(cp.getConnection());
+
                                    Sender sender = new Sender(params);
 
                                    SocketExchange exchange = new SocketExchange(requestSocket, sender);
