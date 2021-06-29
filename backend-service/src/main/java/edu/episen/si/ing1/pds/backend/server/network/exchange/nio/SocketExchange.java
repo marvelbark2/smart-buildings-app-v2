@@ -1,20 +1,21 @@
 package edu.episen.si.ing1.pds.backend.server.network.exchange.nio;
 
+import edu.episen.si.ing1.pds.backend.server.network.exchange.models.RequestSocket;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Receiver;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Sender;
 
 public class SocketExchange {
-    private final Receiver receiver;
+    private final RequestSocket request;
     private final Sender sender;
     private boolean closed;
 
-    public SocketExchange(Receiver receiver, Sender sender) {
-        this.receiver = receiver;
+    public SocketExchange(RequestSocket receiver, Sender sender) {
+        this.request = receiver;
         this.sender = sender;
     }
 
-    public Receiver getReceiver() {
-        return receiver;
+    public RequestSocket getRequest() {
+        return request;
     }
 
     public Sender getSender() {
@@ -32,7 +33,7 @@ public class SocketExchange {
     @Override
     public String toString() {
         return "SocketExchange{" +
-                "receiver=" + receiver +
+                "receiver=" + request +
                 ", sender=" + sender +
                 ", closed=" + closed +
                 '}';

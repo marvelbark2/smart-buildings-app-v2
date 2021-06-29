@@ -16,17 +16,15 @@ public class TestHandler implements SocketHandler {
 
     @Override
     public void handle(SocketExchange exchange) throws Exception {
-        Receiver reader = exchange.getReceiver();
         Sender writer = exchange.getSender();
 
         logger.info("Here in Handler");
 
-        String msg = reader.nextLine();
-        if(msg != null) {
-            Companies user = new Companies();
-            List<Companies> list = user.all();
-            writer.println("hashcode: " + SocketParams.getConnection().hashCode());
-        }
+        logger.info(exchange.getRequest().getHeader().getParam().toString());
+        logger.info(exchange.getRequest().getHeader().getQuery().toString());
+        Companies user = new Companies();
+        List<Companies> list = user.all();
+        writer.println("hashcode: " + SocketParams.getConnection().hashCode());
         System.out.println(exchange);
     }
 }

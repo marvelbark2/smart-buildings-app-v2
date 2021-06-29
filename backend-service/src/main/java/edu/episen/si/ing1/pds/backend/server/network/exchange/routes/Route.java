@@ -10,6 +10,7 @@ public class Route {
     private final boolean containParams;
     private final SocketMethod method;
     private final Map<String, String> param = new HashMap<>();
+    private final Map<String, String> query = new HashMap<>();
 
     public Route(String route, Object callback, SocketMethod method) {
         this.route = route;
@@ -25,6 +26,22 @@ public class Route {
             return true;
         } else {
             if(containParams) {
+                if(path.contains("?")) {
+                    System.out.println(path);
+                    String[] pQuery = path.split("\\?");
+                    path = pQuery[0];
+                    String queryURL = pQuery [1];
+                    if(queryURL.contains("&")) {
+                        String[] args = queryURL.split("&");
+                        for (String arg: args) {
+                            String[] argSplit = arg.split("=");
+                            query.put(argSplit[0], argSplit[1]);
+                        }
+                    } else {
+                        String[] arg = queryURL.split("=");
+                        query.put(arg[0], arg[1]);
+                    }
+                }
                 String[] pathSplit = path.split("/");
                 if(pathSplit.length == arcRoute.size()) {
                     for (int i = 0; i < pathSplit.length; i++) {
@@ -40,6 +57,7 @@ public class Route {
                 }
             } else {
                 param.clear();
+                query.clear();
             }
             return false;
         }
@@ -59,5 +77,13 @@ public class Route {
 
     public Map<String, String> getParam() {
         return param;
+    }
+
+    public Map<String, String> getQuery() {
+        return query;
+    }
+
+    public SocketMethod getMethod() {
+        return method;
     }
 }

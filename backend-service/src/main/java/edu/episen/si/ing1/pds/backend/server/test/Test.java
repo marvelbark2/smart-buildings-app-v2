@@ -1,5 +1,7 @@
 package edu.episen.si.ing1.pds.backend.server.test;
 
+import edu.episen.si.ing1.pds.backend.server.network.exchange.routes.CallBack;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.routes.RouteService;
 import edu.episen.si.ing1.pds.backend.server.network.server.Server;
 import edu.episen.si.ing1.pds.backend.server.orm.builder.Builder;
 import edu.episen.si.ing1.pds.backend.server.orm.builder.DbColumn;
@@ -37,6 +39,37 @@ public class Test {
         String sqlInsert = Builder.insertBuilder().into(t).build();
         logger.info("SQL query3: {}", sqlInsert);
         Properties.executor = Executors.newCachedThreadPool();
+
+        RouteService.INSTANCE.get("/tot/me", new CallBack() {
+            @Override
+            public Object callBack() {
+                return "toto";
+            }
+        });
+        RouteService.INSTANCE.get("/yo/me", new CallBack() {
+            @Override
+            public Object callBack() {
+                return "toto";
+            }
+        });
+        RouteService.INSTANCE.get("/mon/me", new CallBack() {
+            @Override
+            public Object callBack() {
+                return "toto";
+            }
+        });
+        RouteService.INSTANCE.get("/tot/:to", new CallBack() {
+            @Override
+            public Object callBack(Object... t) {
+                return  t[0];
+            }
+        });
+        RouteService.INSTANCE.get("/bre/me/:mo", new CallBack() {
+            @Override
+            public Object callBack(Object... t) {
+                return t[0];
+            }
+        });
 
        /* Companies c = new Companies();
         List<Companies> l = c.all();

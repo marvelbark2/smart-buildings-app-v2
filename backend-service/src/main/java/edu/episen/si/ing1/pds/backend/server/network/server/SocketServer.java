@@ -1,14 +1,23 @@
 package edu.episen.si.ing1.pds.backend.server.network.server;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import edu.episen.si.ing1.pds.backend.server.network.config.SocketConfig;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.models.Request;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.models.RequestHeader;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.models.RequestSocket;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Receiver;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.Sender;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.nio.SocketExchange;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.routes.Route;
+import edu.episen.si.ing1.pds.backend.server.network.exchange.routes.RouteService;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketHandler;
 import edu.episen.si.ing1.pds.backend.server.network.exchange.socket.SocketParams;
 import edu.episen.si.ing1.pds.backend.server.pool.ConnectionPool;
 import edu.episen.si.ing1.pds.backend.server.pool.DataSource;
 import edu.episen.si.ing1.pds.backend.server.utils.Properties;
+import edu.episen.si.ing1.pds.backend.server.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -23,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SocketServer {
+    private final Logger logger = LoggerFactory.getLogger(SocketServer.class.getName());
     private Selector selector;
     private final InetSocketAddress listenAddress;
     private final boolean encrypted;
@@ -61,20 +71,34 @@ public class SocketServer {
                        } else if(key.isValid()) {
                            System.out.println("Ready for use");
                            SocketParams params = new SocketParams(key, encrypted);
-                           SocketChannel client = (SocketChannel) key.channel();
 
-                           ConnectionPool cp = cpk.get(client.hashCode());
-
-                           SocketParams.setConnection(cp.getConnection());
                            Receiver receiver = new Receiver(params);
-                           Sender sender = new Sender(params);
+                           String msg = receiver.nextLine();
+                           if(msg != null) {
+                               JsonNode request = Utils.jsonMapper.readTree(msg);
 
-                           SocketExchange exchange = new SocketExchange(receiver, sender);
-                           exchange.setClosed(params.isClosed());
-                           handler.handle(exchange);
-                           if(!params.isClosed())
-                               sender.println("end");
-                           else {
+                               String path = request.get("path").asText();
+                               Route route = RouteService.INSTANCE.findRoute(path);
+                               if(route != null) {
+                                   RequestHeader header = new RequestHeader(path,route);
+                                   RequestSocket requestSocket = new RequestSocket();
+                                   requestSocket.setBody(request.get("body"));
+                                   requestSocket.setHeader(header);
+                                   requestSocket.setRequestId(request.get("request_id").asText());
+
+                                   SocketChannel client = (SocketChannel) key.channel();
+                                   ConnectionPool cp = cpk.get(client.hashCode());
+                                   SocketParams.setConnection(cp.getConnection());
+                                   Sender sender = new Sender(params);
+
+                                   SocketExchange exchange = new SocketExchange(requestSocket, sender);
+                                   exchange.setClosed(params.isClosed());
+                                   handler.handle(exchange);
+                               } else {
+                                    logger.warn("Not found");
+                               }
+
+                           } else {
                                System.out.println("Disconnected");
                            }
                        }else if(!key.isValid())
